@@ -11,6 +11,7 @@ import StyledWrapper from './StyledWrapper';
 import RunnerTags from './RunnerTags/index';
 import RunConfigurationPanel from './RunConfigurationPanel';
 import Button from 'ui/Button/index';
+import { useTranslation } from 'react-i18next';
 
 const getDisplayName = (fullPath, pathname, name = '') => {
   const relativePath = path.relative(fullPath, pathname);
@@ -76,6 +77,7 @@ const FilterButton = ({ label, count, active, onClick }) => (
 );
 
 export default function RunnerResults({ collection }) {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [selectedItem, setSelectedItem] = useState(null);
   const [delay, setDelay] = useState(null);
@@ -252,9 +254,9 @@ export default function RunnerResults({ collection }) {
             {isCollectionLoading ? <div className="my-1 danger">Requests in this collection are still loading.</div> : null}
 
             {/* Timings */}
-            <div className="runner-section-title mt-6">Timings</div>
+            <div className="runner-section-title mt-6">{t('RUNNER.DELAY', 'Delay')}</div>
             <div className="runner-section mt-2">
-              <label>Delay between requests (ms)</label>
+              <label>{t('RUNNER.DELAY', 'Delay between requests (ms)')}</label>
               <input
                 type="number"
                 className="block textbox w-full mt-2"
@@ -283,11 +285,11 @@ export default function RunnerResults({ collection }) {
                 disabled={selectedRequestItems.length === 0 || isCollectionLoading}
                 onClick={runCollection}
               >
-                Run {selectedRequestItems.length} Request{selectedRequestItems.length !== 1 ? 's' : ''}
+                {t('RUNNER.RUN', 'Run')} {selectedRequestItems.length} {t('REQUEST.REQUESTS', 'Requests')}
               </Button>
 
               <Button type="button" variant="ghost" onClick={resetRunner}>
-                Reset
+                {t('COMMON.RESET', 'Reset')}
               </Button>
             </div>
           </div>
@@ -336,7 +338,7 @@ export default function RunnerResults({ collection }) {
               color="danger"
               data-testid="runner-cancel-button"
             >
-              Cancel Execution
+              {t('COMMON.CANCEL', 'Cancel Execution')}
             </Button>
           </div>
         ) : runnerInfo.status === 'ended' ? (
@@ -348,7 +350,7 @@ export default function RunnerResults({ collection }) {
               variant="filled"
               color="secondary"
             >
-              Run Again
+              {t('RUNNER.RUN_AGAIN', 'Run Again')}
             </Button>
             <Button
               type="button"
@@ -357,7 +359,7 @@ export default function RunnerResults({ collection }) {
               variant="filled"
               color="secondary"
             >
-              Reset
+              {t('COMMON.RESET', 'Reset')}
             </Button>
           </div>
         ) : null}

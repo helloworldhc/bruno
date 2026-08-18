@@ -28,6 +28,7 @@ import { setEnvVarSearchQuery, setEnvVarSearchExpanded } from 'providers/ReduxSt
 import { validateName, validateNameError } from 'utils/common/regex';
 import toast from 'react-hot-toast';
 import classnames from 'classnames';
+import { useTranslation } from 'react-i18next';
 
 const EMPTY_ARRAY = [];
 
@@ -41,6 +42,7 @@ const EnvironmentList = ({
   collection,
   setShowExportModal
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);
   const activeEnvTab = useSelector((state) => state.tabs.tabs.find((t) => t.uid === activeTabUid)?.tabState?.environment?.tab) || 'variables';
@@ -524,13 +526,13 @@ const EnvironmentList = ({
     return (
       <div className="empty-state">
         <IconFileAlert size={48} strokeWidth={1.5} />
-        <div className="title">No Environments</div>
+        <div className="title">{t('ENVIRONMENTS.NO_ENVIRONMENT', 'No Environments')}</div>
         <div className="actions">
           <Button size="sm" color="secondary" onClick={() => handleCreateEnvClick()}>
-            Create Environment
+            {t('ENVIRONMENTS.ADD_ENVIRONMENT', 'Create Environment')}
           </Button>
           <Button size="sm" color="secondary" onClick={() => handleImportClick()}>
-            Import Environment
+            {t('IMPORT_COLLECTION.TITLE', 'Import Environment')}
           </Button>
         </div>
       </div>
@@ -554,7 +556,7 @@ const EnvironmentList = ({
 
           <div className="sections-container">
             <CollapsibleSection
-              title="Environments"
+              title={t('ENVIRONMENTS.ENVIRONMENTS', 'Environments')}
               expanded={environmentsExpanded}
               onToggle={() => setEnvironmentsExpanded(!environmentsExpanded)}
               actions={(
@@ -566,7 +568,7 @@ const EnvironmentList = ({
                       if (!environmentsExpanded) setEnvironmentsExpanded(true);
                       handleCreateEnvClick();
                     }}
-                    title="Create environment"
+                    title={t('ENVIRONMENTS.ADD_ENVIRONMENT', 'Create environment')}
                   >
                     <IconPlus size={14} strokeWidth={1.5} />
                   </button>
@@ -577,7 +579,7 @@ const EnvironmentList = ({
                       if (!environmentsExpanded) setEnvironmentsExpanded(true);
                       handleImportClick();
                     }}
-                    title="Import environment"
+                    title={t('IMPORT_COLLECTION.TITLE', 'Import environment')}
                   >
                     <IconDownload size={14} strokeWidth={1.5} />
                   </button>
@@ -588,7 +590,7 @@ const EnvironmentList = ({
                       if (!environmentsExpanded) setEnvironmentsExpanded(true);
                       handleExportClick();
                     }}
-                    title="Export environment"
+                    title={t('COMMON.EXPORT', 'Export environment')}
                   >
                     <IconUpload size={14} strokeWidth={1.5} />
                   </button>

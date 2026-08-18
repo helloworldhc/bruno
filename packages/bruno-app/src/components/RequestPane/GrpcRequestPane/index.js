@@ -16,8 +16,10 @@ import StyledWrapper from './StyledWrapper';
 import TabBarAiAssist from '../TabBarAiAssist';
 import { hasEffectiveAuth } from 'utils/auth';
 import { AUTH_MODES_GRPC } from 'utils/common/constants';
+import { useTranslation } from 'react-i18next';
 
 const GrpcRequestPane = ({ item, collection, handleRun }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);
@@ -84,26 +86,26 @@ const GrpcRequestPane = ({ item, collection, handleRun }) => {
     return [
       {
         key: 'body',
-        label: 'Message',
+        label: t('REQUEST.BODY', 'Message'),
         indicator: getMessageIndicator()
       },
       {
         key: 'headers',
-        label: 'Metadata',
+        label: t('REQUEST.HEADERS', 'Metadata'),
         indicator: activeHeadersLength > 0 ? <sup className="ml-[.125rem] font-medium">{activeHeadersLength}</sup> : null
       },
       {
         key: 'auth',
-        label: 'Auth',
+        label: t('REQUEST.AUTH', 'Auth'),
         indicator: hasAuth ? <StatusDot type="default" dataTestId="auth" /> : null
       },
       {
         key: 'docs',
-        label: 'Docs',
+        label: t('REQUEST.DOCS', 'Docs'),
         indicator: docs && docs.length > 0 ? <StatusDot type="default" /> : null
       }
     ];
-  }, [grpcMessagesCount, isClientStreaming, activeHeadersLength, hasAuth, docs]);
+  }, [grpcMessagesCount, isClientStreaming, activeHeadersLength, hasAuth, docs, t]);
 
   // Initialize tab to 'body' if no tab is currently set
   useEffect(() => {

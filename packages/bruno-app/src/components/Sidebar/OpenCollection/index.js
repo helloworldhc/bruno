@@ -14,8 +14,10 @@ import SelectionFooter from 'components/SelectionFooter';
 import SkippedPathsWarning from 'components/SkippedPathsWarning';
 import { getRelativePath, normalizePath } from 'utils/common/path';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const OpenCollectionModal = ({ onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const [showSelection, setShowSelection] = useState(false);
@@ -164,8 +166,8 @@ const OpenCollectionModal = ({ onClose }) => {
     <Portal id="open-collection-portal">
       <Modal
         size="md"
-        title="Open Collection"
-        confirmText="Open"
+        title={t('COMMON.OPEN', 'Open Collection')}
+        confirmText={t('COMMON.OPEN', 'Open')}
         handleConfirm={handleConfirm}
         handleCancel={onClose}
         confirmDisabled={selectedCollectionPaths.length === 0}
@@ -177,13 +179,13 @@ const OpenCollectionModal = ({ onClose }) => {
       >
         <StyledWrapper>
           <p className="modal-description">
-            These collections were found inside your selection. Choose which ones to open.
+            {t('SIDEBAR.OPEN_COLLECTION_HELP', 'These collections were found inside your selection. Choose which ones to open.')}
           </p>
           <div className="w-full min-w-0 flex flex-col gap-3">
             <SkippedPathsWarning paths={skippedCollectionPaths} itemNoun="collections" />
             <SelectionList
-              title="Collections"
-              searchPlaceholder="Search Collections"
+              title={t('CREATE_COLLECTION.TITLE', 'Collections')}
+              searchPlaceholder={t('SIDEBAR.SEARCH_COLLECTIONS', 'Search Collections')}
               items={collectionPaths}
               selectedItems={selectedCollectionPaths}
               onSelectAll={handleSelectAllCollections}

@@ -15,8 +15,10 @@ import Portal from 'components/Portal';
 import Dropdown from 'components/Dropdown';
 import StyledWrapper from './StyledWrapper';
 import Button from 'ui/Button';
+import { useTranslation } from 'react-i18next';
 
 const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const collection = useSelector((state) => state.collections.collections?.find((c) => c.uid === collectionUid));
   const isFolder = isItemAFolder(item);
@@ -87,20 +89,20 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
       <StyledWrapper>
         <Modal
           size="md"
-          title={`Clone ${isFolder ? 'Folder' : 'Request'}`}
+          title={`${t('COMMON.CLONE', 'Clone')} ${isFolder ? t('NEW_FOLDER.TITLE', 'Folder') : t('REQUEST.REQUEST', 'Request')}`}
           handleCancel={onClose}
           hideFooter
         >
           <form className="bruno-form" onSubmit={formik.handleSubmit}>
             <div>
               <label htmlFor="name" className="block font-medium">
-                {isFolder ? 'Folder' : 'Request'} Name
+                {isFolder ? t('NEW_FOLDER.NAME_LABEL', 'Folder Name') : t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
               </label>
               <input
                 id="collection-item-name"
                 type="text"
                 name="name"
-                placeholder="Enter Item name"
+                placeholder={t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
                 ref={inputRef}
                 className="block textbox mt-2 w-full"
                 autoComplete="off"
@@ -201,10 +203,10 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
               </div>
               <div className="flex justify-end">
                 <Button type="button" color="secondary" variant="ghost" onClick={onClose} className="mr-2">
-                  Cancel
+                  {t('COMMON.CANCEL', 'Cancel')}
                 </Button>
                 <Button type="submit" data-testid="clone-item-button">
-                  Clone
+                  {t('COMMON.CLONE', 'Clone')}
                 </Button>
               </div>
             </div>

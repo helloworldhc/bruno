@@ -6,8 +6,10 @@ import { deleteItem, closeTabs } from 'providers/ReduxStore/slices/collections/a
 import { recursivelyGetAllItemUids } from 'utils/collections';
 import StyledWrapper from './StyledWrapper';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const DeleteCollectionItem = ({ onClose, item, collectionUid }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const isFolder = isItemAFolder(item);
   const onConfirm = () => {
@@ -40,14 +42,14 @@ const DeleteCollectionItem = ({ onClose, item, collectionUid }) => {
     <StyledWrapper>
       <Modal
         size="md"
-        title={`Delete ${isFolder ? 'Folder' : 'Request'}`}
-        confirmText="Delete"
+        title={`${t('COMMON.DELETE', 'Delete')} ${isFolder ? t('NEW_FOLDER.TITLE', 'Folder') : t('REQUEST.REQUEST', 'Request')}`}
+        confirmText={t('COMMON.DELETE', 'Delete')}
         confirmButtonColor="danger"
         handleConfirm={onConfirm}
         handleCancel={onClose}
         dataTestId="delete-collection-item-modal"
       >
-        Are you sure you want to delete <span className="font-medium">{item.name}</span> ?
+        {t('COMMON.CONFIRM_DELETE', 'Are you sure you want to delete')} <span className="font-medium">{item.name}</span> ?
       </Modal>
     </StyledWrapper>
   );

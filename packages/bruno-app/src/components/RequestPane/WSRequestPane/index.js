@@ -24,8 +24,10 @@ import WSSettingsPane from '../WSSettingsPane/index';
 import TabBarAiAssist from '../TabBarAiAssist';
 import { hasEffectiveAuth } from 'utils/auth';
 import { AUTH_MODES_WS } from 'utils/common/constants';
+import { useTranslation } from 'react-i18next';
 
 const WSRequestPane = ({ item, collection, handleRun }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);
@@ -117,31 +119,31 @@ const WSRequestPane = ({ item, collection, handleRun }) => {
     return [
       {
         key: 'body',
-        label: 'Message',
+        label: t('REQUEST.BODY', 'Message'),
         indicator: null
       },
       {
         key: 'headers',
-        label: 'Headers',
+        label: t('REQUEST.HEADERS', 'Headers'),
         indicator: activeHeadersLength > 0 ? <sup className="ml-[.125rem] font-medium">{activeHeadersLength}</sup> : null
       },
       {
         key: 'auth',
-        label: 'Auth',
+        label: t('REQUEST.AUTH', 'Auth'),
         indicator: hasAuth ? <StatusDot type="default" dataTestId="auth" /> : null
       },
       {
         key: 'settings',
-        label: 'Settings',
+        label: t('COMMON.SETTINGS', 'Settings'),
         indicator: null
       },
       {
         key: 'docs',
-        label: 'Docs',
+        label: t('REQUEST.DOCS', 'Docs'),
         indicator: docs && docs.length > 0 ? <StatusDot type="default" /> : null
       }
     ];
-  }, [activeHeadersLength, hasAuth, docs]);
+  }, [activeHeadersLength, hasAuth, docs, t]);
 
   const tabPanel = useMemo(() => {
     switch (requestPaneTab) {

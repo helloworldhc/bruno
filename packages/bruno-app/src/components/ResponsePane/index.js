@@ -24,11 +24,13 @@ import HeightBoundContainer from 'ui/HeightBoundContainer';
 import ResponseStopWatch from 'components/ResponsePane/ResponseStopWatch';
 import WSMessagesList from './WsResponsePane/WSMessagesList';
 import ResponsiveTabs from 'ui/ResponsiveTabs';
+import { useTranslation } from 'react-i18next';
 
 // Width threshold for expanded right-side action buttons
 const RIGHT_CONTENT_EXPANDED_WIDTH = 135;
 
 const ResponsePane = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);
@@ -122,17 +124,17 @@ const ResponsePane = ({ item, collection }) => {
     return [
       {
         key: 'response',
-        label: 'Response',
+        label: t('RESPONSE.PREVIEW', 'Response'),
         indicator: null
       },
       {
         key: 'headers',
-        label: 'Headers',
+        label: t('RESPONSE.HEADERS', 'Headers'),
         indicator: responseHeadersCount > 0 ? <sup className="ml-1 font-medium">{responseHeadersCount}</sup> : null
       },
       {
         key: 'timeline',
-        label: 'Timeline',
+        label: t('RESPONSE.TIMELINE', 'Timeline'),
         indicator: null
       },
       {
@@ -148,7 +150,7 @@ const ResponsePane = ({ item, collection }) => {
         indicator: null
       }
     ];
-  }, [responseHeadersCount, item.testResults, item.assertionResults, item.preRequestTestResults, item.postResponseTestResults]);
+  }, [responseHeadersCount, item.testResults, item.assertionResults, item.preRequestTestResults, item.postResponseTestResults, t]);
 
   const getTabPanel = (tab) => {
     switch (tab) {

@@ -15,8 +15,10 @@ import Portal from 'components/Portal';
 import Dropdown from 'components/Dropdown';
 import StyledWrapper from './StyledWrapper';
 import Button from 'ui/Button';
+import { useTranslation } from 'react-i18next';
 
 const RenameCollectionItem = ({ collectionUid, item, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const collection = useSelector((state) => state.collections.collections?.find((c) => c.uid === collectionUid));
   const isFolder = isItemAFolder(item);
@@ -106,14 +108,14 @@ const RenameCollectionItem = ({ collectionUid, item, onClose }) => {
       <StyledWrapper>
         <Modal
           size="md"
-          title={`Rename ${isFolder ? 'Folder' : 'Request'}`}
+          title={`${t('COMMON.RENAME', 'Rename')} ${isFolder ? t('NEW_FOLDER.TITLE', 'Folder') : t('REQUEST.REQUEST', 'Request')}`}
           handleCancel={onClose}
           hideFooter
         >
           <form className="bruno-form" onSubmit={formik.handleSubmit}>
             <div className="flex flex-col mt-2">
               <label htmlFor="name" className="block font-medium">
-                {isFolder ? 'Folder' : 'Request'} Name
+                {isFolder ? t('NEW_FOLDER.NAME_LABEL', 'Folder Name') : t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
               </label>
               <input
                 id="collection-item-name"
@@ -219,10 +221,10 @@ const RenameCollectionItem = ({ collectionUid, item, onClose }) => {
               </div>
               <div className="flex justify-end">
                 <Button type="button" color="secondary" variant="ghost" onClick={onClose} className="mr-2">
-                  Cancel
+                  {t('COMMON.CANCEL', 'Cancel')}
                 </Button>
                 <Button type="submit" data-testid="rename-item-button">
-                  Rename
+                  {t('COMMON.RENAME', 'Rename')}
                 </Button>
               </div>
             </div>

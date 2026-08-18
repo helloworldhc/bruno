@@ -71,8 +71,10 @@ import ActionIcon from 'ui/ActionIcon';
 import MenuDropdown from 'ui/MenuDropdown';
 import { useSidebarAccordion } from 'components/Sidebar/SidebarAccordionContext';
 import useKeybinding from 'hooks/useKeybinding';
+import { useTranslation } from 'react-i18next';
 
 const CollectionItem = ({ item, collectionUid, collectionPathname, searchText }) => {
+  const { t } = useTranslation();
   const isMockServerEnabled = useBetaFeature(BETA_FEATURES.MOCK_SERVER);
   const { dropdownContainerRef } = useSidebarAccordion();
   const selectorInput = {
@@ -365,13 +367,13 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
         {
           id: 'new-request',
           leftSection: IconFilePlus,
-          label: 'New Request',
+          label: t('SIDEBAR.NEW_REQUEST', 'New Request'),
           onClick: () => setNewRequestModalOpen(true)
         },
         {
           id: 'new-folder',
           leftSection: IconFolderPlus,
-          label: 'New Folder',
+          label: t('SIDEBAR.NEW_FOLDER', 'New Folder'),
           onClick: () => setNewFolderModalOpen(true)
         },
         {
@@ -383,7 +385,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
         {
           id: 'run',
           leftSection: IconPlayerPlay,
-          label: 'Run',
+          label: t('SIDEBAR.RUN', 'Run'),
           onClick: () => setRunCollectionModalOpen(true)
         }
       );
@@ -393,13 +395,13 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       {
         id: 'clone',
         leftSection: IconCopy,
-        label: 'Clone',
+        label: t('COMMON.CLONE', 'Clone'),
         onClick: () => setCloneItemModalOpen(true)
       },
       {
         id: 'copy',
         leftSection: IconCopy,
-        label: 'Copy',
+        label: t('COMMON.COPY', 'Copy'),
         onClick: handleCopyItem
       }
     );
@@ -408,7 +410,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       items.push({
         id: 'paste',
         leftSection: IconClipboard,
-        label: 'Paste',
+        label: t('COMMON.PASTE', 'Paste'),
         onClick: handlePasteItem
       });
     }
@@ -417,7 +419,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       {
         id: 'rename',
         leftSection: IconEdit,
-        label: 'Rename',
+        label: t('COMMON.RENAME', 'Rename'),
         onClick: () => setRenameItemModalOpen(true)
       }
     );
@@ -425,7 +427,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       items.push({
         id: 'run',
         leftSection: IconPlayerPlay,
-        label: 'Run',
+        label: t('SIDEBAR.RUN', 'Run'),
         onClick: () => {
           handleRun();
         }
@@ -436,7 +438,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       items.push({
         id: 'generate-code',
         leftSection: IconCode,
-        label: 'Generate Code',
+        label: t('SIDEBAR.GENERATE_CODE', 'Generate Code'),
         onClick: handleGenerateCode
       });
     }
@@ -473,7 +475,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
     items.push({
       id: 'info',
       leftSection: IconInfoCircle,
-      label: 'Info',
+      label: t('COMMON.INFO', 'Info'),
       onClick: () => setItemInfoModalOpen(true)
     });
 
@@ -482,13 +484,13 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
         {
           id: 'settings',
           leftSection: IconSettings,
-          label: 'Settings',
+          label: t('COMMON.SETTINGS', 'Settings'),
           onClick: viewFolderSettings
         },
         {
           id: 'open-terminal',
           leftSection: IconTerminal2,
-          label: 'Open in Terminal',
+          label: t('SIDEBAR.OPEN_IN_TERMINAL', 'Open in Terminal'),
           onClick: async () => {
             const folderCwd = item.pathname || collectionPathname;
             await openDevtoolsAndSwitchToTerminal(dispatch, folderCwd);
@@ -500,7 +502,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
     items.push({
       id: 'delete',
       leftSection: IconTrash,
-      label: 'Delete',
+      label: t('COMMON.DELETE', 'Delete'),
       className: 'delete-item',
       onClick: () => setDeleteItemModalOpen(true)
     });

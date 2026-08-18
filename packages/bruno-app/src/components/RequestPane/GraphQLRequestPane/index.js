@@ -32,20 +32,22 @@ import ResponsiveTabs from 'ui/ResponsiveTabs';
 import AuthMode from '../Auth/AuthMode/index';
 import TabBarAiAssist from '../TabBarAiAssist';
 import StatusDot from 'components/StatusDot';
+import { useTranslation } from 'react-i18next';
 
 const TAB_CONFIG = [
-  { key: 'query', label: 'Query' },
-  { key: 'headers', label: 'Headers' },
-  { key: 'auth', label: 'Auth' },
-  { key: 'vars', label: 'Vars' },
-  { key: 'script', label: 'Script' },
-  { key: 'assert', label: 'Assert' },
-  { key: 'tests', label: 'Tests' },
-  { key: 'docs', label: 'Docs' },
-  { key: 'settings', label: 'Settings' }
+  { key: 'query', labelKey: 'REQUEST.QUERY', defaultLabel: 'Query' },
+  { key: 'headers', labelKey: 'REQUEST.HEADERS', defaultLabel: 'Headers' },
+  { key: 'auth', labelKey: 'REQUEST.AUTH', defaultLabel: 'Auth' },
+  { key: 'vars', labelKey: 'REQUEST.VARS', defaultLabel: 'Vars' },
+  { key: 'script', labelKey: 'REQUEST.SCRIPT', defaultLabel: 'Script' },
+  { key: 'assert', labelKey: 'REQUEST.ASSERT', defaultLabel: 'Assert' },
+  { key: 'tests', labelKey: 'REQUEST.TESTS', defaultLabel: 'Tests' },
+  { key: 'docs', labelKey: 'REQUEST.DOCS', defaultLabel: 'Docs' },
+  { key: 'settings', labelKey: 'COMMON.SETTINGS', defaultLabel: 'Settings' }
 ];
 
 const GraphQLRequestPane = ({ item, collection, onSchemaLoad, toggleDocs, handleGqlClickReference }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);
@@ -183,12 +185,12 @@ const GraphQLRequestPane = ({ item, collection, onSchemaLoad, toggleDocs, handle
   );
 
   const allTabs = useMemo(
-    () => TAB_CONFIG.map(({ key, label }) => ({
+    () => TAB_CONFIG.map(({ key, labelKey, defaultLabel }) => ({
       key,
-      label,
+      label: t(labelKey, defaultLabel),
       indicator: key === 'auth' && hasAuth ? <StatusDot dataTestId="auth" /> : null
     })),
-    [hasAuth]
+    [hasAuth, t]
   );
 
   const handlePrettify = useCallback(() => {

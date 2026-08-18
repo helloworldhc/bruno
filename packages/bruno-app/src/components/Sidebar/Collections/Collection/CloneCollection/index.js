@@ -14,8 +14,10 @@ import { useState } from 'react';
 import { IconArrowBackUp, IconEdit } from '@tabler/icons';
 import { findCollectionByUid } from 'utils/collections/index';
 import get from 'lodash/get';
+import { useTranslation } from 'react-i18next';
 
 const CloneCollection = ({ onClose, collectionUid }) => {
+  const { t } = useTranslation();
   const inputRef = useRef();
   const dispatch = useDispatch();
   const [isEditing, toggleEditing] = useState(false);
@@ -42,7 +44,7 @@ const CloneCollection = ({ onClose, collectionUid }) => {
       collectionName: Yup.string()
         .min(1, 'must be at least 1 character')
         .max(255, 'must be 255 characters or less')
-        .required('collection name is required'),
+        .required(t('CREATE_COLLECTION.NAME_REQUIRED', 'collection name is required')),
       collectionFolderName: Yup.string()
         .min(1, 'must be at least 1 character')
         .max(255, 'must be 255 characters or less')
@@ -50,8 +52,8 @@ const CloneCollection = ({ onClose, collectionUid }) => {
           const isValid = validateName(value);
           return isValid ? true : this.createError({ message: validateNameError(value) });
         })
-        .required('folder name is required'),
-      collectionLocation: Yup.string().min(1, 'location is required').required('location is required')
+        .required(t('CREATE_COLLECTION.FOLDER_NAME_REQUIRED', 'folder name is required')),
+      collectionLocation: Yup.string().min(1, t('CREATE_COLLECTION.LOCATION_REQUIRED', 'location is required')).required(t('CREATE_COLLECTION.LOCATION_REQUIRED', 'location is required'))
     }),
     onSubmit: (values) => {
       dispatch(
@@ -63,7 +65,7 @@ const CloneCollection = ({ onClose, collectionUid }) => {
         )
       )
         .then(() => {
-          toast.success('Collection created!');
+          toast.success(t('CREATE_COLLECTION.SUCCESS', 'Collection created!'));
           onClose();
         })
         .catch((e) => toast.error('An error occurred while creating the collection - ' + e));
@@ -93,11 +95,17 @@ const CloneCollection = ({ onClose, collectionUid }) => {
   const onSubmit = () => formik.handleSubmit();
 
   return (
-    <Modal size="md" title="Clone Collection" confirmText="Create" handleConfirm={onSubmit} handleCancel={onClose}>
+    <Modal
+      size="md"
+      title={`${t('COMMON.CLONE', 'Clone')} ${t('CREATE_COLLECTION.TITLE', 'Collection')}`}
+      confirmText={t('COMMON.CREATE', 'Create')}
+      handleConfirm={onSubmit}
+      handleCancel={onClose}
+    >
       <form className="bruno-form" onSubmit={(e) => e.preventDefault()}>
         <div>
           <label htmlFor="collection-name" className="flex items-center font-medium">
-            Name
+            {t('CREATE_COLLECTION.NAME_LABEL', 'Name')}
           </label>
           <input
             id="collection-name"
@@ -120,7 +128,7 @@ const CloneCollection = ({ onClose, collectionUid }) => {
           ) : null}
 
           <label htmlFor="collection-location" className="block font-medium mt-3">
-            Location
+            {t('CREATE_COLLECTION.LOCATION_LABEL', 'Location')}
           </label>
           <input
             id="collection-location"
@@ -143,20 +151,20 @@ const CloneCollection = ({ onClose, collectionUid }) => {
               className="text-link cursor-pointer hover:underline"
               onClick={browse}
             >
-              Browse
+              {t('COMMON.BROWSE', 'Browse')}
             </span>
           </div>
 
           <div className="mt-4">
             <div className="flex items-center justify-between">
               <label htmlFor="filename" className="flex items-center font-medium">
-                Folder Name
+                {t('CREATE_COLLECTION.FOLDER_NAME_LABEL', 'Folder Name')}
                 <Help width="300">
                   <p>
-                    The name of the folder used to store the collection.
+                    {t('CREATE_COLLECTION.FOLDER_NAME_HELP_1', 'The name of the folder used to store the collection.')}
                   </p>
                   <p className="mt-2">
-                    You can choose a folder name different from your collection's name or one compatible with filesystem rules.
+                    {t('CREATE_COLLECTION.FOLDER_NAME_HELP_2', 'You can choose a folder name different from your collection\'s name or one compatible with filesystem rules.')}
                   </p>
                 </Help>
               </label>

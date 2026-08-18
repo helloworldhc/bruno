@@ -14,8 +14,10 @@ import Dropdown from 'components/Dropdown';
 import { IconCaretDown } from '@tabler/icons';
 import StyledWrapper from './StyledWrapper';
 import Button from 'ui/Button';
+import { useTranslation } from 'react-i18next';
 
 const NewFolder = ({ collectionUid, item, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const inputRef = useRef();
   const [isEditing, toggleEditing] = useState(false);
@@ -33,8 +35,8 @@ const NewFolder = ({ collectionUid, item, onClose }) => {
     validationSchema: Yup.object({
       folderName: Yup.string()
         .trim()
-        .min(1, 'must be at least 1 character')
-        .required('name is required'),
+        .min(1, t('NEW_FOLDER.NAME_REQUIRED', 'Folder name is required'))
+        .required(t('NEW_FOLDER.NAME_REQUIRED', 'Folder name is required')),
       directoryName: Yup.string()
         .trim()
         .min(1, 'must be at least 1 character')
@@ -55,7 +57,7 @@ const NewFolder = ({ collectionUid, item, onClose }) => {
     onSubmit: (values) => {
       dispatch(newFolder(values.folderName, values.directoryName, collectionUid, item ? item.uid : null))
         .then(() => {
-          toast.success('New folder created!');
+          toast.success(t('NEW_FOLDER.SUCCESS', 'New folder created!'));
           onClose();
         })
         .catch((err) => toast.error(err ? err.message : 'An error occurred while adding the folder'));
@@ -75,7 +77,7 @@ const NewFolder = ({ collectionUid, item, onClose }) => {
           className="btn-advanced"
           type="button"
         >
-          Options
+          {t('COMMON.OPTIONS', 'Options')}
         </button>
         <IconCaretDown className="caret ml-1" size={14} strokeWidth={2} />
       </div>
@@ -85,10 +87,10 @@ const NewFolder = ({ collectionUid, item, onClose }) => {
   return (
     <Portal>
       <StyledWrapper>
-        <Modal size="md" title="New Folder" hideFooter={true} handleCancel={onClose}>
+        <Modal size="md" title={t('NEW_FOLDER.TITLE', 'New Folder')} hideFooter={true} handleCancel={onClose}>
           <form className="bruno-form" onSubmit={formik.handleSubmit}>
             <label htmlFor="folderName" className="block font-medium">
-              Folder Name
+              {t('NEW_FOLDER.NAME_LABEL', 'Folder Name')}
             </label>
             <input
               id="folder-name"
@@ -184,10 +186,10 @@ const NewFolder = ({ collectionUid, item, onClose }) => {
               </div>
               <div className="flex justify-end">
                 <Button type="button" color="secondary" variant="ghost" onClick={onClose} className="mr-2">
-                  Cancel
+                  {t('COMMON.CANCEL', 'Cancel')}
                 </Button>
                 <Button type="submit">
-                  Create
+                  {t('COMMON.CREATE', 'Create')}
                 </Button>
               </div>
             </div>

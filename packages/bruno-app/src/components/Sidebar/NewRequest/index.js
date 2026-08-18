@@ -23,8 +23,10 @@ import StyledWrapper from './StyledWrapper';
 import SingleLineEditor from 'components/SingleLineEditor/index';
 import { useTheme } from 'styled-components';
 import Button from 'ui/Button';
+import { useTranslation } from 'react-i18next';
 
 const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const inputRef = useRef();
 
@@ -312,14 +314,14 @@ const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
   return (
     <Portal>
       <StyledWrapper>
-        <Modal size="md" title="New Request" hideFooter handleCancel={onClose}>
+        <Modal size="md" title={t('NEW_REQUEST.TITLE', 'New Request')} hideFooter handleCancel={onClose}>
           <form
             className="bruno-form"
             onSubmit={formik.handleSubmit}
           >
             <div>
               <label htmlFor="requestName" className="block font-medium">
-                Type
+                {t('NEW_REQUEST.TYPE_LABEL', 'Type')}
               </label>
 
               <div className="mt-2 grid grid-cols-3 gap-2">
@@ -406,13 +408,13 @@ const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
             </div>
             <div className="mt-4">
               <label htmlFor="requestName" className="block font-medium">
-                Request Name
+                {t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
               </label>
               <input
                 id="request-name"
                 type="text"
                 name="requestName"
-                placeholder="Request Name"
+                placeholder={t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
                 ref={inputRef}
                 className="block textbox mt-2 w-full"
                 autoComplete="off"
@@ -493,7 +495,7 @@ const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
               <>
                 <div className="mt-4">
                   <label htmlFor="request-url" className="block font-medium">
-                    URL
+                    {t('NEW_REQUEST.URL_LABEL', 'URL')}
                   </label>
                   <div className="flex items-center mt-2 ">
                     {!['grpc-request', 'ws-request'].includes(formik.values.requestType) ? (
@@ -513,7 +515,7 @@ const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
                       <SingleLineEditor
                         onRun={() => formik.handleSubmit()}
                         onPaste={handlePaste}
-                        placeholder="Request URL"
+                        placeholder={t('REQUEST.URL_PLACEHOLDER', 'Request URL')}
                         value={formik.values.requestUrl || ''}
                         theme={storedTheme}
                         onChange={(value) => {
@@ -592,10 +594,10 @@ const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
               </div>
               <div className="flex justify-end">
                 <Button type="button" color="secondary" variant="ghost" onClick={onClose} className="mr-2">
-                  Cancel
+                  {t('COMMON.CANCEL', 'Cancel')}
                 </Button>
                 <Button type="submit" data-testid="create-new-request-button">
-                  Create
+                  {t('COMMON.CREATE', 'Create')}
                 </Button>
               </div>
             </div>

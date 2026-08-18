@@ -62,12 +62,14 @@ import { useBetaFeature } from 'utils/beta-features';
 import { BETA_FEATURES } from 'utils/beta-features';
 import StatusBadge from 'ui/StatusBadge';
 import CreateMockServerModal from 'components/MockServer/CreateMockServerModal';
+import { useTranslation } from 'react-i18next';
 
 // Delay before showing empty collection state (ms)
 // This prevents flicker from race condition between loading state and item batch updates
 const EMPTY_STATE_DELAY_MS = 300;
 
 const Collection = ({ collection, searchText }) => {
+  const { t } = useTranslation();
   const isMockServerEnabled = useBetaFeature(BETA_FEATURES.MOCK_SERVER);
   const { dropdownContainerRef } = useSidebarAccordion();
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
@@ -368,7 +370,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'new-request',
       leftSection: IconFilePlus,
-      label: 'New Request',
+      label: t('SIDEBAR.NEW_REQUEST', 'New Request'),
       onClick: () => {
         ensureCollectionIsMounted();
         setShowNewRequestModal(true);
@@ -377,7 +379,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'new-folder',
       leftSection: IconFolderPlus,
-      label: 'New Folder',
+      label: t('SIDEBAR.NEW_FOLDER', 'New Folder'),
       onClick: () => {
         ensureCollectionIsMounted();
         setShowNewFolderModal(true);
@@ -395,7 +397,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'run',
       leftSection: IconPlayerPlay,
-      label: 'Run',
+      label: t('SIDEBAR.RUN', 'Run'),
       onClick: () => {
         ensureCollectionIsMounted();
         handleRun();
@@ -404,7 +406,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'clone',
       leftSection: IconCopy,
-      label: 'Clone',
+      label: t('COMMON.CLONE', 'Clone'),
       testId: 'clone-collection',
       onClick: () => {
         setShowCloneCollectionModalOpen(true);
@@ -421,7 +423,7 @@ const Collection = ({ collection, searchText }) => {
           {
             id: 'paste',
             leftSection: IconClipboard,
-            label: 'Paste',
+            label: t('COMMON.PASTE', 'Paste'),
             onClick: handlePasteItem
           }
         ]
@@ -429,7 +431,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'rename',
       leftSection: IconEdit,
-      label: 'Rename',
+      label: t('COMMON.RENAME', 'Rename'),
       onClick: () => {
         setShowRenameCollectionModal(true);
       }
@@ -437,7 +439,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'share',
       leftSection: IconShare,
-      label: 'Share',
+      label: t('COMMON.EXPORT', 'Share'),
       onClick: () => {
         ensureCollectionIsMounted();
         setShowShareCollectionModal(true);
@@ -446,7 +448,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'generate-docs',
       leftSection: IconBook,
-      label: 'Generate Docs',
+      label: t('REQUEST.DOCS', 'Generate Docs'),
       onClick: () => {
         ensureCollectionIsMounted();
         setShowGenerateDocumentationModal(true);
@@ -455,7 +457,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'collapse',
       leftSection: IconFoldDown,
-      label: 'Collapse',
+      label: t('SIDEBAR.COLLAPSE_ALL', 'Collapse'),
       onClick: handleCollapseFullCollection
     },
     {
@@ -478,13 +480,13 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'settings',
       leftSection: IconSettings,
-      label: 'Settings',
+      label: t('COMMON.SETTINGS', 'Settings'),
       onClick: viewCollectionSettings
     },
     {
       id: 'terminal',
       leftSection: IconTerminal2,
-      label: 'Open in Terminal',
+      label: t('SIDEBAR.OPEN_IN_TERMINAL', 'Open in Terminal'),
       onClick: async () => {
         const collectionCwd = collection.pathname;
         await openDevtoolsAndSwitchToTerminal(dispatch, collectionCwd);
@@ -506,7 +508,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'remove',
       leftSection: IconX,
-      label: 'Remove',
+      label: t('COMMON.CLOSE', 'Remove'),
       onClick: () => {
         setShowRemoveCollectionModal(true);
       }

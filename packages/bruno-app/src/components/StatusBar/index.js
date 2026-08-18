@@ -13,8 +13,10 @@ import { openConsole } from 'providers/ReduxStore/slices/logs';
 import { addTab } from 'providers/ReduxStore/slices/tabs';
 import { useApp } from 'providers/App';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const StatusBar = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const activeWorkspaceUid = useSelector((state) => state.workspaces.activeWorkspaceUid);
   const workspaces = useSelector((state) => state.workspaces.workspaces);
@@ -75,7 +77,7 @@ const StatusBar = () => {
       <div className="status-bar">
         <div className="status-bar-section">
           <div className="status-bar-group">
-            <ToolHint text="Preferences" toolhintId="Preferences" place="top-start" offset={10}>
+            <ToolHint text={t('PREFERENCES.TITLE', 'Preferences')} toolhintId="Preferences" place="top-start" offset={10}>
               <button
                 className="status-bar-button preferences-button"
                 data-trigger="preferences"
@@ -130,7 +132,7 @@ const StatusBar = () => {
             >
               <div className="console-button-content">
                 <IconSearch size={16} strokeWidth={1.5} aria-hidden="true" />
-                <span className="console-label">Search</span>
+                <span className="console-label">{t('COMMON.SEARCH', 'Search')}</span>
               </div>
             </button>
 
@@ -156,7 +158,7 @@ const StatusBar = () => {
             >
               <div className="console-button-content">
                 <IconTool size={16} strokeWidth={1.5} aria-hidden="true" />
-                <span className="console-label">Dev Tools</span>
+                <span className="console-label">{t('APP_MENU.DEV_TOOLS', 'Dev Tools')}</span>
                 {errorCount > 0 && (
                   <span className="error-count-inline">{errorCount}</span>
                 )}
