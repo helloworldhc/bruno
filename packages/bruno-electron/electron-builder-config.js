@@ -99,6 +99,14 @@ const config = {
       {
         target: 'nsis',
         arch: ['x64', 'arm64']
+      },
+      {
+        target: 'zip',
+        arch: ['x64', 'arm64']
+      },
+      {
+        target: 'portable',
+        arch: ['x64']
       }
     ],
     sign: null,

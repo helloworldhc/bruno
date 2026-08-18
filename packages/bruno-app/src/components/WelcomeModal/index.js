@@ -7,6 +7,7 @@ import Button from 'ui/Button';
 import { useTheme } from 'providers/Theme';
 import { browseDirectory } from 'providers/ReduxStore/slices/collections/actions';
 import { savePreferences } from 'providers/ReduxStore/slices/app';
+import { useTranslation } from 'react-i18next';
 import WelcomeStep from './WelcomeStep';
 import ThemeStep from './ThemeStep';
 import StorageStep from './StorageStep';
@@ -16,6 +17,7 @@ import StyledWrapper from './StyledWrapper';
 const TOTAL_STEPS = 4;
 
 const WelcomeModal = ({ onDismiss, onImportCollection, onCreateCollection, onOpenCollection, onStartRequest }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const preferences = useSelector((state) => state.app.preferences);
   const defaultLocation = get(preferences, 'general.defaultLocation', '');
@@ -99,6 +101,12 @@ const WelcomeModal = ({ onDismiss, onImportCollection, onCreateCollection, onOpe
 
   const isLastStep = step === TOTAL_STEPS;
 
+  const getHeading = () => {
+    if (step === 1) return t('WELCOME.WELCOME_TO_BRUNO');
+    if (step === 4) return t('WELCOME.READY_TO_GO');
+    return t('WELCOME.SET_UP_BRUNO');
+  };
+
   return (
     <StyledWrapper data-testid="welcome-modal">
       <div className="welcome-card">
@@ -107,11 +115,11 @@ const WelcomeModal = ({ onDismiss, onImportCollection, onCreateCollection, onOpe
             <Bruno width={48} />
           </div>
           <h1 className="welcome-heading">
-            {step === 1 ? 'Welcome to Bruno' : step === 4 ? 'Ready to go!' : 'Set up Bruno'}
+            {getHeading()}
           </h1>
           {step === 1 && (
             <p className="welcome-tagline">
-              A fast, Git-friendly, and open-source API client.
+              {t('WELCOME.TAGLINE')}
             </p>
           )}
         </div>
@@ -134,21 +142,21 @@ const WelcomeModal = ({ onDismiss, onImportCollection, onCreateCollection, onOpe
 
           <div className="footer-buttons">
             <Button type="button" color="secondary" variant="ghost" onClick={handleSaveAndDismiss}>
-              Skip
+              {t('COMMON.SKIP')}
             </Button>
             {step > 1 && (
               <Button type="button" color="secondary" variant="ghost" onClick={() => goTo(step - 1)}>
-                Back
+                {t('COMMON.BACK')}
               </Button>
             )}
             {!isLastStep && (
               <Button type="button" onClick={() => goTo(step + 1)}>
-                {step === 1 ? 'Get Started' : 'Next'}
+                {step === 1 ? t('WELCOME.GET_STARTED') : t('COMMON.NEXT')}
               </Button>
             )}
             {isLastStep && (
               <Button type="button" color="secondary" onClick={handleSaveAndDismiss}>
-                I'll explore on my own
+                {t('WELCOME.EXPLORE_ON_OWN')}
               </Button>
             )}
           </div>

@@ -14,6 +14,7 @@ import {
   SIDEBAR_WIDTH_KEY,
   SIDEBAR_COLLAPSED_KEY
 } from 'utils/common/localStorage';
+import { changeAppLanguage } from 'i18n';
 
 const initialState = {
   isDragging: false,
@@ -58,7 +59,8 @@ const initialState = {
       codeFont: 'default'
     },
     general: {
-      defaultLocation: ''
+      defaultLocation: '',
+      language: 'system'
     },
     onboarding: {
       hasLaunchedBefore: false,
@@ -216,6 +218,9 @@ export const appSlice = createSlice({
     },
     updatePreferences: (state, action) => {
       state.preferences = action.payload;
+      if (action.payload?.general?.language) {
+        changeAppLanguage(action.payload.general.language);
+      }
     },
     updateActivePreferencesTab: (state, action) => {
       state.activePreferencesTab = action.payload.tab;

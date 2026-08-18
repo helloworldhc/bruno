@@ -1,0 +1,85 @@
+name: Build Windows Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create GitHub Release draft?'
+        required: false
+        type: boolean
+        default: false
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows Application
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+          cache-dependency-path: './package-lock.json'
+
+      - name: Install dependencies
+        shell: pwsh
+        run: npm ci --legacy-peer-deps
+
+      - name: Build libraries
+        shell: pwsh
+        run: |
+          npm run build:graphql-docs
+          npm run build:bruno-query
+          npm run build:bruno-common
+          npm run sandbox:bundle-libraries --workspace=packages/bruno-js
+          npm run build:bruno-converters
+          npm run build:bruno-requests
+          npm run build:schema-types
+          npm run build:bruno-filestore
+          npm run build:bruno-sqlite
+
+      - name: Build web application
+        shell: pwsh
+        run: npm run build:web
+
+      - name: Build Electron for Windows
+        shell: pwsh
+        run: node ./scripts/build-electron.js
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Windows build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruno-windows-build
+          path: |
+            packages/bruno-electron/out/*.exe
+            packages/bruno-electron/out/*.zip
+            packages/bruno-electron/out/*.blockmap
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: ${{ inputs.create_release || startsWith(github.ref, 'refs/tags/v') }}
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            packages/bruno-electron/out/*.exe
+            packages/bruno-electron/out/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

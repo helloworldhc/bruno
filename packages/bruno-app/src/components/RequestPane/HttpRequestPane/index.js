@@ -22,19 +22,20 @@ import HeightBoundContainer from 'ui/HeightBoundContainer';
 import AuthMode from '../Auth/AuthMode/index';
 import TabBarAiAssist from '../TabBarAiAssist';
 import { hasEffectiveAuth } from 'utils/auth';
+import { useTranslation } from 'react-i18next';
 
 const TAB_CONFIG = [
-  { key: 'params', label: 'Params' },
-  { key: 'body', label: 'Body' },
-  { key: 'headers', label: 'Headers' },
-  { key: 'auth', label: 'Auth' },
-  { key: 'vars', label: 'Vars' },
-  { key: 'script', label: 'Script' },
-  { key: 'assert', label: 'Assert' },
-  { key: 'tests', label: 'Tests' },
-  { key: 'docs', label: 'Docs' },
-  { key: 'app', label: 'App' },
-  { key: 'settings', label: 'Settings' }
+  { key: 'params', labelKey: 'REQUEST.PARAMS', defaultLabel: 'Params' },
+  { key: 'body', labelKey: 'REQUEST.BODY', defaultLabel: 'Body' },
+  { key: 'headers', labelKey: 'REQUEST.HEADERS', defaultLabel: 'Headers' },
+  { key: 'auth', labelKey: 'REQUEST.AUTH', defaultLabel: 'Auth' },
+  { key: 'vars', labelKey: 'REQUEST.VARS', defaultLabel: 'Vars' },
+  { key: 'script', labelKey: 'REQUEST.SCRIPT', defaultLabel: 'Script' },
+  { key: 'assert', labelKey: 'REQUEST.ASSERT', defaultLabel: 'Assert' },
+  { key: 'tests', labelKey: 'REQUEST.TESTS', defaultLabel: 'Tests' },
+  { key: 'docs', labelKey: 'REQUEST.DOCS', defaultLabel: 'Docs' },
+  { key: 'app', labelKey: 'REQUEST.APP', defaultLabel: 'App' },
+  { key: 'settings', labelKey: 'REQUEST.SETTINGS', defaultLabel: 'Settings' }
 ];
 
 const TAB_PANELS = {
@@ -52,6 +53,7 @@ const TAB_PANELS = {
 };
 
 const HttpRequestPane = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);
@@ -74,7 +76,6 @@ const HttpRequestPane = ({ item, collection }) => {
   const docs = getProperty('request.docs');
   const requestVars = getProperty('request.vars.req');
   const responseVars = getProperty('request.vars.res');
-  const auth = getProperty('request.auth');
   const tags = getProperty('tags');
   const app = getProperty('app', null);
   const appTabEnabled = app?.enabled === true;
@@ -95,10 +96,9 @@ const HttpRequestPane = ({ item, collection }) => {
     [dispatch, item.uid]
   );
 
-  const itemAuthMode = item.draft?.request?.auth?.mode ?? item.request?.auth?.mode ?? item.root?.request?.auth?.mode;
   const hasAuth = useMemo(
     () => hasEffectiveAuth(collection, item),
-    [item, itemAuthMode, collection]
+    [collection, item]
   );
 
   const indicators = useMemo(() => {
@@ -123,8 +123,12 @@ const HttpRequestPane = ({ item, collection }) => {
   const allTabs = useMemo(
     () => TAB_CONFIG
       .filter(({ key }) => key !== 'app' || appTabEnabled)
-      .map(({ key, label }) => ({ key, label, indicator: indicators[key] })),
-    [indicators, appTabEnabled]
+      .map(({ key, labelKey, defaultLabel }) => ({
+        key,
+        label: t(labelKey, defaultLabel),
+        indicator: indicators[key]
+      })),
+    [indicators, appTabEnabled, t]
   );
 
   const tabPanel = useMemo(() => {

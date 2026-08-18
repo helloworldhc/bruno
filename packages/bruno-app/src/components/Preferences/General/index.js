@@ -10,13 +10,17 @@ import * as Yup from 'yup';
 import toast from 'react-hot-toast';
 import path from 'utils/common/path';
 import { IconTrash } from '@tabler/icons';
+import { useTranslation } from 'react-i18next';
+import { changeAppLanguage } from 'i18n';
 
 const General = () => {
+  const { t } = useTranslation();
   const preferences = useSelector((state) => state.app.preferences);
   const dispatch = useDispatch();
   const inputFileCaCertificateRef = useRef();
 
   const preferencesSchema = Yup.object().shape({
+    language: Yup.string().nullable(),
     sslVerification: Yup.boolean(),
     customCaCertificate: Yup.object({
       enabled: Yup.boolean(),
@@ -65,6 +69,7 @@ const General = () => {
 
   const formik = useFormik({
     initialValues: {
+      language: get(preferences, 'general.language', 'system'),
       sslVerification: preferences.request.sslVerification,
       customCaCertificate: {
         enabled: get(preferences, 'request.customCaCertificate.enabled', false),
@@ -122,7 +127,8 @@ const General = () => {
           interval: newPreferences.autoSave.interval
         },
         general: {
-          defaultLocation: newPreferences.defaultLocation
+          defaultLocation: newPreferences.defaultLocation,
+          language: newPreferences.language
         }
       }))
       .catch((err) => console.log(err) && toast.error('Failed to update preferences'));
@@ -178,8 +184,27 @@ const General = () => {
 
   return (
     <StyledWrapper className="w-full">
-      <div className="section-header">General Settings</div>
+      <div className="section-header">{t('PREFERENCES.GENERAL_SETTINGS')}</div>
       <form className="bruno-form" onSubmit={formik.handleSubmit}>
+        <div className="flex flex-col mb-4">
+          <label className="block select-none" htmlFor="language">
+            {t('PREFERENCES.LANGUAGE')}
+          </label>
+          <select
+            id="language"
+            name="language"
+            className="block textbox mt-2 w-72"
+            onChange={(e) => {
+              formik.handleChange(e);
+              changeAppLanguage(e.target.value);
+            }}
+            value={formik.values.language || 'system'}
+          >
+            <option value="system">{t('PREFERENCES.LANGUAGE_AUTO')}</option>
+            <option value="zh-CN">{t('PREFERENCES.LANGUAGE_ZH_CN')}</option>
+            <option value="en">{t('PREFERENCES.LANGUAGE_EN')}</option>
+          </select>
+        </div>
         <div className="flex items-center mb-2">
           <input
             id="sslVerification"
@@ -190,7 +215,7 @@ const General = () => {
             className="mousetrap mr-0"
           />
           <label className="block ml-2 select-none" htmlFor="sslVerification">
-            SSL/TLS Certificate Verification
+            {t('PREFERENCES.SSL_VERIFICATION')}
           </label>
         </div>
         <div className="flex items-center mt-2">
@@ -203,7 +228,7 @@ const General = () => {
             className="mousetrap mr-0"
           />
           <label className="block ml-2 select-none" htmlFor="customCaCertificateEnabled">
-            Use Custom CA Certificate
+            {t('PREFERENCES.USE_CUSTOM_CA_CERTIFICATE')}
           </label>
         </div>
         {formik.values.customCaCertificate.filePath ? (
@@ -234,7 +259,7 @@ const General = () => {
               disabled={formik.values.customCaCertificate.enabled ? false : true}
               onClick={() => inputFileCaCertificateRef.current.click()}
             >
-              Select File
+              {t('COMMON.SELECT_FILE')}
               <input
                 id="caCertFilePath"
                 type="file"
@@ -261,7 +286,7 @@ const General = () => {
             className={`block ml-2 select-none ${formik.values.customCaCertificate.enabled && formik.values.customCaCertificate.filePath ? '' : 'opacity-25'}`}
             htmlFor="keepDefaultCaCertificatesEnabled"
           >
-            Keep Default CA Certificates
+            {t('PREFERENCES.KEEP_DEFAULT_CA_CERTIFICATES')}
           </label>
         </div>
         <div className="flex items-center mt-2">
@@ -274,7 +299,7 @@ const General = () => {
             className="mousetrap mr-0"
           />
           <label className="block ml-2 select-none" htmlFor="storeCookies">
-            Store Cookies automatically
+            {t('PREFERENCES.STORE_COOKIES')}
           </label>
         </div>
         <div className="flex items-center mt-2">
@@ -287,7 +312,7 @@ const General = () => {
             className="mousetrap mr-0"
           />
           <label className="block ml-2 select-none" htmlFor="sendCookies">
-            Send Cookies automatically
+            {t('PREFERENCES.SEND_COOKIES')}
           </label>
         </div>
         <div className="flex items-center mt-2">
@@ -300,12 +325,12 @@ const General = () => {
             className="mousetrap mr-0"
           />
           <label className="block ml-2 select-none" htmlFor="oauth2.useSystemBrowser">
-            Use System Browser for OAuth2 Authorization
+            {t('PREFERENCES.USE_SYSTEM_BROWSER')}
           </label>
         </div>
         <div className="flex flex-col mt-6">
           <label className="block select-none" htmlFor="timeout">
-            Request Timeout (in ms)
+            {t('PREFERENCES.REQUEST_TIMEOUT')}
           </label>
           <input
             type="text"
@@ -332,12 +357,12 @@ const General = () => {
             className="mousetrap mr-0"
           />
           <label className="block ml-2 select-none" htmlFor="autoSaveEnabled">
-            Enable Auto Save
+            {t('PREFERENCES.ENABLE_AUTO_SAVE')}
           </label>
         </div>
         <div className={`flex flex-col mt-2 ${!formik.values.autoSave.enabled ? 'opacity-50' : ''}`}>
           <label className="block select-none" htmlFor="autoSaveInterval">
-            Save Delay (in ms)
+            {t('PREFERENCES.SAVE_DELAY')}
           </label>
           <input
             type="text"
@@ -361,10 +386,10 @@ const General = () => {
         )}
         <div className="flex flex-col mt-6">
           <label className="block select-none default-location-label" htmlFor="defaultLocation">
-            Default Location
+            {t('PREFERENCES.DEFAULT_LOCATION')}
           </label>
           <p className="text-muted mt-1 text-xs">
-            Used as the default location for new workspaces and collections
+            {t('PREFERENCES.DEFAULT_LOCATION_DESC')}
           </p>
           <input
             type="text"
@@ -379,14 +404,14 @@ const General = () => {
             onChange={formik.handleChange}
             value={formik.values.defaultLocation || ''}
             onClick={browseDefaultLocation}
-            placeholder="Click to browse for default location"
+            placeholder={t('PREFERENCES.DEFAULT_LOCATION_PLACEHOLDER')}
           />
           <div className="mt-1">
             <span
               className="text-link cursor-pointer hover:underline default-location-browse"
               onClick={browseDefaultLocation}
             >
-              Browse
+              {t('COMMON.BROWSE')}
             </span>
           </div>
         </div>

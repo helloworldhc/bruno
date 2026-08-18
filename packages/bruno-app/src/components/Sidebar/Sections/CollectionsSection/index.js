@@ -39,8 +39,10 @@ import Collections from 'components/Sidebar/Collections';
 import SidebarSection from 'components/Sidebar/SidebarSection';
 import { openDevtoolsAndSwitchToTerminal } from 'utils/terminal';
 import useKeybinding from 'hooks/useKeybinding';
+import { useTranslation } from 'react-i18next';
 
 const CollectionsSection = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const showSearch = useSelector((state) => state.app.showSidebarSearch);
 
@@ -167,11 +169,11 @@ const CollectionsSection = () => {
   const getSortLabel = () => {
     switch (collectionSortOrder) {
       case 'alphabetical':
-        return 'Sort Z-A';
+        return t('SIDEBAR.SORT_ZA');
       case 'reverseAlphabetical':
-        return 'Clear sort';
+        return t('SIDEBAR.CLEAR_SORT');
       default:
-        return 'Sort A-Z';
+        return t('SIDEBAR.SORT_AZ');
     }
   };
 
@@ -241,7 +243,7 @@ const CollectionsSection = () => {
     {
       id: 'create',
       leftSection: IconPlus,
-      label: 'Create collection',
+      label: t('SIDEBAR.CREATE_COLLECTION'),
       onClick: () => {
         dispatch(setIsCreatingCollection(true));
       }
@@ -249,7 +251,7 @@ const CollectionsSection = () => {
     {
       id: 'open',
       leftSection: IconFolder,
-      label: 'Open collection',
+      label: t('SIDEBAR.OPEN_COLLECTION'),
       onClick: () => {
         handleOpenCollection();
       }
@@ -257,7 +259,7 @@ const CollectionsSection = () => {
     {
       id: 'import',
       leftSection: IconDownload,
-      label: 'Import collection',
+      label: t('SIDEBAR.IMPORT_COLLECTION'),
       onClick: () => {
         setImportCollectionModalOpen(true);
       }
@@ -276,7 +278,7 @@ const CollectionsSection = () => {
     {
       id: 'close-all',
       leftSection: IconSquareX,
-      label: 'Close all',
+      label: t('SIDEBAR.CLOSE_ALL'),
       onClick: () => {
         selectAllCollectionsToClose();
       }
@@ -284,7 +286,7 @@ const CollectionsSection = () => {
     {
       id: 'open-in-terminal',
       leftSection: IconTerminal2,
-      label: 'Open in Terminal',
+      label: t('SIDEBAR.OPEN_IN_TERMINAL'),
       onClick: () => {
         openDevtoolsAndSwitchToTerminal(dispatch, activeWorkspace?.pathname);
       }
@@ -295,7 +297,7 @@ const CollectionsSection = () => {
     <>
       <ActionIcon
         onClick={handleToggleSearch}
-        label="Search requests"
+        label={t('SIDEBAR.SEARCH_REQUESTS')}
       >
         <IconSearch size={14} stroke={1.5} aria-hidden="true" />
       </ActionIcon>
@@ -306,7 +308,7 @@ const CollectionsSection = () => {
         placement="bottom-end"
       >
         <ActionIcon
-          label="Add new collection"
+          label={t('SIDEBAR.ADD_NEW_COLLECTION')}
         >
           <IconPlus size={14} stroke={1.5} aria-hidden="true" />
         </ActionIcon>
@@ -318,7 +320,7 @@ const CollectionsSection = () => {
         placement="bottom-end"
       >
         <ActionIcon
-          label="More actions"
+          label={t('SIDEBAR.MORE_ACTIONS')}
         >
           <IconDotsVertical size={14} stroke={1.5} aria-hidden="true" />
         </ActionIcon>
@@ -403,7 +405,7 @@ const CollectionsSection = () => {
       )}
       <SidebarSection
         id="collections"
-        title="Collections"
+        title={t('SIDEBAR.COLLECTIONS')}
         icon={IconBox}
         actions={sectionActions}
       >
