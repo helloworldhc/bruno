@@ -93,17 +93,9 @@ const config = {
     ]
   },
   win: {
-    artifactName: '${name}_${version}_${arch}_win.${ext}',
+    artifactName: '${name}_${version}_${arch}_portable.${ext}',
     icon: 'resources/icons/win/icon.ico',
     target: [
-      {
-        target: 'nsis',
-        arch: ['x64', 'arm64']
-      },
-      {
-        target: 'zip',
-        arch: ['x64', 'arm64']
-      },
       {
         target: 'portable',
         arch: ['x64']

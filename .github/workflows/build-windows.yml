@@ -68,11 +68,9 @@ jobs:
       - name: Upload Windows build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bruno-windows-build
+          name: bruno-windows-portable
           path: |
             packages/bruno-electron/out/*.exe
-            packages/bruno-electron/out/*.zip
-            packages/bruno-electron/out/*.blockmap
           retention-days: 30
 
       - name: Create GitHub Release
@@ -82,6 +80,5 @@ jobs:
           draft: true
           files: |
             packages/bruno-electron/out/*.exe
-            packages/bruno-electron/out/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
