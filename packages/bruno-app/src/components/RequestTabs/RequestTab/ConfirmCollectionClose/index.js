@@ -3,15 +3,18 @@ import { IconAlertTriangle } from '@tabler/icons';
 import Modal from 'components/Modal';
 import Button from 'ui/Button';
 import Portal from 'ui/Portal';
+import { useTranslation, Trans } from 'react-i18next';
 
 const ConfirmCollectionClose = ({ collection, onCancel, onCloseWithoutSave, onSaveAndClose }) => {
+  const { t } = useTranslation();
+
   return (
     <Portal>
       <Modal
         size="md"
-        title="Unsaved changes"
-        confirmText="Save and Close"
-        cancelText="Close without saving"
+        title={t('REQUEST.UNSAVED_CHANGES', 'Unsaved changes')}
+        confirmText={t('COMMON.SAVE_AND_CLOSE', 'Save and Close')}
+        cancelText={t('COMMON.CLOSE_WITHOUT_SAVING', 'Close without saving')}
         disableEscapeKey={true}
         disableCloseOnOutsideClick={true}
         closeModalFadeTimeout={150}
@@ -24,24 +27,31 @@ const ConfirmCollectionClose = ({ collection, onCancel, onCloseWithoutSave, onSa
       >
         <div className="flex items-center font-normal">
           <IconAlertTriangle size={32} strokeWidth={1.5} className="text-yellow-600" />
-          <h1 className="ml-2 text-lg font-medium">Hold on..</h1>
+          <h1 className="ml-2 text-lg font-medium">{t('COMMON.HOLD_ON', 'Hold on..')}</h1>
         </div>
         <div className="font-normal mt-4">
-          You have unsaved changes in <span className="font-medium">{collection.name}</span> collection settings.
+          <Trans
+            i18nKey="COLLECTION.UNSAVED_CHANGES_HINT"
+            defaults="You have unsaved changes in <1>{{name}}</1> collection settings."
+            values={{ name: collection.name }}
+            components={{
+              1: <span className="font-medium" />
+            }}
+          />
         </div>
 
         <div className="flex justify-between mt-6">
           <div>
             <Button color="danger" onClick={onCloseWithoutSave}>
-              Don't Save
+              {t('COMMON.DONT_SAVE', 'Don\'t Save')}
             </Button>
           </div>
           <div className="flex gap-2">
             <Button color="secondary" variant="ghost" onClick={onCancel}>
-              Cancel
+              {t('COMMON.CANCEL', 'Cancel')}
             </Button>
             <Button onClick={onSaveAndClose}>
-              Save
+              {t('COMMON.SAVE', 'Save')}
             </Button>
           </div>
         </div>

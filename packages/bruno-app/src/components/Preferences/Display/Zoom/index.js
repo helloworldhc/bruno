@@ -6,6 +6,7 @@ import StyledWrapper from './StyledWrapper';
 import { IconReload } from '@tabler/icons';
 import { IconChevronDown, IconCheck } from '@tabler/icons';
 import Button from 'ui/Button/index';
+import { useTranslation } from 'react-i18next';
 const { percentageToZoomLevel } = require('@usebruno/common');
 
 // Zoom options for dropdown (50% to 150%)
@@ -82,13 +83,14 @@ const Zoom = () => {
     handleSelect(DEFAULT_ZOOM);
   };
 
+  const { t } = useTranslation();
   const selectedOption = ZOOM_OPTIONS.find((opt) => opt.value === savedZoom);
   const isDefault = savedZoom === DEFAULT_ZOOM;
 
   return (
     <StyledWrapper>
       <div>
-        <label className="block">Interface Zoom</label>
+        <label className="block">{t('PREFERENCES.ZOOM_LABEL', 'Interface Zoom')}</label>
       </div>
       <div className="flex flex-row gap-1 items-center mt-2">
         <div className="zoom-field" ref={dropdownRef}>
@@ -117,6 +119,7 @@ const Zoom = () => {
             icon={<IconReload />}
             color="secondary"
             variant="ghost"
+            title={t('PREFERENCES.RESET_ZOOM_DEFAULT', 'Reset to default (100%)')}
             onClick={handleResetToDefault}
           />
         )}

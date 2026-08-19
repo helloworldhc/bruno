@@ -13,8 +13,10 @@ import ResponsiveTabs from 'ui/ResponsiveTabs';
 import { updateTabState } from 'providers/ReduxStore/slices/tabs';
 import useEnvironmentTabs from 'hooks/useEnvironmentTabs';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuery, setSearchQuery, isSearchExpanded, setIsSearchExpanded, debouncedSearchQuery, searchInputRef }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const environments = collection?.environments || [];
 
@@ -211,16 +213,16 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
         </div>
         {nameError && isRenaming && <div className="title-error">{nameError}</div>}
         <div className="actions">
-          <ActionIcon label="Save All" onClick={handleSaveAll} data-testid="save-all-env">
+          <ActionIcon label={t('COMMON.SAVE', 'Save All')} onClick={handleSaveAll} data-testid="save-all-env">
             <IconDeviceFloppy size={15} strokeWidth={1.5} />
           </ActionIcon>
-          <ActionIcon label="Rename" onClick={handleRenameClick} data-testid="env-rename-action">
+          <ActionIcon label={t('COMMON.RENAME', 'Rename')} onClick={handleRenameClick} data-testid="env-rename-action">
             <IconEdit size={15} strokeWidth={1.5} />
           </ActionIcon>
-          <ActionIcon label="Copy" onClick={() => setOpenCopyModal(true)} data-testid="env-copy-action">
+          <ActionIcon label={t('COMMON.COPY', 'Copy')} onClick={() => setOpenCopyModal(true)} data-testid="env-copy-action">
             <IconCopy size={15} strokeWidth={1.5} />
           </ActionIcon>
-          <ActionIcon label="Delete" onClick={() => setOpenDeleteModal(true)} colorOnHover="danger" data-testid="env-delete-action">
+          <ActionIcon label={t('COMMON.DELETE', 'Delete')} onClick={() => setOpenDeleteModal(true)} colorOnHover="danger" data-testid="env-delete-action">
             <IconTrash size={15} strokeWidth={1.5} />
           </ActionIcon>
         </div>
@@ -239,7 +241,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder={activeTab === 'secrets' ? 'Search secrets...' : 'Search variables...'}
+                    placeholder={activeTab === 'secrets' ? t('ENVIRONMENTS.SEARCH_SECRETS', 'Search secrets...') : t('ENVIRONMENTS.SEARCH_VARIABLES', 'Search variables...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onBlur={handleSearchBlur}
@@ -255,7 +257,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
                       className="clear-search"
                       onClick={handleClearSearch}
                       onMouseDown={(e) => e.preventDefault()}
-                      title="Clear search"
+                      title={t('COMMON.CLEAR', 'Clear search')}
                       data-testid="env-clear-search"
                     >
                       <IconX size={14} strokeWidth={1.5} />
@@ -263,7 +265,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
                   )}
                 </div>
               ) : (
-                <ActionIcon label="Search" onClick={handleSearchIconClick} data-testid="env-search-action">
+                <ActionIcon label={t('COMMON.SEARCH', 'Search')} onClick={handleSearchIconClick} data-testid="env-search-action">
                   <IconSearch size={15} strokeWidth={1.5} />
                 </ActionIcon>
               )}

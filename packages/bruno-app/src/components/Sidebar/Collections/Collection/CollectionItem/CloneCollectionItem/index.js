@@ -77,7 +77,7 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
           className="btn-advanced"
           type="button"
         >
-          Options
+          {t('COMMON.OPTIONS', 'Options')}
         </button>
         <IconCaretDown className="caret ml-1" size={14} strokeWidth={2} />
       </div>
@@ -102,7 +102,7 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
                 id="collection-item-name"
                 type="text"
                 name="name"
-                placeholder={t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
+                placeholder={isFolder ? t('NEW_FOLDER.NAME_LABEL', 'Folder Name') : t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
                 ref={inputRef}
                 className="block textbox mt-2 w-full"
                 autoComplete="off"
@@ -122,20 +122,21 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
               <div className="mt-4">
                 <div className="flex items-center justify-between">
                   <label htmlFor="filename" className="flex items-center font-medium">
-                    {isFolder ? 'Folder' : 'File'} Name <small className="font-normal text-muted ml-1">(on filesystem)</small>
-                    { isFolder ? (
+                    {isFolder ? t('NEW_FOLDER.NAME_LABEL', 'Folder Name') : t('NEW_REQUEST.FILE_NAME_LABEL', 'File Name')}{' '}
+                    <small className="font-normal text-muted ml-1">(on filesystem)</small>
+                    {isFolder ? (
                       <Help width="300">
                         <p>
-                          You can choose to save the folder as a different name on your file system versus what is displayed in the app.
+                          {t('NEW_FOLDER.FOLDER_NAME_HELP', 'You can choose to save the folder as a different name on your file system versus what is displayed in the app.')}
                         </p>
                       </Help>
                     ) : (
                       <Help width="300">
                         <p>
-                          Bruno saves each request as a file in your collection's folder.
+                          {t('CREATE_COLLECTION.FOLDER_NAME_HELP_1', 'Bruno saves each request as a file in your collection\'s folder.')}
                         </p>
                         <p className="mt-2">
-                          You can choose a file name different from your request's name or one compatible with filesystem rules.
+                          {t('CREATE_COLLECTION.FOLDER_NAME_HELP_2', 'You can choose a file name different from your request\'s name or one compatible with filesystem rules.')}
                         </p>
                       </Help>
                     )}
@@ -162,7 +163,7 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
                       id="file-name"
                       type="text"
                       name="filename"
-                      placeholder={isFolder ? 'Folder Name' : 'File Name'}
+                      placeholder={isFolder ? t('NEW_FOLDER.NAME_LABEL', 'Folder Name') : t('NEW_REQUEST.FILE_NAME_LABEL', 'File Name')}
                       className="!pr-10 block textbox mt-2 w-full"
                       autoComplete="off"
                       autoCorrect="off"
@@ -197,7 +198,7 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
                       toggleShowFilesystemName(!showFilesystemName);
                     }}
                   >
-                    {showFilesystemName ? 'Hide Filesystem Name' : 'Show Filesystem Name'}
+                    {showFilesystemName ? t('NEW_REQUEST.HIDE_FILESYSTEM_NAME', 'Hide Filesystem Name') : t('NEW_REQUEST.SHOW_FILESYSTEM_NAME', 'Show Filesystem Name')}
                   </div>
                 </Dropdown>
               </div>

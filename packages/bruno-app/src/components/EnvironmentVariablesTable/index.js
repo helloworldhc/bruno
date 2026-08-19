@@ -32,6 +32,7 @@ import { sortRowsByName, reorderWithinSubset } from 'utils/sortableRows';
 import { useMouseRowDrag, DRAG_ROW_KEY_ATTR } from 'hooks/useMouseRowDrag';
 import ColumnSortHeader from 'components/EditableTable/ColumnSortHeader';
 import { reconcileSavedChange } from './reconcile';
+import { useTranslation } from 'react-i18next';
 
 const MIN_H = 35 * 2;
 const MIN_COLUMN_WIDTH = 80;
@@ -185,6 +186,7 @@ const EnvironmentVariablesTable = ({
   searchQuery = '',
   variableType = 'variables'
 }) => {
+  const { t } = useTranslation();
   const isSecretTab = variableType === 'secrets';
   const { storedTheme } = useTheme();
   const { globalEnvironments, activeGlobalEnvironmentUid } = useSelector((state) => state.globalEnvironments);
@@ -655,7 +657,7 @@ const EnvironmentVariablesTable = ({
 
     const hasChanges = JSON.stringify(activeCurrent.map(stripEnvVarUid)) !== JSON.stringify(activeSaved.map(stripEnvVarUid));
     if (!hasChanges) {
-      toast.error('No changes to save');
+      toast.error(t('COMMON.NO_CHANGES_TO_SAVE', 'No changes to save'));
       return;
     }
 
@@ -670,7 +672,7 @@ const EnvironmentVariablesTable = ({
     });
 
     if (hasValidationErrors) {
-      toast.error('Please fix validation errors before saving');
+      toast.error(t('COMMON.FIX_VALIDATION_ERRORS', 'Please fix validation errors before saving'));
       return;
     }
 
@@ -684,7 +686,7 @@ const EnvironmentVariablesTable = ({
 
     onSave(cloneDeep(persistedVariables))
       .then(() => {
-        toast.success('Changes saved successfully');
+        toast.success(t('COMMON.CHANGES_SAVED_SUCCESS', 'Changes saved successfully'));
 
         // Preserve unsaved edits on the other tab across the post-save reinit via the
         // draft: keep it if the other tab is still dirty, clear it otherwise.
@@ -718,9 +720,9 @@ const EnvironmentVariablesTable = ({
       })
       .catch((error) => {
         console.error(error);
-        toast.error('An error occurred while saving the changes');
+        toast.error(t('COMMON.ERROR_SAVING_CHANGES', 'An error occurred while saving the changes'));
       });
-  }, [formik.values, environment.variables, onSave, onDraftChange, onDraftClear, setIsModified, isSecretTab, buildSortOrder, sortMode]);
+  }, [formik.values, environment.variables, onSave, onDraftChange, onDraftClear, setIsModified, isSecretTab, buildSortOrder, sortMode, t]);
 
   const handleReset = useCallback(() => {
     const belongsToActiveTab = (variable) => (isSecretTab ? !!variable.secret : !variable.secret);
@@ -772,7 +774,7 @@ const EnvironmentVariablesTable = ({
     const hasChanges
       = JSON.stringify(persistedVariables.map(stripEnvVarUid)) !== JSON.stringify(savedValues.map(stripEnvVarUid));
     if (!hasChanges) {
-      toast.error('No changes to save');
+      toast.error(t('COMMON.NO_CHANGES_TO_SAVE', 'No changes to save'));
       return;
     }
 
@@ -787,7 +789,7 @@ const EnvironmentVariablesTable = ({
     });
 
     if (hasValidationErrors) {
-      toast.error('Please fix validation errors before saving');
+      toast.error(t('COMMON.FIX_VALIDATION_ERRORS', 'Please fix validation errors before saving'));
       return;
     }
 
@@ -798,7 +800,7 @@ const EnvironmentVariablesTable = ({
 
     onSave(cloneDeep(persistedVariables))
       .then(() => {
-        toast.success('Changes saved successfully');
+        toast.success(t('COMMON.CHANGES_SAVED_SUCCESS', 'Changes saved successfully'));
         onDraftClear();
 
         sortOrderRef.current = buildSortOrder(persistedVariables, sortMode);
@@ -820,9 +822,9 @@ const EnvironmentVariablesTable = ({
       })
       .catch((error) => {
         console.error(error);
-        toast.error('An error occurred while saving the changes');
+        toast.error(t('COMMON.ERROR_SAVING_CHANGES', 'An error occurred while saving the changes'));
       });
-  }, [formik.values, environment.variables, onSave, onDraftClear, setIsModified, isSecretTab, buildSortOrder, sortMode]);
+  }, [formik.values, environment.variables, onSave, onDraftClear, setIsModified, isSecretTab, buildSortOrder, sortMode, t]);
 
   const handleSaveRef = useRef(handleSave);
   handleSaveRef.current = handleSave;
@@ -908,7 +910,7 @@ const EnvironmentVariablesTable = ({
   return (
     <StyledWrapper className={`${resizing ? 'is-resizing' : ''} has-description-column`.trim()}>
       {isSearchActive && displayedVariables.length === 0 ? (
-        <div className="no-results">No results found for &ldquo;{searchQuery.trim()}&rdquo;</div>
+        <div className="no-results">{t('COMMON.NO_RESULTS_FOR', 'No results found for "{{query}}"', { query: searchQuery.trim() })}</div>
       ) : (
         <TableVirtuoso
           className="table-container"
@@ -930,7 +932,7 @@ const EnvironmentVariablesTable = ({
                   if (!e.target.closest('.resize-handle')) cycleSortMode();
                 }}
               >
-                <ColumnSortHeader label="Name" SortIcon={SortIcon} sortLabel={sortLabel} />
+                <ColumnSortHeader label={t('COMMON.NAME', 'Name')} SortIcon={SortIcon} sortLabel={sortLabel} />
                 <div
                   className={`resize-handle ${resizing === 'name' ? 'resizing' : ''}`}
                   style={{ height: tableHeight > 0 ? `${tableHeight}px` : undefined }}
@@ -938,14 +940,14 @@ const EnvironmentVariablesTable = ({
                 />
               </td>
               <td style={{ width: columnWidths.value }}>
-                Value
+                {t('COMMON.VALUE', 'Value')}
                 <div
                   className={`resize-handle ${resizing === 'value' ? 'resizing' : ''}`}
                   style={{ height: tableHeight > 0 ? `${tableHeight}px` : undefined }}
                   onMouseDown={(e) => handleResizeStart(e, 'value')}
                 />
               </td>
-              <td style={{ width: columnWidths.description }}>Description</td>
+              <td style={{ width: columnWidths.description }}>{t('COMMON.DESCRIPTION', 'Description')}</td>
               <td className="actions-column"></td>
             </tr>
           )}
@@ -994,7 +996,7 @@ const EnvironmentVariablesTable = ({
                         name={`${actualIndex}.name`}
                         data-testid="env-var-name-input"
                         value={variable.name}
-                        placeholder={!variable.name || (typeof variable.name === 'string' && variable.name.trim() === '') ? 'Name' : ''}
+                        placeholder={!variable.name || (typeof variable.name === 'string' && variable.name.trim() === '') ? t('COMMON.NAME', 'Name') : ''}
                         onChange={(e) => handleNameChange(actualIndex, e)}
                         onFocus={() => handleRowFocus(variable.uid)}
                         onBlur={() => {
@@ -1027,7 +1029,7 @@ const EnvironmentVariablesTable = ({
                     collection={_collection}
                     name={`${actualIndex}.description`}
                     value={variable.description ?? ''}
-                    placeholder={isLastEmptyRow && (!variable.description || (typeof variable.description === 'string' && variable.description.trim() === '')) ? 'Description' : ''}
+                    placeholder={isLastEmptyRow && (!variable.description || (typeof variable.description === 'string' && variable.description.trim() === '')) ? t('COMMON.DESCRIPTION', 'Description') : ''}
                     onChange={(newValue) => {
                       formik.setFieldValue(`${actualIndex}.description`, newValue, true);
                       if (isLastRow) {
@@ -1064,10 +1066,10 @@ const EnvironmentVariablesTable = ({
       <div className="button-container">
         <div className="flex items-center">
           <button type="button" className="submit" onClick={handleSave} data-testid="save-env">
-            Save
+            {t('COMMON.SAVE', 'Save')}
           </button>
           <button type="button" className="submit reset ml-2" onClick={handleReset} data-testid="reset-env">
-            Reset
+            {t('COMMON.RESET', 'Reset')}
           </button>
         </div>
       </div>

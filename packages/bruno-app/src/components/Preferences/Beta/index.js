@@ -14,6 +14,7 @@ import ToggleSwitch from 'components/ToggleSwitch';
 
 import { BETA_FEATURES as BETA_FEATURE_IDS } from 'utils/beta-features';
 import { getDocsUrlWithVersion } from 'utils/url';
+import { useTranslation } from 'react-i18next';
 
 /**
  * UI metadata for the Beta Features section in Preferences — one entry per toggle.
@@ -70,6 +71,7 @@ const BETA_FEATURES = [
 ];
 
 const Beta = ({ close }) => {
+  const { t } = useTranslation();
   const preferences = useSelector((state) => state.app.preferences);
   const dispatch = useDispatch();
 
@@ -154,11 +156,11 @@ const Beta = ({ close }) => {
 
   return (
     <StyledWrapper>
-      <div className="section-header">Beta Features</div>
+      <div className="section-header">{t('PREFERENCES.BETA', 'Beta Features')}</div>
       <form onSubmit={formik.handleSubmit}>
         <div className="mb-6">
           <p className="text-gray-500 dark:text-gray-400 mb-4 text-wrap">
-            Beta features are experimental previews that may change before full release. Try them and share feedback.
+            {t('PREFERENCES.BETA_DESC', 'Beta features are experimental previews that may change before full release. Try them and share feedback.')}
           </p>
         </div>
 
@@ -202,7 +204,7 @@ const Beta = ({ close }) => {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <span>View docs</span>
+                      <span>{t('COMMON.DOCUMENTATION', 'View docs')}</span>
                       <IconExternalLink size={14} strokeWidth={1.5} />
                     </a>
                   )}

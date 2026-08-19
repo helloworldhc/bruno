@@ -3,6 +3,7 @@ import { uuid } from 'utils/common';
 import { sortByNameThenSequence } from 'utils/common/index';
 import path, { normalizePath } from 'utils/common/path';
 import { isRequestTagsIncluded } from '@usebruno/common';
+import i18n from 'i18n';
 
 const replaceTabsWithSpaces = (str, numSpaces = 2) => {
   if (!str || !str.length || !isString(str)) {
@@ -950,7 +951,7 @@ export const sortItemsBySidebarOrder = (items = []) => {
 };
 
 export const humanizeRequestBodyMode = (mode) => {
-  let label = 'No Body';
+  let label = i18n.t('REQUEST.NO_BODY', 'No Body');
   switch (mode) {
     case 'json': {
       label = 'JSON';
@@ -986,10 +987,10 @@ export const humanizeRequestBodyMode = (mode) => {
 };
 
 export const humanizeRequestAuthMode = (mode) => {
-  let label = 'No Auth';
+  let label = i18n.t('REQUEST.NO_AUTH', 'No Auth');
   switch (mode) {
     case 'inherit': {
-      label = 'Inherit';
+      label = i18n.t('COMMON.INHERIT', 'Inherit');
       break;
     }
     case 'awsv4': {

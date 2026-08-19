@@ -10,8 +10,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IconEye, IconEyeOff, IconRefresh } from '@tabler/icons';
 import { useState } from 'react';
 import SystemProxy from './SystemProxy';
+import { useTranslation } from 'react-i18next';
 
 const ProxySettings = ({ close }) => {
+  const { t } = useTranslation();
   const preferences = useSelector((state) => state.app.preferences);
   const dispatch = useDispatch();
 
@@ -133,11 +135,11 @@ const ProxySettings = ({ close }) => {
 
   return (
     <StyledWrapper>
-      <div className="section-header">Proxy Settings</div>
+      <div className="section-header">{t('PREFERENCES.PROXY_SETTINGS', 'Proxy Settings')}</div>
       <form className="bruno-form" onSubmit={formik.handleSubmit}>
         <div className="mb-3 flex items-center mt-2">
           <label className="settings-label" htmlFor="protocol">
-            Mode
+            {t('PREFERENCES.PROXY_MODE', 'Mode')}
           </label>
           <div className="flex items-center">
             <label className="flex items-center cursor-pointer" data-testid="off-proxy-mode">
@@ -152,7 +154,7 @@ const ProxySettings = ({ close }) => {
                 }}
                 className="mr-1 cursor-pointer"
               />
-              Off
+              {t('PREFERENCES.PROXY_OFF', 'Off')}
             </label>
             <label className="flex items-center ml-4 cursor-pointer" data-testid="manual-proxy-mode">
               <input
@@ -167,7 +169,7 @@ const ProxySettings = ({ close }) => {
                 }}
                 className="mr-1 cursor-pointer"
               />
-              On
+              {t('PREFERENCES.PROXY_ON', 'On')}
             </label>
             <label className="flex items-center ml-4 cursor-pointer" data-testid="system-proxy-mode">
               <input
@@ -182,7 +184,7 @@ const ProxySettings = ({ close }) => {
                 }}
                 className="mr-1 cursor-pointer"
               />
-              System Proxy
+              {t('PREFERENCES.PROXY_SYSTEM', 'System Proxy')}
             </label>
             <label className="flex items-center ml-4 cursor-pointer" data-testid="pac-proxy-mode">
               <input
@@ -197,7 +199,7 @@ const ProxySettings = ({ close }) => {
                 }}
                 className="mr-1 cursor-pointer"
               />
-              PAC
+              {t('PREFERENCES.PROXY_PAC', 'PAC')}
             </label>
           </div>
         </div>
@@ -210,7 +212,7 @@ const ProxySettings = ({ close }) => {
           <>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="protocol">
-                Protocol
+                {t('PREFERENCES.PROXY_PROTOCOL', 'Protocol')}
               </label>
               <div className="flex items-center">
                 <label className="flex items-center">
@@ -261,7 +263,7 @@ const ProxySettings = ({ close }) => {
             </div>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="config.hostname">
-                Hostname
+                {t('PREFERENCES.PROXY_HOSTNAME', 'Hostname')}
               </label>
               <input
                 id="config.hostname"
@@ -281,7 +283,7 @@ const ProxySettings = ({ close }) => {
             </div>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="config.port">
-                Port
+                {t('PREFERENCES.PROXY_PORT', 'Port')}
               </label>
               <input
                 id="config.port"
@@ -301,7 +303,7 @@ const ProxySettings = ({ close }) => {
             </div>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="config.auth.disabled">
-                Auth
+                {t('REQUEST.AUTH', 'Auth')}
               </label>
               <input
                 id="config.auth.disabled"
@@ -317,7 +319,7 @@ const ProxySettings = ({ close }) => {
             <div>
               <div className="mb-3 flex items-center">
                 <label className="settings-label" htmlFor="config.auth.username">
-                  Username
+                  {t('PREFERENCES.PROXY_USERNAME', 'Username')}
                 </label>
                 <input
                   id="config.auth.username"
@@ -337,7 +339,7 @@ const ProxySettings = ({ close }) => {
               </div>
               <div className="mb-3 flex items-center">
                 <label className="settings-label" htmlFor="config.auth.password">
-                  Password
+                  {t('PREFERENCES.PROXY_PASSWORD', 'Password')}
                 </label>
                 <div className="textbox flex flex-row items-center w-[13.2rem] h-[2.25rem] relative">
                   <input
@@ -367,7 +369,7 @@ const ProxySettings = ({ close }) => {
             </div>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="config.bypassProxy">
-                Proxy Bypass
+                {t('PREFERENCES.PROXY_BYPASS', 'Proxy Bypass')}
               </label>
               <input
                 id="config.bypassProxy"
@@ -445,7 +447,7 @@ const ProxySettings = ({ close }) => {
                   >
                     {formik.values.pac.source
                       ? decodeURIComponent(formik.values.pac.source.split('/').pop())
-                      : 'Select File'}
+                      : t('COMMON.SELECT_FILE', 'Select File')}
                   </button>
                 )}
                 {formik.touched.pac?.source && formik.errors.pac?.source ? (
@@ -454,8 +456,8 @@ const ProxySettings = ({ close }) => {
               </div>
               <p className="pac-hint">
                 {pacInputMode === 'url'
-                  ? 'Enter the URL to your PAC file'
-                  : 'Supports .pac files for automatic proxy configuration'}
+                  ? t('PREFERENCES.PAC_URL_HINT', 'Enter the URL to your PAC file')
+                  : t('PREFERENCES.PAC_FILE_HINT', 'Supports .pac files for automatic proxy configuration')}
               </p>
               {formik.values.pac.source ? (
                 <span
@@ -463,7 +465,7 @@ const ProxySettings = ({ close }) => {
                   onClick={handleRefreshPac}
                 >
                   <IconRefresh size={14} strokeWidth={1.5} className="mr-1" />
-                  Refetch
+                  {t('PREFERENCES.REFETCH', 'Refetch')}
                 </span>
               ) : null}
             </div>

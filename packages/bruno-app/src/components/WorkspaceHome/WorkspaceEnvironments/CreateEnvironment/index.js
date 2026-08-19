@@ -7,8 +7,10 @@ import Portal from 'components/Portal';
 import Modal from 'components/Modal';
 import { addGlobalEnvironment } from 'providers/ReduxStore/slices/global-environments';
 import { validateName, validateNameError } from 'utils/common/regex';
+import { useTranslation } from 'react-i18next';
 
 const CreateEnvironment = ({ onClose, onEnvironmentCreated }) => {
+  const { t } = useTranslation();
   const globalEnvs = useSelector((state) => state?.globalEnvironments?.globalEnvironments);
 
   const validateEnvironmentName = (name) => {
@@ -31,20 +33,20 @@ const CreateEnvironment = ({ onClose, onEnvironmentCreated }) => {
           const isValid = validateName(value);
           return isValid ? true : this.createError({ message: validateNameError(value) });
         })
-        .required('Name is required')
-        .test('duplicate-name', 'Global environment already exists', validateEnvironmentName)
+        .required(t('ENVIRONMENTS.NAME_REQUIRED', 'Name is required'))
+        .test('duplicate-name', t('ENVIRONMENTS.GLOBAL_ENV_EXISTS', 'Global environment already exists'), validateEnvironmentName)
     }),
     onSubmit: (values) => {
       dispatch(addGlobalEnvironment({ name: values.name }))
         .then(() => {
-          toast.success('Global environment created!');
+          toast.success(t('ENVIRONMENTS.GLOBAL_ENV_CREATED_SUCCESS', 'Global environment created!'));
           onClose();
           // Call the callback if provided
           if (onEnvironmentCreated) {
             onEnvironmentCreated();
           }
         })
-        .catch(() => toast.error('An error occurred while creating the environment'));
+        .catch(() => toast.error(t('ENVIRONMENTS.ENV_CREATED_ERROR', 'An error occurred while creating the environment')));
     }
   });
 
@@ -62,15 +64,16 @@ const CreateEnvironment = ({ onClose, onEnvironmentCreated }) => {
     <Portal>
       <Modal
         size="md"
-        title="Create Global Environment"
-        confirmText="Create"
+        title={t('ENVIRONMENTS.CREATE_GLOBAL_ENV', 'Create Global Environment')}
+        confirmText={t('COMMON.CREATE', 'Create')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         handleConfirm={onSubmit}
         handleCancel={onClose}
       >
         <form className="bruno-form" onSubmit={(e) => e.preventDefault()}>
           <div>
             <label htmlFor="environment-name" className="block font-semibold">
-              Environment Name
+              {t('ENVIRONMENTS.NAME', 'Environment Name')}
             </label>
             <div className="flex items-center mt-2">
               <input

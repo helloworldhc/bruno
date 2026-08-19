@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Modal from 'components/Modal';
 import Portal from 'components/Portal';
 import statusCodePhraseMap from 'components/ResponsePane/StatusCode/get-status-code-phrase';
+import { useTranslation } from 'react-i18next';
 
 const BODY_TYPES = [
   { value: 'json', label: 'JSON' },
@@ -10,7 +11,10 @@ const BODY_TYPES = [
   { value: 'html', label: 'HTML' }
 ];
 
-const CreateExampleModal = ({ isOpen, onClose, onSave, title = 'Create Response Example', initialName = '', showMockFields = false, confirmText = 'Create Example' }) => {
+const CreateExampleModal = ({ isOpen, onClose, onSave, title, initialName = '', showMockFields = false, confirmText }) => {
+  const { t } = useTranslation();
+  const modalTitle = title || t('RESPONSE_EXAMPLE.CREATE_RESPONSE_EXAMPLE', 'Create Response Example');
+  const modalConfirmText = confirmText || t('RESPONSE_EXAMPLE.CREATE_EXAMPLE', 'Create Example');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [nameError, setNameError] = useState('');
@@ -39,7 +43,7 @@ const CreateExampleModal = ({ isOpen, onClose, onSave, title = 'Create Response 
       setStatusCode(200);
       setBodyType('json');
     } else {
-      setNameError('Example name is required');
+      setNameError(t('RESPONSE_EXAMPLE.EXAMPLE_NAME_REQUIRED', 'Example name is required'));
     }
   };
 
@@ -71,17 +75,17 @@ const CreateExampleModal = ({ isOpen, onClose, onSave, title = 'Create Response 
     <Portal>
       <Modal
         size="md"
-        title={title}
+        title={modalTitle}
         handleCancel={handleClose}
         handleConfirm={handleConfirm}
-        confirmText={confirmText}
-        cancelText="Cancel"
+        confirmText={modalConfirmText}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         isOpen={isOpen}
       >
         <div className="space-y-4">
           <div>
             <label htmlFor="exampleName" className="block font-medium">
-              Example Name<span className="text-red-600">*</span>
+              {t('RESPONSE_EXAMPLE.EXAMPLE_NAME', 'Example Name')}<span className="text-red-600">*</span>
             </label>
             <input
               id="exampleName"
@@ -102,7 +106,7 @@ const CreateExampleModal = ({ isOpen, onClose, onSave, title = 'Create Response 
 
           <div>
             <label htmlFor="exampleDescription" className="block font-medium">
-              Description
+              {t('COMMON.DESCRIPTION', 'Description')}
             </label>
             <textarea
               id="exampleDescription"
@@ -118,7 +122,7 @@ const CreateExampleModal = ({ isOpen, onClose, onSave, title = 'Create Response 
             <>
               <div>
                 <label htmlFor="statusCode" className="block font-medium">
-                  Status Code
+                  {t('RESPONSE_EXAMPLE.STATUS_CODE', 'Status Code')}
                 </label>
                 <select
                   id="statusCode"
@@ -135,7 +139,7 @@ const CreateExampleModal = ({ isOpen, onClose, onSave, title = 'Create Response 
 
               <div>
                 <label htmlFor="bodyType" className="block font-medium">
-                  Body Type
+                  {t('RESPONSE_EXAMPLE.BODY_TYPE', 'Body Type')}
                 </label>
                 <select
                   id="bodyType"

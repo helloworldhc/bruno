@@ -6,8 +6,10 @@ import { useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
+import { useTranslation } from 'react-i18next';
 
 const CopyEnvironment = ({ environment, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const inputRef = useRef();
   const formik = useFormik({
@@ -24,11 +26,11 @@ const CopyEnvironment = ({ environment, onClose }) => {
     onSubmit: (values) => {
       dispatch(copyGlobalEnvironment({ name: values.name, environmentUid: environment.uid }))
         .then(() => {
-          toast.success('Environment created!');
+          toast.success(t('ENVIRONMENTS.ENV_CREATED_SUCCESS', 'Environment created!'));
           onClose();
         })
         .catch((error) => {
-          toast.error('An error occurred while creating the environment');
+          toast.error(t('ENVIRONMENTS.ENV_CREATED_ERROR', 'An error occurred while creating the environment'));
           console.error(error);
         });
     }
@@ -46,11 +48,18 @@ const CopyEnvironment = ({ environment, onClose }) => {
 
   return (
     <Portal>
-      <Modal size="sm" title="Copy Environment" confirmText="Copy" handleConfirm={onSubmit} handleCancel={onClose}>
+      <Modal
+        size="sm"
+        title={t('ENVIRONMENTS.COPY_ENVIRONMENT', 'Copy Environment')}
+        confirmText={t('COMMON.COPY', 'Copy')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
+        handleConfirm={onSubmit}
+        handleCancel={onClose}
+      >
         <form className="bruno-form" onSubmit={(e) => e.preventDefault()}>
           <div>
             <label htmlFor="environment-name" className="block font-semibold">
-              New Environment Name
+              {t('ENVIRONMENTS.NEW_ENVIRONMENT_NAME', 'New Environment Name')}
             </label>
             <input
               id="environment-name"

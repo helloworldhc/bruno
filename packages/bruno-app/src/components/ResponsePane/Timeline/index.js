@@ -8,6 +8,7 @@ import { usePersistedState } from 'hooks/usePersistedState';
 import { useTrackScroll } from 'hooks/useTrackScroll';
 import { buildTimelineEntries, getEntryKind, countByKind } from './buildEntries';
 import { FILTER_CHIPS } from './entryMeta';
+import { useTranslation } from 'react-i18next';
 
 const getEffectiveAuthSource = (collection, item) => {
   const authMode = item.draft ? get(item, 'draft.request.auth.mode') : get(item, 'request.auth.mode');
@@ -48,6 +49,7 @@ const getEffectiveAuthSource = (collection, item) => {
 };
 
 const Timeline = ({ collection, item }) => {
+  const { t } = useTranslation();
   const wrapperRef = useRef(null);
   const [scroll, setScroll] = usePersistedState({ key: `response-timeline-scroll-${item.uid}`, default: 0 });
   useTrackScroll({ ref: wrapperRef, selector: null, onChange: setScroll, initialValue: scroll });
@@ -71,6 +73,16 @@ const Timeline = ({ collection, item }) => {
   const hasOtherKinds = counts.pre > 0 || counts.post > 0 || counts.oauth > 0;
   const showFilterBar = entries.length > 0 && hasOtherKinds;
 
+  const getChipLabel = (chip) => {
+    switch (chip.id) {
+      case 'all': return t('COMMON.ALL', 'All');
+      case 'main': return t('REQUEST.REQUEST', 'Request');
+      case 'pre': return t('REQUEST.PRE_REQUEST', 'Pre-Request');
+      case 'post': return t('REQUEST.POST_RESPONSE', 'Post-Response');
+      default: return chip.label;
+    }
+  };
+
   useEffect(() => {
     if (activeFilter === 'all') return;
     const stillVisible = visibleChips.some((chip) => chip.id === activeFilter);
@@ -92,7 +104,7 @@ const Timeline = ({ collection, item }) => {
               onClick={() => setActiveFilter(chip.id)}
               data-testid={`timeline-chip-${chip.id}`}
             >
-              {chip.label}
+              {getChipLabel(chip)}
               <span className="timeline-chip-count" data-testid="timeline-chip-count">{counts[chip.id] ?? 0}</span>
             </button>
           ))}

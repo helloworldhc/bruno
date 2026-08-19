@@ -140,7 +140,7 @@ const CollectionSettings = ({ collection }) => {
             {hasTests && <StatusDot />}
           </div>
           <div className={getTabClassname('presets')} role="tab" data-testid="collection-settings-tab-presets" onClick={() => setTab('presets')}>
-            Presets
+            {t('COLLECTION_SETTINGS.PRESETS', 'Presets')}
             {hasPresets && <StatusDot />}
           </div>
           <div className={getTabClassname('proxy')} role="tab" data-testid="collection-settings-tab-proxy" onClick={() => setTab('proxy')}>
@@ -152,7 +152,7 @@ const CollectionSettings = ({ collection }) => {
             {clientCertConfig.length > 0 && <StatusDot />}
           </div>
           <div className={getTabClassname('protobuf')} role="tab" data-testid="collection-settings-tab-protobuf" onClick={() => setTab('protobuf')}>
-            Protobuf
+            {t('COLLECTION_SETTINGS.PROTOBUF', 'Protobuf')}
             {protobufConfig.protoFiles && protobufConfig.protoFiles.length > 0 && <StatusDot />}
           </div>
         </div>

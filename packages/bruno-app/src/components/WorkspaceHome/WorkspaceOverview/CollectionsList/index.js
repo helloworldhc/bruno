@@ -27,8 +27,10 @@ import StatusBadge from 'ui/StatusBadge';
 import ConnectGitRemote from './ConnectGitRemote';
 import RemoveGitRemote from './RemoveGitRemote';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const CollectionsList = ({ workspace }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { collections } = useSelector((state) => state.collections);
   const dropdownRefs = useRef({});
@@ -360,10 +362,10 @@ const CollectionsList = ({ workspace }) => {
                     </StatusBadge>
                   )}
                   {collection.failedToOpen && (
-                    <StatusBadge status="danger" size="xs">Failed to open</StatusBadge>
+                    <StatusBadge status="danger" size="xs">{t('WORKSPACE.FAILED_TO_OPEN', 'Failed to open')}</StatusBadge>
                   )}
                   {isNotCloned(collection) && (
-                    <StatusBadge status="warning" size="xs">Not cloned</StatusBadge>
+                    <StatusBadge status="warning" size="xs">{t('WORKSPACE.NOT_CLONED', 'Not cloned')}</StatusBadge>
                   )}
                 </div>
                 <div className="collection-path">{collection.pathname}</div>
@@ -392,7 +394,7 @@ const CollectionsList = ({ workspace }) => {
                           }}
                         >
                           <IconEdit size={16} strokeWidth={1.5} />
-                          <span>Rename</span>
+                          <span>{t('COMMON.RENAME', 'Rename')}</span>
                         </div>
                         <div
                           className="dropdown-item"
@@ -402,7 +404,7 @@ const CollectionsList = ({ workspace }) => {
                           }}
                         >
                           <IconShare size={16} strokeWidth={1.5} />
-                          <span>Share</span>
+                          <span>{t('COMMON.SHARE', 'Share')}</span>
                         </div>
                         <div
                           className="dropdown-item"
@@ -429,7 +431,7 @@ const CollectionsList = ({ workspace }) => {
                                 }}
                               >
                                 <IconCopy size={16} strokeWidth={1.5} />
-                                <span>Copy Git URL</span>
+                                <span>{t('WORKSPACE.COPY_GIT_URL', 'Copy Git URL')}</span>
                               </div>
                             )}
                             {!collection.isGitBacked && collection.isLoaded !== false && (
@@ -441,7 +443,7 @@ const CollectionsList = ({ workspace }) => {
                                 }}
                               >
                                 <IconBrandGit size={16} strokeWidth={1.5} />
-                                <span>Connect to Git</span>
+                                <span>{t('WORKSPACE.CONNECT_TO_GIT', 'Connect to Git')}</span>
                               </div>
                             )}
                             {collection.isGitBacked && (
@@ -453,7 +455,7 @@ const CollectionsList = ({ workspace }) => {
                                 }}
                               >
                                 <IconUnlink size={16} strokeWidth={1.5} />
-                                <span>Remove Git Remote</span>
+                                <span>{t('WORKSPACE.REMOVE_GIT_REMOTE', 'Remove Git Remote')}</span>
                               </div>
                             )}
                           </>
@@ -468,7 +470,7 @@ const CollectionsList = ({ workspace }) => {
                       }}
                     >
                       <IconX size={16} strokeWidth={1.5} />
-                      <span>Remove</span>
+                      <span>{t('COMMON.REMOVE', 'Remove')}</span>
                     </div>
                     {!collection.failedToOpen && !isNotCloned(collection) && (
                       <div
@@ -479,7 +481,7 @@ const CollectionsList = ({ workspace }) => {
                         }}
                       >
                         <IconTrash size={16} strokeWidth={1.5} />
-                        <span>Delete</span>
+                        <span>{t('COMMON.DELETE', 'Delete')}</span>
                       </div>
                     )}
                   </div>

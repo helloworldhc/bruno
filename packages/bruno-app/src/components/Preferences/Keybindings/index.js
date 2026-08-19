@@ -17,6 +17,7 @@ import {
 import { Tooltip } from 'react-tooltip';
 import ToggleSwitch from 'components/ToggleSwitch/index';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const getOS = () => (isMacOS() ? 'mac' : 'windows');
 
@@ -261,6 +262,7 @@ const ERROR = {
 };
 
 const Keybindings = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const preferences = useSelector((state) => state.app.preferences);
   const { theme } = useTheme();
@@ -763,7 +765,7 @@ const Keybindings = () => {
   return (
     <StyledWrapper className="w-full">
       <div className="section-header">
-        <span>Keybindings</span>
+        <span>{t('PREFERENCES.KEYBINDINGS', 'Keybindings')}</span>
 
         <div className="section-actions">
           <ToggleSwitch
@@ -779,7 +781,7 @@ const Keybindings = () => {
             data-testid="reset-all-keybindings-btn"
             disabled={!hasCustomizedKeybindings}
           >
-            Reset Default
+            {t('COMMON.RESET_DEFAULT', 'Reset Default')}
           </button>
         </div>
       </div>
@@ -790,8 +792,8 @@ const Keybindings = () => {
             <table>
               <thead>
                 <tr>
-                  <td>Command</td>
-                  <td>Keybinding</td>
+                  <td>{t('COMMON.COMMAND', 'Command')}</td>
+                  <td>{t('PREFERENCES.KEYBINDING', 'Keybinding')}</td>
                 </tr>
               </thead>
               <tbody>
@@ -936,7 +938,7 @@ const Keybindings = () => {
             </table>
           </div>
         ) : (
-          <div className="empty-state">No key bindings available</div>
+          <div className="empty-state">{t('PREFERENCES.NO_KEYBINDINGS', 'No key bindings available')}</div>
         )}
       </div>
     </StyledWrapper>

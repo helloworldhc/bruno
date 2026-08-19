@@ -5,8 +5,10 @@ import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { IconFolder } from '@tabler/icons';
 import { closeWorkspaceAction } from 'providers/ReduxStore/slices/workspaces/actions';
+import { useTranslation } from 'react-i18next';
 
 const DeleteWorkspace = ({ onClose, workspace }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -18,7 +20,7 @@ const DeleteWorkspace = ({ onClose, workspace }) => {
       await dispatch(closeWorkspaceAction(workspace.uid));
       onClose();
     } catch (error) {
-      toast.error(error?.message || 'An error occurred while removing the workspace');
+      toast.error(error?.message || t('WORKSPACE.FAILED_REMOVE_WORKSPACE', 'An error occurred while removing the workspace'));
       setIsDeleting(false);
     }
   };
@@ -27,8 +29,9 @@ const DeleteWorkspace = ({ onClose, workspace }) => {
     <Portal>
       <Modal
         size="sm"
-        title="Remove Workspace"
-        confirmText={isDeleting ? 'Removing...' : 'Remove'}
+        title={t('WORKSPACE.REMOVE_WORKSPACE', 'Remove Workspace')}
+        confirmText={isDeleting ? t('COMMON.LOADING', 'Removing...') : t('COMMON.REMOVE', 'Remove')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         handleConfirm={onConfirm}
         handleCancel={onClose}
         confirmDisabled={isDeleting}
@@ -42,10 +45,10 @@ const DeleteWorkspace = ({ onClose, workspace }) => {
           <div className="break-words text-xs mt-1">{workspace.pathname}</div>
         )}
         <div className="mt-4">
-          Are you sure you want to remove workspace <span className="font-semibold">{workspace?.name}</span>?
+          {t('WORKSPACE.REMOVE_CONFIRM', 'Are you sure you want to remove workspace {{name}}?', { name: workspace?.name })}
         </div>
         <div className="mt-4">
-          The workspace will still be available in the file system and can be re-opened later.
+          {t('WORKSPACE.REMOVE_HELP', 'The workspace will still be available in the file system and can be re-opened later.')}
         </div>
       </Modal>
     </Portal>

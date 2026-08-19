@@ -7,12 +7,14 @@ import ApiSpecItem from './ApiSpecItem';
 import StyledWrapper from './StyledWrapper';
 import { matchLoadedApiSpecs } from './matchLoadedApiSpecs';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const LinkStyle = styled.span`
   color: ${(props) => props.theme['text-link']};
 `;
 
 const ApiSpecs = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { theme } = useTheme();
   const allApiSpecs = useSelector((state) => state.apiSpec.apiSpecs);
@@ -32,13 +34,13 @@ const ApiSpecs = () => {
 
   const handleOpenApiSpec = () => {
     dispatch(openApiSpec()).catch(
-      (err) => console.log(err) && toast.error('An error occurred while opening the API spec')
+      (err) => console.log(err) && toast.error(t('API_SPEC.ERROR_OPENING', 'An error occurred while opening the API spec'))
     );
   };
 
   const OpenLink = () => (
     <LinkStyle className="underline text-link cursor-pointer" theme={theme} onClick={() => handleOpenApiSpec()}>
-      Open
+      {t('COMMON.OPEN', 'Open')}
     </LinkStyle>
   );
 
@@ -46,9 +48,9 @@ const ApiSpecs = () => {
     return (
       <StyledWrapper>
         <div className="text-xs text-center placeholder py-4">
-          <div>No API Specs found.</div>
+          <div>{t('API_SPEC.NO_API_SPECS_FOUND', 'No API Specs found.')}</div>
           <div className="mt-2">
-            <OpenLink /> API Spec.
+            <OpenLink /> {t('API_SPEC.API_SPEC', 'API Spec.')}
           </div>
         </div>
       </StyledWrapper>

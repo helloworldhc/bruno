@@ -11,8 +11,10 @@ import { importWorkspaceAction } from 'providers/ReduxStore/slices/workspaces/ac
 import { formatIpcError } from 'utils/common/error';
 import { multiLineMsg } from 'utils/common/index';
 import Help from 'components/Help';
+import { useTranslation } from 'react-i18next';
 
 const ImportWorkspace = ({ onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const preferences = useSelector((state) => state.app.preferences);
   const [dragActive, setDragActive] = useState(false);
@@ -29,7 +31,7 @@ const ImportWorkspace = ({ onClose }) => {
       workspaceLocation: defaultLocation
     },
     validationSchema: Yup.object({
-      workspaceLocation: Yup.string().min(1, 'location is required').required('location is required')
+      workspaceLocation: Yup.string().min(1, t('WORKSPACE.LOCATION_REQ', 'Location is required')).required(t('WORKSPACE.LOCATION_REQ', 'Location is required'))
     }),
     onSubmit: async (values) => {
       if (isSubmitting || !selectedFile) return;
@@ -37,10 +39,10 @@ const ImportWorkspace = ({ onClose }) => {
       try {
         setIsSubmitting(true);
         await dispatch(importWorkspaceAction(selectedFile.path, values.workspaceLocation));
-        toast.success('Workspace imported successfully!');
+        toast.success(t('WORKSPACE.WORKSPACE_IMPORTED', 'Workspace imported successfully!'));
         onClose();
       } catch (error) {
-        toast.error(multiLineMsg('Failed to import workspace', formatIpcError(error)));
+        toast.error(multiLineMsg(t('WORKSPACE.FAILED_IMPORT_WORKSPACE', 'Failed to import workspace'), formatIpcError(error)));
       } finally {
         setIsSubmitting(false);
       }
@@ -67,7 +69,7 @@ const ImportWorkspace = ({ onClose }) => {
 
     const isZip = file.name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-zip-compressed';
     if (!isZip) {
-      toast.error('Please select a valid zip file');
+      toast.error(t('WORKSPACE.SELECT_VALID_ZIP', 'Please select a valid zip file'));
       return null;
     }
 
@@ -137,15 +139,16 @@ const ImportWorkspace = ({ onClose }) => {
   return (
     <Modal
       size="md"
-      title="Import Workspace"
-      confirmText={isSubmitting ? 'Importing...' : 'Import'}
+      title={t('WORKSPACE.IMPORT_WORKSPACE', 'Import Workspace')}
+      confirmText={isSubmitting ? t('COMMON.LOADING', 'Importing...') : t('COMMON.IMPORT', 'Import')}
+      cancelText={t('COMMON.CANCEL', 'Cancel')}
       handleConfirm={formik.handleSubmit}
       handleCancel={onClose}
       confirmDisabled={!canSubmit}
     >
       <div className="flex flex-col">
         <div className="mb-4">
-          <h3 className="font-semibold mb-2">Workspace File</h3>
+          <h3 className="font-semibold mb-2">{t('WORKSPACE.WORKSPACE_FILE', 'Workspace File')}</h3>
           {selectedFile ? (
             <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center gap-2">
@@ -157,7 +160,7 @@ const ImportWorkspace = ({ onClose }) => {
                 className="text-gray-500 hover:text-red-500 text-sm"
                 onClick={handleClearFile}
               >
-                Remove
+                {t('COMMON.REMOVE', 'Remove')}
               </button>
             </div>
           ) : (
@@ -185,17 +188,17 @@ const ImportWorkspace = ({ onClose }) => {
                   accept=".zip,application/zip,application/x-zip-compressed"
                 />
                 <p className="text-gray-600 dark:text-gray-300 mb-2">
-                  Drop workspace zip file here or{' '}
+                  {t('WORKSPACE.DROP_ZIP_HERE', 'Drop workspace zip file here or')}{' '}
                   <button
                     type="button"
                     className="text-blue-500 underline cursor-pointer"
                     onClick={handleBrowseFiles}
                   >
-                    choose a file
+                    {t('WORKSPACE.CHOOSE_FILE', 'choose a file')}
                   </button>
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Supports exported Bruno workspace zip files
+                  {t('WORKSPACE.SUPPORTS_ZIP', 'Supports exported Bruno workspace zip files')}
                 </p>
               </div>
             </div>
@@ -204,13 +207,13 @@ const ImportWorkspace = ({ onClose }) => {
 
         <div className="mb-4">
           <label htmlFor="workspace-location" className="font-semibold mb-2 flex items-center">
-            Extract Location
+            {t('WORKSPACE.EXTRACT_LOCATION', 'Extract Location')}
             <Help>
               <p>
-                Choose the location where you want to extract this workspace.
+                {t('WORKSPACE.EXTRACT_LOCATION_HELP_1', 'Choose the location where you want to extract this workspace.')}
               </p>
               <p className="mt-2">
-                The workspace folder will be created at this location.
+                {t('WORKSPACE.EXTRACT_LOCATION_HELP_2', 'The workspace folder will be created at this location.')}
               </p>
             </Help>
           </label>
@@ -236,7 +239,7 @@ const ImportWorkspace = ({ onClose }) => {
               className="text-link cursor-pointer hover:underline"
               onClick={browse}
             >
-              Browse
+              {t('COMMON.BROWSE', 'Browse')}
             </span>
           </div>
         </div>

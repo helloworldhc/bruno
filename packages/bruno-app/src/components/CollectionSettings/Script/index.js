@@ -14,8 +14,10 @@ import StyledWrapper from './StyledWrapper';
 import Button from 'ui/Button';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useFocusErrorLine } from 'hooks/useFocusErrorLine';
+import { useTranslation } from 'react-i18next';
 
 const Script = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const preRequestEditorRef = useRef(null);
   const postResponseEditorRef = useRef(null);
@@ -40,38 +42,13 @@ const Script = ({ collection }) => {
   const { displayedTheme } = useTheme();
   const preferences = useSelector((state) => state.app.preferences);
 
-  const [preReqScroll, setPreReqScroll] = usePersistedState({ key: `collection-pre-req-scroll-${collection.uid}`, default: 0 });
-  const [postResScroll, setPostResScroll] = usePersistedState({ key: `collection-post-res-scroll-${collection.uid}`, default: 0 });
-
-  // Refresh CodeMirror when tab becomes visible and restore scroll position.
-  // CodeMirror's scrollTo() is silently ignored when the editor is inside a display:none container
-  // (TabsContent hides inactive tabs via display:none). After refresh() recalculates layout, we re-apply scrollTo().
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (activeTab === 'pre-request' && preRequestEditorRef.current?.editor) {
-        preRequestEditorRef.current.editor.refresh();
-        preRequestEditorRef.current.editor.scrollTo(null, preReqScroll);
-      } else if (activeTab === 'post-response' && postResponseEditorRef.current?.editor) {
-        postResponseEditorRef.current.editor.refresh();
-        postResponseEditorRef.current.editor.scrollTo(null, postResScroll);
-      }
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, [activeTab]);
-
-  useFocusErrorLine({
-    uid: collection.uid,
-    editorRef: preRequestEditorRef,
-    scriptPhase: 'pre-request',
-    isVisible: activeTab === 'pre-request'
+  const [preReqScroll, setPreReqScroll] = usePersistedState({
+    key: `collection-script-pre-req-scroll-${collection.uid}`,
+    default: { left: 0, top: 0 }
   });
-
-  useFocusErrorLine({
-    uid: collection.uid,
-    editorRef: postResponseEditorRef,
-    scriptPhase: 'post-response',
-    isVisible: activeTab === 'post-response'
+  const [postResScroll, setPostResScroll] = usePersistedState({
+    key: `collection-script-post-res-scroll-${collection.uid}`,
+    default: { left: 0, top: 0 }
   });
 
   const onRequestScriptEdit = (value) => {
@@ -92,30 +69,51 @@ const Script = ({ collection }) => {
     );
   };
 
-  const handleSave = () => {
-    dispatch(saveCollectionSettings(collection.uid));
-  };
+  const handleSave = () => dispatch(saveCollectionSettings(collection.uid));
+
+  useEffect(() => {
+    dispatch(
+      updateScriptPaneTab({
+        uid: collection.uid,
+        scriptPaneTab: activeTab
+      })
+    );
+  }, []);
 
   const items = flattenItems(collection.items || []);
+  const currentItem = items.find((i) => i.uid === collection.uid);
+
+  useFocusErrorLine({
+    editorRef: preRequestEditorRef,
+    errorMessage: currentItem?.preRequestScriptErrorMessage,
+    isActive: activeTab === 'pre-request'
+  });
+
+  useFocusErrorLine({
+    editorRef: postResponseEditorRef,
+    errorMessage: currentItem?.postResponseScriptErrorMessage,
+    isActive: activeTab === 'post-response'
+  });
+
   const hasPreRequestScriptError = items.some((i) => isItemARequest(i) && i.preRequestScriptErrorMessage);
   const hasPostResponseScriptError = items.some((i) => isItemARequest(i) && i.postResponseScriptErrorMessage);
 
   return (
     <StyledWrapper className="w-full flex flex-col h-full">
       <div className="text-xs mb-4 text-muted">
-        Write pre and post-request scripts that will run before and after any request in this collection is sent.
+        {t('COLLECTION_SETTINGS.SCRIPT_DESC', 'Write pre and post-request scripts that will run before and after any request in this collection is sent.')}
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="pre-request">
-            Pre Request
+            {t('REQUEST.PRE_REQUEST', 'Pre Request')}
             {requestScript && requestScript.trim().length > 0 && (
               <StatusDot type={hasPreRequestScriptError ? 'error' : 'default'} />
             )}
           </TabsTrigger>
           <TabsTrigger value="post-response">
-            Post Response
+            {t('REQUEST.POST_RESPONSE', 'Post Response')}
             {responseScript && responseScript.trim().length > 0 && (
               <StatusDot type={hasPostResponseScriptError ? 'error' : 'default'} />
             )}
@@ -167,7 +165,7 @@ const Script = ({ collection }) => {
 
       <div className="mt-12">
         <Button type="submit" size="sm" onClick={handleSave}>
-          Save
+          {t('COMMON.SAVE', 'Save')}
         </Button>
       </div>
     </StyledWrapper>

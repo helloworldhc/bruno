@@ -2,6 +2,7 @@ import React from 'react';
 import { IconChevronDown, IconX } from '@tabler/icons';
 import { useTheme } from 'providers/Theme';
 import Dropdown from 'components/Dropdown';
+import { useTranslation } from 'react-i18next';
 
 const InheritableSettingsInput = ({
   id,
@@ -14,6 +15,7 @@ const InheritableSettingsInput = ({
   onValueChange,
   onCustomValueReset
 }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
 
   return (
@@ -41,16 +43,16 @@ const InheritableSettingsInput = ({
                   color: theme.text
                 }}
               >
-                <span>Inherit</span>
+                <span>{t('COMMON.INHERIT', 'Inherit')}</span>
                 <IconChevronDown size={12} />
               </button>
             )}
           >
             <div className="dropdown-item" onClick={() => onDropdownSelect('inherit')}>
-              Inherit
+              {t('COMMON.INHERIT', 'Inherit')}
             </div>
             <div className="dropdown-item" onClick={() => onDropdownSelect('custom')}>
-              Custom
+              {t('COMMON.CUSTOM', 'Custom')}
             </div>
           </Dropdown>
         ) : (
@@ -76,7 +78,7 @@ const InheritableSettingsInput = ({
               type="button"
               onClick={onCustomValueReset}
               className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-              title="Reset to inherit"
+              title={t('REQUEST.RESET_TO_INHERIT', 'Reset to inherit')}
             >
               <IconX size={14} />
             </button>

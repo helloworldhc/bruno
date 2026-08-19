@@ -13,8 +13,10 @@ import ActionIcon from 'ui/ActionIcon';
 import ResponsiveTabs from 'ui/ResponsiveTabs';
 import useEnvironmentTabs from 'hooks/useEnvironmentTabs';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuery, setSearchQuery, isSearchExpanded, setIsSearchExpanded, debouncedSearchQuery, searchInputRef }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const globalEnvs = useSelector((state) => state?.globalEnvironments?.globalEnvironments);
   const globalEnvironmentDraft = useSelector((state) => state.globalEnvironments.globalEnvironmentDraft);
@@ -44,7 +46,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
 
   const validateEnvironmentName = (name) => {
     if (!name || name.trim() === '') {
-      return 'Name is required';
+      return t('ENVIRONMENTS.NAME_REQUIRED', 'Name is required');
     }
 
     if (name.length < 1) {
@@ -63,7 +65,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
     const isDuplicate = (globalEnvs || []).some((env) =>
       env?.uid !== environment.uid && env?.name?.toLowerCase().trim() === trimmedName);
     if (isDuplicate) {
-      return 'Environment already exists';
+      return t('ENVIRONMENTS.GLOBAL_ENV_EXISTS', 'Environment already exists');
     }
 
     return null;
@@ -88,13 +90,13 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
 
     dispatch(renameGlobalEnvironment({ name: newName, environmentUid: environment.uid }))
       .then(() => {
-        toast.success('Environment renamed!');
+        toast.success(t('ENVIRONMENTS.ENV_RENAMED_SUCCESS', 'Environment renamed!'));
         setIsRenaming(false);
         setNewName('');
         setNameError('');
       })
       .catch(() => {
-        toast.error('An error occurred while renaming the environment');
+        toast.error(t('ENVIRONMENTS.ENV_RENAME_ERROR', 'An error occurred while renaming the environment'));
       });
   };
 
@@ -104,32 +106,27 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
     setNameError('');
   };
 
-  const handleNameChange = (e) => {
-    setNewName(e.target.value);
-    if (nameError) {
-      setNameError('');
-    }
-  };
-
-  const handleNameBlur = () => {
-    if (newName.trim() === '') {
-      handleCancelRename();
-    } else {
-      const error = validateEnvironmentName(newName);
-      if (error) {
-        setNameError(error);
-      }
-    }
-  };
-
-  const handleNameKeyDown = (e) => {
+  const handleEnvNameKeyDown = (e) => {
     if (e.key === 'Enter') {
-      e.preventDefault();
       handleSaveRename();
     } else if (e.key === 'Escape') {
-      e.preventDefault();
       handleCancelRename();
     }
+  };
+
+  const handleColorChange = (color) => {
+    dispatch(updateGlobalEnvironmentColor({ color, environmentUid: environment.uid }))
+      .then(() => {
+        toast.success(t('ENVIRONMENTS.ENV_COLOR_UPDATED_SUCCESS', 'Environment color updated!'));
+      })
+      .catch(() => {
+        toast.error(t('ENVIRONMENTS.ENV_COLOR_UPDATED_ERROR', 'An error occurred while updating the environment color'));
+      });
+  };
+
+  const handleSaveAll = () => {
+    const event = new CustomEvent('save-all-environments');
+    window.dispatchEvent(event);
   };
 
   const handleSearchIconClick = () => {
@@ -141,57 +138,57 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
 
   const handleClearSearch = () => {
     setSearchQuery('');
+    searchInputRef.current?.focus();
   };
 
   const handleSearchBlur = () => {
-    if (searchQuery === '') {
+    if (!searchQuery) {
       setIsSearchExpanded(false);
     }
-  };
-
-  const handleColorChange = (color) => {
-    dispatch(updateGlobalEnvironmentColor(environment.uid, color));
-  };
-
-  const handleSaveAll = () => {
-    window.dispatchEvent(new Event('environment-save-all'));
   };
 
   return (
     <StyledWrapper>
       {openDeleteModal && (
         <DeleteEnvironment
-          onClose={() => setOpenDeleteModal(false)}
           environment={environment}
+          onClose={() => setOpenDeleteModal(false)}
         />
       )}
+
       {openCopyModal && (
-        <CopyEnvironment onClose={() => setOpenCopyModal(false)} environment={environment} />
+        <CopyEnvironment
+          environment={environment}
+          onClose={() => setOpenCopyModal(false)}
+        />
       )}
 
       <div className="header">
-        <div className={`title-container ${isRenaming ? 'renaming' : ''}`}>
+        <div className="title-section">
           {isRenaming ? (
             <>
               <input
                 ref={inputRef}
                 type="text"
-                className="title-input"
+                className="rename-input"
                 value={newName}
-                onChange={handleNameChange}
-                onBlur={handleNameBlur}
-                onKeyDown={handleNameKeyDown}
+                onChange={(e) => {
+                  setNewName(e.target.value);
+                  setNameError('');
+                }}
+                onKeyDown={handleEnvNameKeyDown}
+                onBlur={handleSaveRename}
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck="false"
               />
-              <div className="inline-actions">
+              <div className="inline-rename-actions">
                 <button
                   className="inline-action-btn save"
                   onClick={handleSaveRename}
                   onMouseDown={(e) => e.preventDefault()}
-                  title="Save"
+                  title={t('COMMON.SAVE', 'Save')}
                 >
                   <IconCheck size={14} strokeWidth={2} />
                 </button>
@@ -199,7 +196,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
                   className="inline-action-btn cancel"
                   onClick={handleCancelRename}
                   onMouseDown={(e) => e.preventDefault()}
-                  title="Cancel"
+                  title={t('COMMON.CANCEL', 'Cancel')}
                 >
                   <IconX size={14} strokeWidth={2} />
                 </button>
@@ -214,16 +211,16 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
         </div>
         {nameError && isRenaming && <div className="title-error">{nameError}</div>}
         <div className="actions">
-          <ActionIcon label="Save All" onClick={handleSaveAll} data-testid="save-all-env">
+          <ActionIcon label={t('COMMON.SAVE_ALL', 'Save All')} onClick={handleSaveAll} data-testid="save-all-env">
             <IconDeviceFloppy size={15} strokeWidth={1.5} />
           </ActionIcon>
-          <ActionIcon label="Rename" onClick={handleRenameClick} data-testid="env-rename-action">
+          <ActionIcon label={t('COMMON.RENAME', 'Rename')} onClick={handleRenameClick} data-testid="env-rename-action">
             <IconEdit size={15} strokeWidth={1.5} />
           </ActionIcon>
-          <ActionIcon label="Copy" onClick={() => setOpenCopyModal(true)} data-testid="env-copy-action">
+          <ActionIcon label={t('COMMON.COPY', 'Copy')} onClick={() => setOpenCopyModal(true)} data-testid="env-copy-action">
             <IconCopy size={15} strokeWidth={1.5} />
           </ActionIcon>
-          <ActionIcon label="Delete" onClick={() => setOpenDeleteModal(true)} colorOnHover="danger" data-testid="env-delete-action">
+          <ActionIcon label={t('COMMON.DELETE', 'Delete')} onClick={() => setOpenDeleteModal(true)} colorOnHover="danger" data-testid="env-delete-action">
             <IconTrash size={15} strokeWidth={1.5} />
           </ActionIcon>
         </div>
@@ -242,7 +239,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder={activeTab === 'secrets' ? 'Search secrets...' : 'Search variables...'}
+                    placeholder={activeTab === 'secrets' ? t('ENVIRONMENTS.SEARCH_SECRETS', 'Search secrets...') : t('ENVIRONMENTS.SEARCH_VARIABLES', 'Search variables...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onBlur={handleSearchBlur}
@@ -258,7 +255,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
                       className="clear-search"
                       onClick={handleClearSearch}
                       onMouseDown={(e) => e.preventDefault()}
-                      title="Clear search"
+                      title={t('COMMON.CLEAR_SEARCH', 'Clear search')}
                       data-testid="env-clear-search"
                     >
                       <IconX size={14} strokeWidth={1.5} />
@@ -266,7 +263,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
                   )}
                 </div>
               ) : (
-                <ActionIcon label="Search" onClick={handleSearchIconClick} data-testid="env-search-action">
+                <ActionIcon label={t('COMMON.SEARCH', 'Search')} onClick={handleSearchIconClick} data-testid="env-search-action">
                   <IconSearch size={15} strokeWidth={1.5} />
                 </ActionIcon>
               )}

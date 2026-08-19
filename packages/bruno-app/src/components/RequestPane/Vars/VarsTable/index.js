@@ -14,8 +14,10 @@ import { createDescriptionColumn } from 'components/EditableTable/descriptionCol
 import StyledWrapper from './StyledWrapper';
 import toast from 'react-hot-toast';
 import { variableNameRegex } from 'utils/common/regex';
+import { useTranslation } from 'react-i18next';
 
 const VarsTable = ({ item, collection, vars, varType, initialScroll = 0, isDraft }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const tabs = useSelector((state) => state.tabs.tabs);
@@ -71,21 +73,21 @@ const VarsTable = ({ item, collection, vars, varType, initialScroll = 0, isDraft
   const columns = [
     {
       key: 'name',
-      name: 'Name',
+      name: t('COMMON.NAME', 'Name'),
       isKeyField: true,
       sortable: true,
-      placeholder: 'Name',
+      placeholder: t('COMMON.NAME', 'Name'),
       width: '20%'
     },
     {
       key: 'value',
-      name: varType === 'request' ? 'Value' : (
+      name: varType === 'request' ? t('COMMON.VALUE', 'Value') : (
         <div className="flex items-center">
-          <span>Expr</span>
-          <InfoTip className="tooltip-mod" content="You can write any valid JS expression here" infotipId={`request-${varType}-var`} />
+          <span>{t('REQUEST.EXPR', 'Expr')}</span>
+          <InfoTip className="tooltip-mod" content={t('REQUEST.EXPR_INFO', 'You can write any valid JS expression here')} infotipId={`request-${varType}-var`} />
         </div>
       ),
-      placeholder: varType === 'request' ? 'Value' : 'Expr',
+      placeholder: varType === 'request' ? t('COMMON.VALUE', 'Value') : t('REQUEST.EXPR', 'Expr'),
       render: ({ row, value, onChange, isLastEmptyRow, rowIndex }) => (
         <VarValueCell
           editor={(
@@ -98,7 +100,7 @@ const VarsTable = ({ item, collection, vars, varType, initialScroll = 0, isDraft
               onRun={handleRun}
               collection={collection}
               item={item}
-              placeholder={value == null || (typeof value === 'string' && value.trim() === '') ? (varType === 'request' ? 'Value' : 'Expr') : ''}
+              placeholder={value == null || (typeof value === 'string' && value.trim() === '') ? (varType === 'request' ? t('COMMON.VALUE', 'Value') : t('REQUEST.EXPR', 'Expr')) : ''}
             />
           )}
           renderTypeSelector={!isLastEmptyRow && varType === 'request'

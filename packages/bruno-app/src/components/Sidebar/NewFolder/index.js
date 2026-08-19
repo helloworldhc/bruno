@@ -117,10 +117,10 @@ const NewFolder = ({ collectionUid, item, onClose }) => {
               <div className="mt-4">
                 <div className="flex items-center justify-between">
                   <label htmlFor="directoryName" className="flex items-center font-medium">
-                    Folder Name <small className="font-normal text-muted ml-1">(on filesystem)</small>
+                    {t('NEW_FOLDER.NAME_LABEL', 'Folder Name')} <small className="font-normal text-muted ml-1">{t('NEW_FOLDER.ON_FILESYSTEM', '(on filesystem)')}</small>
                     <Help width="300">
                       <p>
-                        You can choose to save the folder as a different name on your file system versus what is displayed in the app.
+                        {t('NEW_FOLDER.FILESYSTEM_HELP', 'You can choose to save the folder as a different name on your file system versus what is displayed in the app.')}
                       </p>
                     </Help>
                   </label>
@@ -146,7 +146,7 @@ const NewFolder = ({ collectionUid, item, onClose }) => {
                       id="file-name"
                       type="text"
                       name="directoryName"
-                      placeholder="Folder Name"
+                      placeholder={t('NEW_FOLDER.NAME_LABEL', 'Folder Name')}
                       className="block textbox mt-2 w-full"
                       autoComplete="off"
                       autoCorrect="off"
@@ -180,7 +180,7 @@ const NewFolder = ({ collectionUid, item, onClose }) => {
                       toggleShowFilesystemName(!showFilesystemName);
                     }}
                   >
-                    {showFilesystemName ? 'Hide Filesystem Name' : 'Show Filesystem Name'}
+                    {showFilesystemName ? t('NEW_FOLDER.HIDE_FILESYSTEM_NAME', 'Hide Filesystem Name') : t('NEW_FOLDER.SHOW_FILESYSTEM_NAME', 'Show Filesystem Name')}
                   </div>
                 </Dropdown>
               </div>

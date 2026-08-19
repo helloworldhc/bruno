@@ -379,7 +379,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
         {
           id: 'new-app',
           leftSection: IconAppWindow,
-          label: 'New App',
+          label: t('SIDEBAR.NEW_APP', 'New App'),
           onClick: () => setNewAppModalOpen(true)
         },
         {
@@ -447,7 +447,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       items.push({
         id: 'create-example',
         leftSection: ExampleIcon,
-        label: 'Create Example',
+        label: t('RESPONSE_EXAMPLE.CREATE_EXAMPLE', 'Create Example'),
         onClick: () => setCreateExampleModalOpen(true)
       });
     }
@@ -465,7 +465,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       items.push({
         id: 'ignore',
         leftSection: IconEyeOff,
-        label: 'Ignore',
+        label: t('COMMON.IGNORE', 'Ignore'),
         onClick: () => setIgnoreItemModalOpen(true)
       });
     }

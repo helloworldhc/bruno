@@ -29,10 +29,14 @@ const OpenCollectionModal = ({ onClose }) => {
     const openedCount = result?.opened?.length || 0;
     const failedCount = (result?.failed?.length || 0) + (result?.invalid?.length || 0);
     if (openedCount > 0) {
-      toast.success(`${openedCount === 1 ? 'Collection' : 'Collections'} added to workspace`);
+      toast.success(
+        openedCount === 1
+          ? t('COLLECTION.ADDED_TO_WORKSPACE', 'Collection added to workspace')
+          : t('COLLECTION.COLLECTIONS_ADDED_TO_WORKSPACE', '{{count}} collections added to workspace', { count: openedCount })
+      );
     }
     if (failedCount > 0) {
-      toast.error(`Failed to open ${failedCount} collection${failedCount === 1 ? '' : 's'}`);
+      toast.error(t('COLLECTION.FAILED_TO_OPEN_COUNT', 'Failed to open {{count}} collection(s)', { count: failedCount }));
     }
   };
 
@@ -166,14 +170,15 @@ const OpenCollectionModal = ({ onClose }) => {
     <Portal id="open-collection-portal">
       <Modal
         size="md"
-        title={t('COMMON.OPEN', 'Open Collection')}
+        title={t('SIDEBAR.OPEN_COLLECTION', 'Open Collection')}
         confirmText={t('COMMON.OPEN', 'Open')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         handleConfirm={handleConfirm}
         handleCancel={onClose}
         confirmDisabled={selectedCollectionPaths.length === 0}
         footerLeft={(
           <SelectionFooter>
-            <span>{selectedCollectionPaths.length}</span> of {collectionPaths.length} selected
+            <span>{selectedCollectionPaths.length}</span> {t('COLLECTION.OF_TOTAL_SELECTED', 'of {{total}} selected', { total: collectionPaths.length })}
           </SelectionFooter>
         )}
       >

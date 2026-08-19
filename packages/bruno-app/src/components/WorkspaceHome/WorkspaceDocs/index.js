@@ -9,8 +9,10 @@ import ActionIcon from 'ui/ActionIcon/index';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useTrackScroll } from 'hooks/useTrackScroll';
 import DocsEditor from 'components/Documentation/DocsEditor';
+import { useTranslation } from 'react-i18next';
 
 const WorkspaceDocs = ({ workspace }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [localDocs, setLocalDocs] = useState(workspace?.docs || '');
@@ -52,17 +54,17 @@ const WorkspaceDocs = ({ workspace }) => {
 
   const onSave = async () => {
     if (!workspace) {
-      toast.error('Workspace not found');
+      toast.error(t('WORKSPACE.WORKSPACE_NOT_FOUND', 'Workspace not found'));
       return;
     }
 
     try {
       await dispatch(saveWorkspaceDocs(workspace.uid, localDocs));
-      toast.success('Documentation saved successfully');
+      toast.success(t('WORKSPACE.DOCS_SAVED_SUCCESS', 'Documentation saved successfully'));
       toggleViewMode();
     } catch (error) {
       console.error('Error saving workspace docs:', error);
-      toast.error('Failed to save documentation');
+      toast.error(t('WORKSPACE.DOCS_SAVE_FAILED', 'Failed to save documentation'));
     }
   };
 
@@ -77,7 +79,7 @@ const WorkspaceDocs = ({ workspace }) => {
       <div className="docs-header">
         <div className="docs-title">
           <IconFileText size={16} strokeWidth={1.5} />
-          <span>Documentation</span>
+          <span>{t('COMMON.DOCS', 'Documentation')}</span>
         </div>
         {hasDocs && !isEditing && (
           <ActionIcon className="edit-btn" onClick={toggleViewMode}>
@@ -107,7 +109,7 @@ const WorkspaceDocs = ({ workspace }) => {
             {isEditing && (
               <div className="editor-actions">
                 <Button onClick={onSave}>
-                  Save
+                  {t('COMMON.SAVE', 'Save')}
                 </Button>
               </div>
             )}
@@ -118,17 +120,17 @@ const WorkspaceDocs = ({ workspace }) => {
               <IconFileText size={52} strokeWidth={1} />
             </div>
             <p className="empty-text">
-              Add documentation to help your team work smoothly.
+              {t('WORKSPACE.DOCS_EMPTY_TEXT', 'Add documentation to help your team work smoothly.')}
             </p>
-            <p className="empty-subtext">You can include:</p>
+            <p className="empty-subtext">{t('WORKSPACE.DOCS_INCLUDE', 'You can include:')}</p>
             <ul className="suggestions-list">
-              <li>Project overview</li>
-              <li>Setup instructions</li>
-              <li>Key workflows</li>
-              <li>Resources & FAQs</li>
+              <li>{t('WORKSPACE.DOCS_ITEM_OVERVIEW', 'Project overview')}</li>
+              <li>{t('WORKSPACE.DOCS_ITEM_SETUP', 'Setup instructions')}</li>
+              <li>{t('WORKSPACE.DOCS_ITEM_WORKFLOWS', 'Key workflows')}</li>
+              <li>{t('WORKSPACE.DOCS_ITEM_FAQS', 'Resources & FAQs')}</li>
             </ul>
             <Button color="light" size="sm" icon={<IconPlus size={14} strokeWidth={1.5} />} onClick={handleAddDocumentation}>
-              Add Documentation
+              {t('WORKSPACE.ADD_DOCS', 'Add Documentation')}
             </Button>
           </div>
         )}

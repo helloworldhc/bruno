@@ -602,7 +602,7 @@ const EnvironmentList = ({
                 <input
                   ref={envListSearchInputRef}
                   type="text"
-                  placeholder="Search environments..."
+                  placeholder={t('ENVIRONMENTS.SEARCH_ENVIRONMENTS', 'Search environments...')}
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   className="env-list-search-input"
@@ -614,7 +614,7 @@ const EnvironmentList = ({
                 {searchText && (
                   <button
                     className="env-list-search-clear"
-                    title="Clear search"
+                    title={t('COMMON.CLEAR', 'Clear search')}
                     onClick={() => setSearchText('')}
                     onMouseDown={(e) => e.preventDefault()}
                   >
@@ -655,7 +655,7 @@ const EnvironmentList = ({
                             className="inline-action-btn save"
                             onClick={handleSaveRename}
                             onMouseDown={(e) => e.preventDefault()}
-                            title="Save"
+                            title={t('COMMON.SAVE', 'Save')}
                           >
                             <IconCheck size={14} strokeWidth={2} />
                           </button>
@@ -663,7 +663,7 @@ const EnvironmentList = ({
                             className="inline-action-btn cancel"
                             onClick={handleCancelRename}
                             onMouseDown={(e) => e.preventDefault()}
-                            title="Cancel"
+                            title={t('COMMON.CANCEL', 'Cancel')}
                           >
                             <IconX size={14} strokeWidth={2} />
                           </button>
@@ -675,14 +675,14 @@ const EnvironmentList = ({
                         <span className="environment-name">{env.name}</span>
                         <div className="environment-actions">
                           {activeEnvironmentUid === env.uid ? (
-                            <div className="activated-checkmark" title="Active environment">
+                            <div className="activated-checkmark" title={t('ENVIRONMENTS.ACTIVE_ENVIRONMENT', 'Active environment')}>
                               <IconCheck size={16} strokeWidth={2} />
                             </div>
                           ) : (
                             <button
                               className="activate-btn"
                               onClick={(e) => handleActivateEnvironment(e, env)}
-                              title="Activate environment"
+                              title={t('ENVIRONMENTS.ACTIVATE_ENVIRONMENT', 'Activate environment')}
                             >
                               <IconCheck size={16} strokeWidth={2} />
                             </button>
@@ -702,7 +702,7 @@ const EnvironmentList = ({
                       value={newEnvName}
                       onChange={handleEnvNameChange}
                       onKeyDown={handleEnvNameKeyDown}
-                      placeholder="Environment name..."
+                      placeholder={t('ENVIRONMENTS.NAME', 'Environment name...')}
                       autoComplete="off"
                       autoCorrect="off"
                       autoCapitalize="off"
@@ -713,7 +713,7 @@ const EnvironmentList = ({
                         className="inline-action-btn save"
                         onClick={handleSaveNewEnv}
                         onMouseDown={(e) => e.preventDefault()}
-                        title="Save"
+                        title={t('COMMON.SAVE', 'Save')}
                       >
                         <IconCheck size={14} strokeWidth={2} />
                       </button>
@@ -721,7 +721,7 @@ const EnvironmentList = ({
                         className="inline-action-btn cancel"
                         onClick={handleCancelCreate}
                         onMouseDown={(e) => e.preventDefault()}
-                        title="Cancel"
+                        title={t('COMMON.CANCEL', 'Cancel')}
                       >
                         <IconX size={14} strokeWidth={2} />
                       </button>
@@ -733,7 +733,7 @@ const EnvironmentList = ({
 
                 {filteredEnvironments.length === 0 && !isCreatingInline && (
                   <div className="no-env-file">
-                    <span>No environments</span>
+                    <span>{t('ENVIRONMENTS.NO_ENVIRONMENT', 'No environments')}</span>
                   </div>
                 )}
               </div>
@@ -789,7 +789,7 @@ const EnvironmentList = ({
                         className="inline-action-btn save"
                         onClick={handleSaveNewDotEnv}
                         onMouseDown={(e) => e.preventDefault()}
-                        title="Create"
+                        title={t('COMMON.CREATE', 'Create')}
                       >
                         <IconCheck size={14} strokeWidth={2} />
                       </button>
@@ -797,7 +797,7 @@ const EnvironmentList = ({
                         className="inline-action-btn cancel"
                         onClick={handleCancelDotEnvCreate}
                         onMouseDown={(e) => e.preventDefault()}
-                        title="Cancel"
+                        title={t('COMMON.CANCEL', 'Cancel')}
                       >
                         <IconX size={14} strokeWidth={2} />
                       </button>
@@ -809,7 +809,7 @@ const EnvironmentList = ({
 
                 {dotEnvFiles.length === 0 && !isCreatingDotEnvInline && (
                   <div className="no-env-file">
-                    <span>No .env files</span>
+                    <span>{t('ENVIRONMENTS.NO_DOTENV_FILES', 'No .env files')}</span>
                   </div>
                 )}
               </div>

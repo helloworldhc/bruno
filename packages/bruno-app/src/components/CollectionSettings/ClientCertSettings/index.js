@@ -18,6 +18,7 @@ import Button from 'ui/Button';
 import ActionIcon from 'ui/ActionIcon';
 import ListGroup from 'ui/ListGroup';
 import ToggleSwitch from 'components/ToggleSwitch';
+import { useTranslation } from 'react-i18next';
 
 const CertField = ({ label, value, title, action }) => (
   <div className="cert-field">
@@ -29,7 +30,7 @@ const CertField = ({ label, value, title, action }) => (
   </div>
 );
 
-const CertFileInput = ({ label, name, value, inputRef, onSelect, onClear, error, touched, dangerColor }) => (
+const CertFileInput = ({ label, name, value, inputRef, onSelect, onClear, error, touched, dangerColor, chooseFileText = 'Choose file' }) => (
   <div className="mb-3 flex items-start">
     <label className="settings-label mt-1" htmlFor={name}>
       {label}
@@ -62,7 +63,7 @@ const CertFileInput = ({ label, name, value, inputRef, onSelect, onClear, error,
           onClick={() => inputRef.current?.click()}
           data-testid={`choose-file-${name}`}
         >
-          Choose file
+          {chooseFileText}
         </Button>
       )}
       {touched && error ? <div className="text-red-500 text-xs">{error}</div> : null}
@@ -71,6 +72,7 @@ const CertFileInput = ({ label, name, value, inputRef, onSelect, onClear, error,
 );
 
 const ClientCertSettings = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [showAddCertModal, setShowAddCertModal] = useState(false);
   const [visiblePassphrases, setVisiblePassphrases] = useState([]);
@@ -245,8 +247,8 @@ const ClientCertSettings = ({ collection }) => {
 
   return (
     <StyledWrapper className="w-full h-full">
-      <h1 className="font-medium text-[0.9375rem]">Client Certificates</h1>
-      <div className="text-xs mt-1 text-muted">Add client certificates to be used for specific domains.</div>
+      <h1 className="font-medium text-[0.9375rem]">{t('PREFERENCES.CLIENT_CERTIFICATES', 'Client Certificates')}</h1>
+      <div className="text-xs mt-1 text-muted">{t('PREFERENCES.CLIENT_CERT_DESC', 'Add client certificates to be used for specific domains.')}</div>
 
       <ListGroup
         className="mt-5"
@@ -254,18 +256,18 @@ const ClientCertSettings = ({ collection }) => {
         getKey={(_, index) => `client-cert-${index}`}
         emptyState={{
           icon: <IconCertificate size={24} strokeWidth={1.2} />,
-          title: 'No client certificates',
-          text: 'Certificates added here are sent automatically with requests to their matching domains.'
+          title: t('PREFERENCES.NO_CLIENT_CERTS', 'No client certificates'),
+          text: t('PREFERENCES.NO_CLIENT_CERTS_DESC', 'Certificates added here are sent automatically with requests to their matching domains.')
         }}
         addButton={{
-          label: 'Add Certificate',
+          label: t('PREFERENCES.ADD_CERTIFICATE', 'Add Certificate'),
           onClick: openAddCertModal,
           icon: <IconPlus size={15} strokeWidth={1.5} />,
           dataTestId: 'add-client-cert'
         }}
         footerActions={(
           <Button type="button" size="sm" data-testid="client-cert-save-btn" onClick={handleSave}>
-            Save
+            {t('COMMON.SAVE', 'Save')}
           </Button>
         )}
         renderItem={(clientCert, index) => (
@@ -292,16 +294,16 @@ const ClientCertSettings = ({ collection }) => {
           >
             <CertField label="Host" value={clientCert.domain} title={clientCert.domain} />
             {clientCert.type === 'pfx' ? (
-              <CertField label="PFX File" value={path.basename(clientCert.pfxFilePath || '')} title={clientCert.pfxFilePath} />
+              <CertField label={t('PREFERENCES.PFX_FILE', 'PFX File')} value={path.basename(clientCert.pfxFilePath || '')} title={clientCert.pfxFilePath} />
             ) : (
               <>
-                <CertField label="Cert File" value={path.basename(clientCert.certFilePath || '')} title={clientCert.certFilePath} />
-                <CertField label="Key File" value={path.basename(clientCert.keyFilePath || '')} title={clientCert.keyFilePath} />
+                <CertField label={t('PREFERENCES.CERT_FILE', 'Cert File')} value={path.basename(clientCert.certFilePath || '')} title={clientCert.certFilePath} />
+                <CertField label={t('PREFERENCES.KEY_FILE', 'Key File')} value={path.basename(clientCert.keyFilePath || '')} title={clientCert.keyFilePath} />
               </>
             )}
             {clientCert.passphrase ? (
               <CertField
-                label="Passphrase"
+                label={t('PREFERENCES.PASSPHRASE', 'Passphrase')}
                 value={visiblePassphrases.includes(index) ? clientCert.passphrase : '••••••••'}
                 action={(
                   <ActionIcon
@@ -326,20 +328,20 @@ const ClientCertSettings = ({ collection }) => {
       {showAddCertModal && (
         <Modal
           size="md"
-          title="Add Client Certificate"
-          confirmText="Add"
+          title={t('PREFERENCES.ADD_CLIENT_CERT_TITLE', 'Add Client Certificate')}
+          confirmText={t('COMMON.ADD', 'Add')}
           dataTestId="add-client-cert-modal"
           handleConfirm={formik.handleSubmit}
           handleCancel={() => setShowAddCertModal(false)}
         >
           <div className="text-xs mb-4 text-muted">
-            The certificate and key files are stored as paths relative to the collection.
+            {t('COLLECTION_SETTINGS.ADD_CLIENT_CERT_DESC', 'The certificate and key files are stored as paths relative to the collection.')}
           </div>
           {/* Submission is driven by the Modal's confirm button/Enter (handleConfirm); prevent the form's own submit to avoid firing twice */}
           <form className="bruno-form" onSubmit={(e) => e.preventDefault()}>
             <div className="mb-3 flex items-start">
               <label className="settings-label mt-1" htmlFor="domain">
-                Domain
+                {t('PREFERENCES.DOMAIN', 'Domain')}
               </label>
               <div className="flex flex-col gap-1">
                 <div className="relative flex items-center">
@@ -367,7 +369,7 @@ const ClientCertSettings = ({ collection }) => {
             </div>
             <div className="mb-3 flex items-center">
               <label id="type-label" className="settings-label">
-                Type
+                {t('COMMON.TYPE', 'Type')}
               </label>
               <div className="type-picker" role="radiogroup" aria-labelledby="type-label">
                 <button
@@ -393,7 +395,7 @@ const ClientCertSettings = ({ collection }) => {
             {formik.values.type === 'cert' ? (
               <>
                 <CertFileInput
-                  label="Cert file"
+                  label={t('PREFERENCES.CERT_FILE', 'Cert file')}
                   name="certFilePath"
                   value={formik.values.certFilePath}
                   inputRef={certFilePathInputRef}
@@ -402,9 +404,10 @@ const ClientCertSettings = ({ collection }) => {
                   error={formik.errors.certFilePath}
                   touched={formik.touched.certFilePath}
                   dangerColor={theme.colors.text.danger}
+                  chooseFileText={t('COMMON.SELECT_FILE', 'Choose file')}
                 />
                 <CertFileInput
-                  label="Key file"
+                  label={t('PREFERENCES.KEY_FILE', 'Key file')}
                   name="keyFilePath"
                   value={formik.values.keyFilePath}
                   inputRef={keyFilePathInputRef}
@@ -413,11 +416,12 @@ const ClientCertSettings = ({ collection }) => {
                   error={formik.errors.keyFilePath}
                   touched={formik.touched.keyFilePath}
                   dangerColor={theme.colors.text.danger}
+                  chooseFileText={t('COMMON.SELECT_FILE', 'Choose file')}
                 />
               </>
             ) : (
               <CertFileInput
-                label="PFX file"
+                label={t('PREFERENCES.PFX_FILE', 'PFX file')}
                 name="pfxFilePath"
                 value={formik.values.pfxFilePath}
                 inputRef={pfxFilePathInputRef}
@@ -426,11 +430,12 @@ const ClientCertSettings = ({ collection }) => {
                 error={formik.errors.pfxFilePath}
                 touched={formik.touched.pfxFilePath}
                 dangerColor={theme.colors.text.danger}
+                chooseFileText={t('COMMON.SELECT_FILE', 'Choose file')}
               />
             )}
             <div className="mb-3 flex items-start">
               <label className="settings-label mt-1" htmlFor="passphrase">
-                Passphrase
+                {t('PREFERENCES.PASSPHRASE', 'Passphrase')}
               </label>
               <div className="flex flex-col gap-1">
                 <div className="textbox flex flex-row items-center w-[300px] h-[1.70rem] relative">

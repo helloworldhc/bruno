@@ -100,13 +100,13 @@ const StatusBar = () => {
               </button>
             </ThemeDropdown>
 
-            <ToolHint text="Notifications" toolhintId="Notifications" place="top" offset={10}>
+            <ToolHint text={t('COMMON.NOTIFICATIONS', 'Notifications')} toolhintId="Notifications" place="top" offset={10}>
               <div className="status-bar-button">
                 <Notifications />
               </div>
             </ToolHint>
 
-            <ToolHint text="GitHub Repository" toolhintId="GitHub" place="top" offset={10}>
+            <ToolHint text={t('COMMON.GITHUB_REPO', 'GitHub Repository')} toolhintId="GitHub" place="top" offset={10}>
               <button
                 className="status-bar-button"
                 onClick={() => {
@@ -145,7 +145,7 @@ const StatusBar = () => {
             >
               <div className="console-button-content">
                 <IconCookie size={16} strokeWidth={1.5} aria-hidden="true" />
-                <span className="console-label">Cookies</span>
+                <span className="console-label">{t('COOKIES.TITLE', 'Cookies')}</span>
               </div>
             </button>
 
@@ -158,7 +158,7 @@ const StatusBar = () => {
             >
               <div className="console-button-content">
                 <IconTool size={16} strokeWidth={1.5} aria-hidden="true" />
-                <span className="console-label">{t('APP_MENU.DEV_TOOLS', 'Dev Tools')}</span>
+                <span className="console-label">{t('APP_MENU.DEVELOPER_TOOLS', 'Dev Tools')}</span>
                 {errorCount > 0 && (
                   <span className="error-count-inline">{errorCount}</span>
                 )}

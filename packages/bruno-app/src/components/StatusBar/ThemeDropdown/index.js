@@ -5,16 +5,13 @@ import ToolHint from 'components/ToolHint';
 import { useTheme } from 'providers/Theme';
 import { getLightThemes, getDarkThemes } from 'themes/index';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 // Constants
 const MODES = ['light', 'dark', 'system'];
-const MODE_BUTTONS = [
-  { mode: 'light', icon: IconSun, title: 'Light' },
-  { mode: 'dark', icon: IconMoon, title: 'Dark' },
-  { mode: 'system', icon: IconDeviceDesktop, title: 'System' }
-];
 
 const ThemeDropdown = ({ children }) => {
+  const { t } = useTranslation();
   // Dropdown state
   const [isOpen, setIsOpen] = useState(false);
   const [tooltipEnabled, setTooltipEnabled] = useState(true);
@@ -29,6 +26,12 @@ const ThemeDropdown = ({ children }) => {
   const modeButtonRefs = useRef([]);
   const lightItemRefs = useRef([]);
   const darkItemRefs = useRef([]);
+
+  const modeButtons = [
+    { mode: 'light', icon: IconSun, title: t('THEMES.LIGHT', 'Light') },
+    { mode: 'dark', icon: IconMoon, title: t('THEMES.DARK', 'Dark') },
+    { mode: 'system', icon: IconDeviceDesktop, title: t('THEMES.SYSTEM', 'System') }
+  ];
 
   // Theme context
   const {
@@ -206,36 +209,34 @@ const ThemeDropdown = ({ children }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, handleKeyDown]);
 
-  // Render theme list
-  const renderThemeList = (themes, isLight, currentVariant, label) => {
-    const refs = isLight ? lightItemRefs : darkItemRefs;
-    const section = isLight ? 'light' : 'dark';
-    const isActiveSystemTheme = isSystemMode && ((isLight && displayedTheme === 'light') || (!isLight && displayedTheme === 'dark'));
+  // Render a theme list (light or dark)
+  const renderThemeList = (themes, isLight, currentVariant, title) => {
+    const sectionName = isLight ? 'light' : 'dark';
+    const itemRefs = isLight ? lightItemRefs : darkItemRefs;
 
     return (
-      <div className="theme-list" role="listbox" aria-label={label}>
-        <div className="theme-list-label">
-          {label}
-          {isActiveSystemTheme && <span className="active-badge">Active</span>}
+      <div className="theme-column" role="listbox" aria-label={title}>
+        <div className="theme-column-header">{title}</div>
+        <div className="theme-items-scroll">
+          {themes.map((theme, index) => {
+            const isSelected = currentVariant === theme.id;
+            return (
+              <div
+                key={theme.id}
+                ref={(el) => (itemRefs.current[index] = el)}
+                className={`theme-item ${isSelected ? 'selected' : ''} ${getFocusedClass(sectionName, index)}`}
+                role="option"
+                aria-selected={isSelected}
+                tabIndex={-1}
+                onClick={() => handleThemeSelect(theme.id, isLight)}
+                onMouseEnter={() => handleMouseEnter(sectionName, index)}
+              >
+                <span className="theme-name">{theme.name}</span>
+                {isSelected && <IconCheck size={14} strokeWidth={2} className="check-icon" />}
+              </div>
+            );
+          })}
         </div>
-        {themes.map((theme, index) => {
-          const isActive = currentVariant === theme.id;
-          return (
-            <div
-              key={theme.id}
-              ref={(el) => (refs.current[index] = el)}
-              className={`theme-item ${isActive ? 'active' : ''} ${getFocusedClass(section, index)}`}
-              role="option"
-              aria-selected={isActive}
-              tabIndex={-1}
-              onClick={() => handleThemeSelect(theme.id, isLight)}
-              onMouseEnter={() => handleMouseEnter(section, index)}
-            >
-              <span className="theme-item-label">{theme.name}</span>
-              {isActive && <IconCheck size={14} strokeWidth={2} className="check-icon" />}
-            </div>
-          );
-        })}
       </div>
     );
   };
@@ -243,7 +244,7 @@ const ThemeDropdown = ({ children }) => {
   // Render mode buttons
   const renderModeButtons = () => (
     <div className="mode-buttons" role="radiogroup" aria-labelledby="mode-label">
-      {MODE_BUTTONS.map((btn, index) => {
+      {modeButtons.map((btn, index) => {
         const Icon = btn.icon;
         const isActive = storedTheme === btn.mode;
         return (
@@ -275,22 +276,22 @@ const ThemeDropdown = ({ children }) => {
         aria-label="Theme selector"
       >
         <div className="mode-section">
-          <div className="mode-label" id="mode-label">Appearance</div>
+          <div className="mode-label" id="mode-label">{t('THEMES.APPEARANCE', 'Appearance')}</div>
           {renderModeButtons()}
         </div>
 
         <div className={`theme-lists ${isSystemMode ? 'two-columns' : ''}`}>
           {(storedTheme === 'light' || isSystemMode)
-            && renderThemeList(lightThemes, true, themeVariantLight, 'Light theme')}
+            && renderThemeList(lightThemes, true, themeVariantLight, t('THEMES.LIGHT_THEMES', 'Light Themes'))}
           {(storedTheme === 'dark' || isSystemMode)
-            && renderThemeList(darkThemes, false, themeVariantDark, 'Dark theme')}
+            && renderThemeList(darkThemes, false, themeVariantDark, t('THEMES.DARK_THEMES', 'Dark Themes'))}
         </div>
       </div>
     </StyledWrapper>
   );
 
   return (
-    <ToolHint text="Theme" toolhintId="ThemeDropdown" place="top" offset={10} hidden={!tooltipEnabled}>
+    <ToolHint text={t('PREFERENCES.THEMES', 'Theme')} toolhintId="ThemeDropdown" place="top" offset={10} hidden={!tooltipEnabled}>
       <Tippy
         content={menuContent}
         placement="top-start"

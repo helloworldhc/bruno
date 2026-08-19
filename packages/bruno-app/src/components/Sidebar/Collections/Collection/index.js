@@ -388,7 +388,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'new-app',
       leftSection: IconAppWindow,
-      label: 'New App',
+      label: t('SIDEBAR.NEW_APP', 'New App'),
       onClick: () => {
         ensureCollectionIsMounted();
         setShowNewAppModal(true);
@@ -448,7 +448,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'generate-docs',
       leftSection: IconBook,
-      label: t('REQUEST.DOCS', 'Generate Docs'),
+      label: t('COLLECTION.GENERATE_DOCS', 'Generate Docs'),
       onClick: () => {
         ensureCollectionIsMounted();
         setShowGenerateDocumentationModal(true);
@@ -469,7 +469,7 @@ const Collection = ({ collection, searchText }) => {
     ...(isMockServerEnabled ? [{
       id: 'create-mock-server',
       leftSection: IconServer,
-      label: 'Create Mock server',
+      label: t('MOCK_SERVER.CREATE_MOCK_SERVER', 'Create Mock server'),
       rightSection: <StatusBadge status="info" size="xs">Beta</StatusBadge>,
       onClick: openMockServerDashboard
     }] : []),
@@ -497,7 +497,7 @@ const Collection = ({ collection, searchText }) => {
           {
             id: 'move-to-workspace',
             leftSection: IconFileArrowRight,
-            label: 'Move into Workspace',
+            label: t('WORKSPACE.MOVE_INTO_WORKSPACE', 'Move into Workspace'),
             testId: 'move-collection-to-workspace',
             onClick: () => {
               setShowMoveToWorkspaceModal(true);
@@ -508,7 +508,7 @@ const Collection = ({ collection, searchText }) => {
     {
       id: 'remove',
       leftSection: IconX,
-      label: t('COMMON.CLOSE', 'Remove'),
+      label: t('COMMON.REMOVE', 'Remove'),
       onClick: () => {
         setShowRemoveCollectionModal(true);
       }

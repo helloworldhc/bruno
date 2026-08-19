@@ -17,8 +17,10 @@ import { normalizePath } from 'utils/common/path';
 import { normalizeQuery, isValidQuery, highlightText, sortResults, getTypeLabel, getItemPath } from './utils/searchUtils';
 import { SEARCH_TYPES, MATCH_TYPES, SEARCH_CONFIG, DOCUMENTATION_RESULT } from './constants';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const GlobalSearchModal = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [results, setResults] = useState([]);
@@ -85,30 +87,30 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
         const itemPathLower = itemPath.toLowerCase();
 
         if (isItemARequest(item)) {
-          // add an optional check for the item name to prevent a crash if it doesn’t exist.
           const nameMatch = searchTerms.every((term) => (item.name || '').toLowerCase().includes(term));
           const urlMatch = searchTerms.every((term) => (item.request?.url || '').toLowerCase().includes(term));
           const pathMatch = enablePathMatch && searchTerms.every((term) => itemPathLower.includes(term));
 
           if (nameMatch || urlMatch || pathMatch) {
-            // Check if this is a gRPC request and get the method type
             const isGrpcRequest = item.request?.type === 'grpc';
-
             let method = item.request?.method || '';
 
             if (isGrpcRequest) {
-              // For gRPC requests, use the methodType
-              const methodType = item.request?.methodType || 'UNARY';
-              method = methodType.toLowerCase().replace(/[_]/g, '-');
+              method = item.request?.methodType || 'unary';
             }
+
+            let matchType = MATCH_TYPES.REQUEST;
+            if (nameMatch) matchType = MATCH_TYPES.REQUEST;
+            else if (urlMatch) matchType = MATCH_TYPES.URL;
+            else if (pathMatch) matchType = MATCH_TYPES.PATH;
 
             results.push({
               type: SEARCH_TYPES.REQUEST,
               item,
               name: item.name,
               path: itemPath,
-              matchType: nameMatch ? MATCH_TYPES.REQUEST : urlMatch ? MATCH_TYPES.URL : MATCH_TYPES.PATH,
               method,
+              matchType,
               collectionUid: collection.uid
             });
           }
@@ -130,233 +132,203 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
       });
     });
 
-    return results;
+    return sortResults(results);
   };
 
-  const performSearch = (searchQuery) => {
+  const performSearch = useCallback((searchQuery) => {
     const normalizedQuery = normalizeQuery(searchQuery);
 
-    if (!normalizedQuery) {
-      setResults(createCollectionResults());
-      return;
-    }
-
     if (!isValidQuery(normalizedQuery)) {
-      setResults([]);
+      setResults(createCollectionResults());
+      setSelectedIndex(0);
       return;
     }
 
-    const searchTerms = normalizedQuery.toLowerCase().split(/[\s\/]+/).filter(Boolean);
-    if (!searchTerms.length) {
-      setResults([]);
-      return;
-    }
-
+    const searchTerms = normalizedQuery.toLowerCase().split(' ').filter(Boolean);
     const enablePathMatch = normalizedQuery.includes('/');
     const searchResults = searchInCollections(searchTerms, enablePathMatch);
-    const sortedResults = sortResults(searchResults);
 
-    setResults(sortedResults);
+    setResults(searchResults);
     setSelectedIndex(0);
-  };
-
-  const debouncedSearch = useCallback((searchQuery) => {
-    // Clear existing timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
-    // Set new timeout
-    debounceTimeoutRef.current = setTimeout(() => {
-      performSearch(searchQuery);
-    }, SEARCH_CONFIG.DEBOUNCE_DELAY);
-  }, [collections]); // Depend on collections to recreate when they change
-
-  const expandItemPath = (result) => {
-    const collection = collections.find((c) => c.uid === result.collectionUid);
-    if (!collection) return;
-
-    ensureCollectionIsMounted(collection);
-
-    if (collection.collapsed) {
-      dispatch(toggleCollection(collection.uid));
-    }
-
-    let currentItem = result.type === SEARCH_TYPES.FOLDER
-      ? result.item
-      : findParentItemInCollection(collection, result.item.uid);
-
-    while (currentItem?.type === 'folder') {
-      if (currentItem.collapsed) {
-        dispatch(toggleCollectionItem({ collectionUid: collection.uid, itemUid: currentItem.uid }));
-      }
-      currentItem = findParentItemInCollection(collection, currentItem.uid);
-    }
-  };
-
-  const ensureCollectionIsMounted = (collection) => {
-    if (!collection || collection.mountStatus === 'mounted') return;
-    dispatch(mountCollection({
-      collectionUid: collection.uid,
-      collectionPathname: collection.pathname,
-      brunoConfig: collection.brunoConfig
-    }));
-  };
-
-  const handleKeyNavigation = (e) => {
-    const handlers = {
-      ArrowDown: () => {
-        e.preventDefault();
-        setSelectedIndex((prev) => prev < results.length - 1 ? prev + 1 : 0);
-      },
-      ArrowUp: () => {
-        e.preventDefault();
-        setSelectedIndex((prev) => prev > 0 ? prev - 1 : results.length - 1);
-      },
-      Enter: () => {
-        e.preventDefault();
-        if (results[selectedIndex]) {
-          handleResultSelection(results[selectedIndex]);
-        }
-      },
-      Escape: () => {
-        e.preventDefault();
-        onClose();
-      },
-      PageDown: () => {
-        e.preventDefault();
-        setSelectedIndex((prev) => Math.min(prev + 5, results.length - 1));
-      },
-      PageUp: () => {
-        e.preventDefault();
-        setSelectedIndex((prev) => Math.max(prev - 5, 0));
-      },
-      Home: () => {
-        e.preventDefault();
-        setSelectedIndex(0);
-      },
-      End: () => {
-        e.preventDefault();
-        setSelectedIndex(results.length - 1);
-      }
-    };
-
-    const handler = handlers[e.key];
-    if (handler) handler();
-  };
-
-  const handleResultSelection = (result) => {
-    const targetCollection = collections.find((c) => c.uid === result.collectionUid);
-    ensureCollectionIsMounted(targetCollection);
-
-    if (result.type === SEARCH_TYPES.DOCUMENTATION) {
-      window.open('https://docs.usebruno.com/', '_blank');
-      onClose();
-      return;
-    }
-
-    expandItemPath(result);
-
-    if (result.type === SEARCH_TYPES.REQUEST) {
-      const existingTab = tabs.find((tab) => tab.uid === result.item.uid);
-
-      if (existingTab) {
-        dispatch(focusTab({ uid: result.item.uid }));
-      } else {
-        dispatch(addTab({
-          uid: result.item.uid,
-          collectionUid: result.collectionUid,
-          requestPaneTab: getDefaultRequestPaneTab(result.item),
-          type: result.item.type,
-          pathname: result.item.pathname
-        }));
-      }
-    } else if (result.type === SEARCH_TYPES.FOLDER) {
-      dispatch(addTab({
-        uid: result.item.uid,
-        collectionUid: result.collectionUid,
-        type: 'folder-settings',
-        pathname: result.item.pathname
-      }));
-    } else if (result.type === SEARCH_TYPES.COLLECTION) {
-      dispatch(addTab({
-        uid: result.item.uid,
-        collectionUid: result.collectionUid,
-        type: 'collection-settings'
-      }));
-    }
-
-    onClose();
-  };
+  }, [collections]);
 
   const handleQueryChange = (e) => {
     const newQuery = e.target.value;
     setQuery(newQuery);
 
-    if (newQuery.trim()) {
-      debouncedSearch(newQuery);
-    } else {
-      // For empty queries, search immediately to show collections
-      performSearch(newQuery);
-    }
-  };
-
-  const clearSearch = () => {
-    // Clear any pending debounced search
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
 
-    setQuery('');
-    setResults([]);
+    debounceTimeoutRef.current = setTimeout(() => {
+      performSearch(newQuery);
+    }, SEARCH_CONFIG.DEBOUNCE_DELAY);
   };
 
-  // Initialize modal when opened
   useEffect(() => {
     if (isOpen) {
-      const timeoutId = setTimeout(() => inputRef.current?.focus(), SEARCH_CONFIG.FOCUS_DELAY);
-      setQuery('');
-      performSearch('');
+      const focusTimer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, SEARCH_CONFIG.FOCUS_DELAY);
+
+      setResults(createCollectionResults());
       setSelectedIndex(0);
 
-      return () => clearTimeout(timeoutId);
+      return () => clearTimeout(focusTimer);
     } else {
-      // Clear any pending debounced search when modal closes
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
+      setQuery('');
+      setResults([]);
+      setSelectedIndex(0);
     }
-  }, [isOpen]);
+  }, [isOpen, collections]);
 
-  // Auto-scroll selected item into view
   useEffect(() => {
     if (resultsRef.current && results.length > 0) {
       const selectedElement = resultsRef.current.children[selectedIndex];
-      selectedElement?.scrollIntoView({
-        behavior: SEARCH_CONFIG.SCROLL_BEHAVIOR,
-        block: SEARCH_CONFIG.SCROLL_BLOCK
-      });
-    }
-  }, [selectedIndex, results]);
-
-  // Cleanup debounce timeout on unmount or modal close
-  useEffect(() => {
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
+      if (selectedElement) {
+        selectedElement.scrollIntoView({
+          behavior: SEARCH_CONFIG.SCROLL_BEHAVIOR,
+          block: SEARCH_CONFIG.SCROLL_BLOCK
+        });
       }
-    };
-  }, []);
+    }
+  }, [selectedIndex, results.length]);
+
+  const openItemInTree = (result) => {
+    if (result.type === SEARCH_TYPES.COLLECTION) {
+      const collection = collections.find((c) => c.uid === result.collectionUid);
+      if (collection && collection.collapsed) {
+        dispatch(toggleCollection(result.collectionUid));
+      }
+    } else if (result.type === SEARCH_TYPES.FOLDER) {
+      const collection = collections.find((c) => c.uid === result.collectionUid);
+      if (collection) {
+        if (collection.collapsed) {
+          dispatch(toggleCollection(result.collectionUid));
+        }
+
+        const expandParents = (itemId) => {
+          const parent = findParentItemInCollection(collection, itemId);
+          if (parent) {
+            if (parent.collapsed) {
+              dispatch(toggleCollectionItem(parent.uid));
+            }
+            expandParents(parent.uid);
+          }
+        };
+
+        expandParents(result.item.uid);
+
+        if (result.item.collapsed) {
+          dispatch(toggleCollectionItem(result.item.uid));
+        }
+      }
+    }
+  };
+
+  const openItemInTab = (result) => {
+    if (result.type === SEARCH_TYPES.REQUEST) {
+      const collection = collections.find((c) => c.uid === result.collectionUid);
+      if (collection) {
+        const existingTab = tabs.find((t) => t.uid === result.item.uid);
+        if (existingTab) {
+          dispatch(focusTab({ uid: existingTab.uid }));
+        } else {
+          dispatch(addTab({
+            uid: result.item.uid,
+            collectionUid: result.collectionUid,
+            requestPaneTab: getDefaultRequestPaneTab(result.item)
+          }));
+        }
+
+        if (collection.collapsed) {
+          dispatch(toggleCollection(result.collectionUid));
+        }
+
+        const expandParents = (itemId) => {
+          const parent = findParentItemInCollection(collection, itemId);
+          if (parent) {
+            if (parent.collapsed) {
+              dispatch(toggleCollectionItem(parent.uid));
+            }
+            expandParents(parent.uid);
+          }
+        };
+
+        expandParents(result.item.uid);
+      }
+    } else if (result.type === SEARCH_TYPES.DOCUMENTATION) {
+      window.open('https://docs.usebruno.com', '_blank');
+    }
+  };
+
+  const handleMountCollection = (collection) => {
+    dispatch(mountCollection(collection.uid));
+  };
+
+  const handleResultSelection = (result) => {
+    if (result.type === SEARCH_TYPES.REQUEST) {
+      openItemInTab(result);
+    } else if (result.type === SEARCH_TYPES.DOCUMENTATION) {
+      openItemInTab(result);
+    } else {
+      openItemInTree(result);
+    }
+    onClose();
+  };
+
+  const handleKeyNavigation = (e) => {
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : 0));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : results.length - 1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (results.length > 0 && results[selectedIndex]) {
+          handleResultSelection(results[selectedIndex]);
+        } else if (results.length === 0 && query) {
+          const normalizedQuery = normalizeQuery(query).toLowerCase();
+          const unmountedCollection = allCollections.find(
+            (c) => c.name.toLowerCase().includes(normalizedQuery)
+          );
+          if (unmountedCollection) {
+            handleMountCollection(unmountedCollection);
+            onClose();
+          }
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        onClose();
+        break;
+    }
+  };
+
+  const clearSearch = () => {
+    setQuery('');
+    setResults(createCollectionResults());
+    setSelectedIndex(0);
+    inputRef.current?.focus();
+  };
 
   const getResultIcon = (type) => {
-    const iconMap = {
-      [SEARCH_TYPES.DOCUMENTATION]: IconBook,
-      [SEARCH_TYPES.COLLECTION]: IconBox,
-      [SEARCH_TYPES.FOLDER]: IconFolder,
-      [SEARCH_TYPES.REQUEST]: IconFileText
-    };
-    const IconComponent = iconMap[type] || IconFileText;
-    return <IconComponent size={18} stroke={1.5} />;
+    switch (type) {
+      case SEARCH_TYPES.COLLECTION:
+        return <IconBox size={16} className="text-gray-400" aria-hidden="true" />;
+      case SEARCH_TYPES.FOLDER:
+        return <IconFolder size={16} className="text-gray-400" aria-hidden="true" />;
+      case SEARCH_TYPES.REQUEST:
+        return <IconFileText size={16} className="text-gray-400" aria-hidden="true" />;
+      case SEARCH_TYPES.DOCUMENTATION:
+        return <IconBook size={16} className="text-gray-400" aria-hidden="true" />;
+      default:
+        return null;
+    }
   };
 
   if (!isOpen) return null;
@@ -364,19 +336,18 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
   return (
     <StyledWrapper>
       <div
-        className="command-k-overlay"
+        className="command-k-modal-backdrop"
         onClick={onClose}
+        aria-hidden="true"
+      />
+      <div
+        className="command-k-modal-container"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="search-modal-title"
-        aria-describedby="search-modal-description"
+        aria-label="Global Search"
       >
         <div className="command-k-modal" onClick={(e) => e.stopPropagation()}>
-          <h1 id="search-modal-title" className="sr-only">Global Search</h1>
-          <p id="search-modal-description" className="sr-only">
-            Search through collections, requests, folders, and documentation. Use arrow keys to navigate results and Enter to select.
-          </p>
-          <div aria-live="polite" aria-atomic="true" className="sr-only">
+          <div className="sr-only" aria-live="polite" aria-atomic="true">
             {results.length > 0 && query
               ? `${results.length} result${results.length === 1 ? '' : 's'} found`
               : query && results.length === 0
@@ -389,7 +360,7 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
               <input
                 ref={inputRef}
                 type="text"
-                placeholder="Search collections, requests, or documentation..."
+                placeholder={t('GLOBAL_SEARCH.INPUT_PLACEHOLDER', 'Search collections, requests, or documentation...')}
                 value={query}
                 onChange={handleQueryChange}
                 onKeyDown={handleKeyNavigation}
@@ -398,13 +369,6 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck="false"
-                aria-label="Search collections, requests, or documentation"
-                aria-expanded={results.length > 0}
-                aria-controls="search-results"
-                aria-activedescendant={results.length > 0 ? `search-result-${selectedIndex}` : undefined}
-                role="combobox"
-                aria-autocomplete="list"
-                data-testid="global-search-input"
               />
               {query && (
                 <button
@@ -422,80 +386,56 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
           <div
             className="command-k-results"
             ref={resultsRef}
-            id="search-results"
             role="listbox"
             aria-label="Search results"
           >
             {results.length === 0 && query ? (
               <div className="no-results">
                 <p>
-                  No results found for "{query}".
+                  {t('GLOBAL_SEARCH.NO_RESULTS_FOR', 'No results found for "{{query}}".', { query })}
                   <br />
                   <span className="block mt-2">
-                    The item might not exist yet, or its collection isn’t mounted. Press <strong>Enter</strong> here (or open it from the sidebar) to mount the collection automatically.
+                    {t('GLOBAL_SEARCH.NOT_MOUNTED_HINT', 'The item might not exist yet, or its collection isn’t mounted. Press Enter here (or open it from the sidebar) to mount the collection automatically.')}
                   </span>
                 </p>
               </div>
             ) : results.length === 0 ? (
               <div className="empty-state">
                 <p>
-                  No collections are currently mounted or visible.
+                  {t('GLOBAL_SEARCH.NO_COLLECTIONS_MOUNTED', 'No collections are currently mounted or visible.')}
                   <br />
                   <span className="block mt-2">
-                    Mount a collection via the sidebar or this search modal, then try again.
+                    {t('GLOBAL_SEARCH.MOUNT_COLLECTION_HINT', 'Mount a collection via the sidebar or this search modal, then try again.')}
                   </span>
                 </p>
               </div>
             ) : (
               results.map((result, index) => {
                 const isSelected = index === selectedIndex;
-                const typeLabel = getTypeLabel(result.type);
-
                 return (
                   <div
                     key={`${result.type}-${result.item.id || result.item.uid}-${index}`}
-                    id={`search-result-${index}`}
                     className={`result-item ${isSelected ? 'selected' : ''}`}
                     onClick={() => handleResultSelection(result)}
-                    data-selected={isSelected}
-                    data-type={result.type}
                     role="option"
                     aria-selected={isSelected}
-                    aria-label={`${result.name}, ${typeLabel || result.type}${result.method ? `, ${result.method}` : ''}`}
-                    tabIndex={-1}
                   >
                     <div className="result-icon">
                       {getResultIcon(result.type)}
                     </div>
                     <div className="result-content">
-                      <div className="result-info">
-                        <div className="result-name">
-                          {highlightText(result.name, query)}
-                        </div>
-                        <div className="result-path">
-                          {result.type === SEARCH_TYPES.DOCUMENTATION
-                            ? result.description
-                            : result.type === SEARCH_TYPES.REQUEST
-                              ? highlightText(result.item.request?.url || '', query)
-                              : highlightText(result.path, query)}
-                        </div>
+                      <div className="result-name">
+                        {highlightText(result.name, query)}
                       </div>
-                      <div className="result-badges">
-                        {result.type === SEARCH_TYPES.REQUEST && result.method && (
-                          <span
-                            className={`method-badge ${result.method.toLowerCase()}`}
-                            aria-label={`HTTP method ${result.method.toUpperCase().replace(/-/g, ' ')}`}
-                          >
-                            {result.method.toUpperCase().replace(/-/g, ' ')}
-                          </span>
-                        )}
-                        {typeLabel && (
-                          <div className="result-type" aria-label={`Item type ${typeLabel}`}>
-                            {typeLabel}
-                          </div>
-                        )}
+                      <div className="result-path">
+                        {result.type === SEARCH_TYPES.REQUEST
+                          ? highlightText(result.item.request?.url || '', query)
+                          : highlightText(result.path, query)}
                       </div>
                     </div>
+                    {result.type === SEARCH_TYPES.REQUEST && result.method && (
+                      <div className="method-badge">{result.method.toUpperCase()}</div>
+                    )}
                   </div>
                 );
               })
@@ -507,15 +447,15 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
               <span aria-label="Use up and down arrows to navigate">
                 <span className="keycap" aria-hidden="true">↑</span>
                 <span className="keycap" aria-hidden="true">↓</span>
-                <span className="hint-label">to navigate</span>
+                <span className="hint-label">{t('GLOBAL_SEARCH.TO_NAVIGATE', 'to navigate')}</span>
               </span>
               <span aria-label="Press Enter to select">
                 <span className="keycap" aria-hidden="true">↵</span>
-                <span className="hint-label">to select</span>
+                <span className="hint-label">{t('GLOBAL_SEARCH.TO_SELECT', 'to select')}</span>
               </span>
               <span aria-label="Press Escape to close">
                 <span className="keycap" aria-hidden="true">esc</span>
-                <span className="hint-label">to close</span>
+                <span className="hint-label">{t('GLOBAL_SEARCH.TO_CLOSE', 'to close')}</span>
               </span>
             </div>
           </div>

@@ -15,8 +15,10 @@ import Button from 'ui/Button';
 import CollectionsList from './CollectionsList';
 import WorkspaceDocs from '../WorkspaceDocs';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const WorkspaceOverview = ({ workspace }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { globalEnvironments } = useSelector((state) => state.globalEnvironments);
   const { sidebarCollapsed, isCreatingCollection } = useSelector((state) => state.app);
@@ -38,7 +40,7 @@ const WorkspaceOverview = ({ workspace }) => {
     }
 
     if (!workspace?.pathname) {
-      toast.error('Workspace path not found');
+      toast.error(t('WORKSPACE.WORKSPACE_PATH_NOT_FOUND', 'Workspace path not found'));
       return;
     }
 
@@ -52,7 +54,7 @@ const WorkspaceOverview = ({ workspace }) => {
       dispatch(setIsCreatingCollection(true));
     } catch (error) {
       console.error('Error ensuring collections folder exists:', error);
-      toast.error('Error preparing workspace for collection creation');
+      toast.error(t('WORKSPACE.ERROR_PREPARING_WORKSPACE', 'Error preparing workspace for collection creation'));
     }
   };
 
@@ -143,16 +145,16 @@ const WorkspaceOverview = ({ workspace }) => {
           <div className="stats-row">
             <div className="stat-item">
               <span className="stat-value">{workspaceCollectionsCount}</span>
-              <span className="stat-label">Collections</span>
+              <span className="stat-label">{t('COMMON.COLLECTIONS', 'Collections')}</span>
             </div>
             <div className="stat-item">
               <span className="stat-value">{workspaceEnvironmentsCount}</span>
-              <span className="stat-label">Environments</span>
+              <span className="stat-label">{t('ENVIRONMENTS.ENVIRONMENTS', 'Environments')}</span>
             </div>
           </div>
 
           <div className="quick-actions-section">
-            <div className="section-title">Quick Actions</div>
+            <div className="section-title">{t('WORKSPACE.QUICK_ACTIONS', 'Quick Actions')}</div>
             <div className="quick-actions-buttons">
               <Button
                 color="light"
@@ -161,7 +163,7 @@ const WorkspaceOverview = ({ workspace }) => {
                 onClick={handleCreateCollection}
                 disabled={isCreatingCollection}
               >
-                Create Collection
+                {t('CREATE_COLLECTION.TITLE', 'Create Collection')}
               </Button>
               <Button
                 color="light"
@@ -169,7 +171,7 @@ const WorkspaceOverview = ({ workspace }) => {
                 icon={<IconFolder size={14} strokeWidth={1.5} />}
                 onClick={handleOpenCollection}
               >
-                Open Collection
+                {t('APP_MENU.OPEN_COLLECTION', 'Open Collection')}
               </Button>
               <Button
                 color="light"
@@ -177,13 +179,13 @@ const WorkspaceOverview = ({ workspace }) => {
                 icon={<IconDownload size={14} strokeWidth={1.5} />}
                 onClick={handleImportCollection}
               >
-                Import Collection
+                {t('IMPORT_COLLECTION.TITLE', 'Import Collection')}
               </Button>
             </div>
           </div>
 
           <div className="collections-section">
-            <div className="section-title">Collections</div>
+            <div className="section-title">{t('COMMON.COLLECTIONS', 'Collections')}</div>
             <CollectionsList workspace={workspace} />
           </div>
         </div>

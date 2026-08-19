@@ -19,37 +19,39 @@ import { updateRequestBody } from 'providers/ReduxStore/slices/collections/index
 import { toastError } from 'utils/common/error';
 import { prettifyJsonString } from 'utils/common/index';
 import xmlFormat from 'xml-formatter';
-
-const DEFAULT_MODES = [
-  {
-    name: 'Form',
-    options: [
-      { id: 'multipartForm', label: 'Multipart Form', leftSection: IconForms },
-      { id: 'formUrlEncoded', label: 'Form URL Encoded', leftSection: IconForms }
-    ]
-  },
-  {
-    name: 'Raw',
-    options: [
-      { id: 'json', label: 'JSON', leftSection: IconBraces },
-      { id: 'xml', label: 'XML', leftSection: IconCode },
-      { id: 'text', label: 'TEXT', leftSection: IconFileText },
-      { id: 'sparql', label: 'SPARQL', leftSection: IconDatabase }
-    ]
-  },
-  {
-    name: 'Other',
-    options: [
-      { id: 'file', label: 'File / Binary', leftSection: IconFile },
-      { id: 'none', label: 'No Body', leftSection: IconX }
-    ]
-  }
-];
+import { useTranslation } from 'react-i18next';
 
 const RequestBodyMode = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const body = item.draft ? get(item, 'draft.request.body') : get(item, 'request.body');
   const bodyMode = body?.mode;
+
+  const defaultModes = useMemo(() => [
+    {
+      name: t('REQUEST.BODY_GROUP_FORM', 'Form'),
+      options: [
+        { id: 'multipartForm', label: 'Multipart Form', leftSection: IconForms },
+        { id: 'formUrlEncoded', label: 'Form URL Encoded', leftSection: IconForms }
+      ]
+    },
+    {
+      name: t('REQUEST.BODY_GROUP_RAW', 'Raw'),
+      options: [
+        { id: 'json', label: 'JSON', leftSection: IconBraces },
+        { id: 'xml', label: 'XML', leftSection: IconCode },
+        { id: 'text', label: 'TEXT', leftSection: IconFileText },
+        { id: 'sparql', label: 'SPARQL', leftSection: IconDatabase }
+      ]
+    },
+    {
+      name: t('REQUEST.BODY_GROUP_OTHER', 'Other'),
+      options: [
+        { id: 'file', label: 'File / Binary', leftSection: IconFile },
+        { id: 'none', label: t('REQUEST.NO_BODY', 'No Body'), leftSection: IconX }
+      ]
+    }
+  ], [t]);
 
   const onModeChange = useCallback((value) => {
     dispatch(
@@ -92,14 +94,14 @@ const RequestBodyMode = ({ item, collection }) => {
   };
 
   const menuItems = useMemo(() => {
-    return DEFAULT_MODES.map((group) => ({
+    return defaultModes.map((group) => ({
       ...group,
       options: group.options.map((option) => ({
         ...option,
         onClick: () => onModeChange(option.id)
       }))
     }));
-  }, [onModeChange]);
+  }, [defaultModes, onModeChange]);
 
   return (
     <StyledWrapper>
@@ -119,7 +121,7 @@ const RequestBodyMode = ({ item, collection }) => {
       </div>
       {(bodyMode === 'json' || bodyMode === 'xml') && (
         <button className="ml-2" onClick={onPrettify}>
-          Prettify
+          {t('REQUEST.PRETTIFY', 'Prettify')}
         </button>
       )}
     </StyledWrapper>

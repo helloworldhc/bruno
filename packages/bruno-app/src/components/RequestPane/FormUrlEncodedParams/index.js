@@ -14,8 +14,10 @@ import { createDescriptionColumn } from 'components/EditableTable/descriptionCol
 import StyledWrapper from './StyledWrapper';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useTrackScroll } from 'hooks/useTrackScroll';
+import { useTranslation } from 'react-i18next';
 
 const FormUrlEncodedParams = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const wrapperRef = useRef(null);
@@ -63,15 +65,15 @@ const FormUrlEncodedParams = ({ item, collection }) => {
   const columns = [
     {
       key: 'name',
-      name: 'Key',
+      name: t('COMMON.KEY', 'Key'),
       isKeyField: true,
-      placeholder: 'Key',
+      placeholder: t('COMMON.KEY', 'Key'),
       width: '20%'
     },
     {
       key: 'value',
-      name: 'Value',
-      placeholder: 'Value',
+      name: t('COMMON.VALUE', 'Value'),
+      placeholder: t('COMMON.VALUE', 'Value'),
       render: ({ value, onChange }) => (
         <MultiLineEditor
           value={value || ''}
@@ -82,7 +84,7 @@ const FormUrlEncodedParams = ({ item, collection }) => {
           onRun={handleRun}
           collection={collection}
           item={item}
-          placeholder={!value ? 'Value' : ''}
+          placeholder={!value ? t('COMMON.VALUE', 'Value') : ''}
         />
       )
     },

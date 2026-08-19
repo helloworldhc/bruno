@@ -6,8 +6,10 @@ import { IconAlertTriangle } from '@tabler/icons';
 import { removeCollectionFromWorkspaceAction } from 'providers/ReduxStore/slices/workspaces/actions';
 import { findCollectionByUid } from 'utils/collections/index';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const DeleteCollection = ({ onClose, collectionUid, workspaceUid }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [confirmText, setConfirmText] = useState('');
   const collection = useSelector((state) => findCollectionByUid(state.collections.collections, collectionUid));
@@ -40,27 +42,27 @@ const DeleteCollection = ({ onClose, collectionUid, workspaceUid }) => {
     <StyledWrapper>
       <Modal
         size="sm"
-        title="Delete Collection"
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('DELETE_COLLECTION.TITLE', 'Delete Collection')}
+        confirmText={t('COMMON.DELETE', 'Delete')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         confirmButtonColor="danger"
         confirmDisabled={!isConfirmed}
         handleConfirm={onConfirm}
         handleCancel={onClose}
       >
         <p className="modal-description">
-          Are you sure you want to permanently delete <strong>"{collection.name}"</strong>?
+          {t('DELETE_COLLECTION.CONFIRM_DESC', 'Are you sure you want to permanently delete')} <strong>"{collection.name}"</strong>?
         </p>
         <div className="collection-info-card">
           <div className="collection-name">{collection.name}</div>
           <div className="collection-path">{collection.pathname}</div>
         </div>
         <p className="warning-text">
-          This action cannot be undone. The collection files will be permanently deleted from disk.
+          {t('DELETE_COLLECTION.WARNING', 'This action cannot be undone. The collection files will be permanently deleted from disk.')}
         </p>
         <div className="delete-confirmation">
           <label htmlFor="delete-confirm-input">
-            Type <span className="delete-keyword">delete</span> to confirm
+            {t('DELETE_COLLECTION.TYPE_KEYWORD', 'Type')} <span className="delete-keyword">delete</span> {t('DELETE_COLLECTION.TO_CONFIRM', 'to confirm')}
           </label>
           <input
             id="delete-confirm-input"

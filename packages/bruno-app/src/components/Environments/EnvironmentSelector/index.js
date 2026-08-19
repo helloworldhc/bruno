@@ -14,16 +14,7 @@ import CreateGlobalEnvironment from 'components/WorkspaceHome/WorkspaceEnvironme
 import ToolHint from 'components/ToolHint';
 import StyledWrapper from './StyledWrapper';
 import { transparentize, toColorString, parseToRgb } from 'polished';
-
-const TABS = [
-  { id: 'collection', label: 'Collection', icon: <IconDatabase size={16} strokeWidth={1.5} /> },
-  { id: 'global', label: 'Global', icon: <IconWorld size={16} strokeWidth={1.5} /> }
-];
-
-const EMPTY_STATE_DESCRIPTIONS = {
-  collection: 'Create your first environment to begin working with your collection.',
-  global: 'Create your first global environment to begin working across collections.'
-};
+import { useTranslation } from 'react-i18next';
 
 /**
  * Generates background color with transparency for environment badges
@@ -99,6 +90,7 @@ const EnvironmentBadge = ({ environment, icon: Icon }) => {
  * Dropdown trigger component showing active environments
  */
 const DropdownTrigger = forwardRef(({ collectionEnv, globalEnv }, ref) => {
+  const { t } = useTranslation();
   const hasAnyEnv = collectionEnv || globalEnv;
 
   // Empty state - no environments selected
@@ -109,7 +101,7 @@ const DropdownTrigger = forwardRef(({ collectionEnv, globalEnv }, ref) => {
         className="current-environment flex align-center justify-center cursor-pointer bg-transparent no-environments"
         data-testid="environment-selector-trigger"
       >
-        <span className="env-text-inactive max-w-36 truncate no-wrap">No Environment</span>
+        <span className="env-text-inactive max-w-36 truncate no-wrap">{t('ENVIRONMENTS.NO_ENVIRONMENT', 'No Environment')}</span>
         <IconCaretDown className="caret flex items-center justify-center" size={12} strokeWidth={2} />
       </div>
     );
@@ -175,6 +167,7 @@ const DropdownTrigger = forwardRef(({ collectionEnv, globalEnv }, ref) => {
 });
 
 const EnvironmentSelector = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const dropdownTippyRef = useRef();
   const [activeTab, setActiveTab] = useState('collection');
@@ -183,6 +176,16 @@ const EnvironmentSelector = ({ collection }) => {
   const [showCreateCollectionModal, setShowCreateCollectionModal] = useState(false);
   const [showImportCollectionModal, setShowImportCollectionModal] = useState(false);
   const [searchText, setSearchText] = useState('');
+
+  const tabsList = [
+    { id: 'collection', label: t('ENVIRONMENTS.COLLECTION', 'Collection'), icon: <IconDatabase size={16} strokeWidth={1.5} /> },
+    { id: 'global', label: t('ENVIRONMENTS.GLOBAL', 'Global'), icon: <IconWorld size={16} strokeWidth={1.5} /> }
+  ];
+
+  const emptyStateDescriptions = {
+    collection: t('ENVIRONMENTS.COLLECTION_EMPTY_DESC', 'Create your first environment to begin working with your collection.'),
+    global: t('ENVIRONMENTS.GLOBAL_EMPTY_DESC', 'Create your first global environment to begin working across collections.')
+  };
 
   const globalEnvironments = useSelector((state) => state.globalEnvironments.globalEnvironments);
   const activeGlobalEnvironmentUid = useSelector((state) => state.globalEnvironments.activeGlobalEnvironmentUid);
@@ -201,7 +204,7 @@ const EnvironmentSelector = ({ collection }) => {
     [environments, globalEnvironments]
   );
 
-  const description = EMPTY_STATE_DESCRIPTIONS[activeTab];
+  const description = emptyStateDescriptions[activeTab];
 
   const hideDropdown = () => dropdownTippyRef.current?.hide();
 
@@ -213,11 +216,11 @@ const EnvironmentSelector = ({ collection }) => {
 
     dispatch(action)
       .then(() => {
-        toast.success(environment ? `Environment changed to ${environment.name}` : 'No Environments are active now');
+        toast.success(environment ? t('ENVIRONMENTS.ENV_CHANGED_TO', 'Environment changed to {{name}}', { name: environment.name }) : t('ENVIRONMENTS.NO_ACTIVE_ENV', 'No Environments are active now'));
         hideDropdown();
       })
       .catch(() => {
-        toast.error('An error occurred while selecting the environment');
+        toast.error(t('ENVIRONMENTS.ERROR_SELECTING_ENV', 'An error occurred while selecting the environment'));
       });
   };
 
@@ -273,7 +276,7 @@ const EnvironmentSelector = ({ collection }) => {
         >
           {/* Tab Headers */}
           <div className="tab-header flex pt-3 pb-2 px-3">
-            {TABS.map((tab) => (
+            {tabsList.map((tab) => (
               <button
                 key={tab.id}
                 className={`tab-button whitespace-nowrap pb-[0.375rem] border-b-[0.125rem] bg-transparent flex align-center cursor-pointer transition-all duration-200 mr-[1.25rem] ${

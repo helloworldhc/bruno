@@ -12,10 +12,12 @@ import Dropdown from 'components/Dropdown';
 import { browseDirectory, exportCollectionToPostman } from 'providers/ReduxStore/slices/collections/actions';
 import { exportPostmanCollection } from 'utils/exporters/postman-collection';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const FILE_EXISTS_ERROR = 'Name already exists in this location.';
 
 const ExportToPostman = ({ onClose, onExported, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const inputRef = useRef();
   const [preserveScripts, setPreserveScripts] = useState(false);
@@ -59,21 +61,20 @@ const ExportToPostman = ({ onClose, onExported, collection }) => {
       toast.success('Collection exported successfully');
       onExported();
     } catch (error) {
-      const message = error?.message || String(error);
-
-      // the filename already exists, surface it as a error message
-      if (!overwrite && message.includes('already exists')) {
+      if (error.message === FILE_EXISTS_ERROR) {
         formik.setFieldError('fileName', FILE_EXISTS_ERROR);
-        return;
+      } else {
+        toast.error(error.message || 'Export failed');
       }
-      toast.error('Failed to export collection: ' + message);
     } finally {
       setIsExporting(false);
     }
   }
 
   // overwrite = true will replace the existing file in the location
-  const handleReplace = () => handleExport(formik.values, true);
+  const handleReplace = () => {
+    handleExport(formik.values, true);
+  };
 
   const browse = () => {
     dispatch(browseDirectory())
@@ -98,7 +99,7 @@ const ExportToPostman = ({ onClose, onExported, collection }) => {
     return (
       <div ref={ref} className="flex items-center text-link cursor-pointer">
         <button className="btn-advanced" type="button">
-          Options
+          {t('COMMON.OPTIONS', 'Options')}
         </button>
         <IconCaretDown className="caret ml-1" size={14} strokeWidth={2} />
       </div>
@@ -110,9 +111,10 @@ const ExportToPostman = ({ onClose, onExported, collection }) => {
       <StyledWrapper>
         <Modal
           size="md"
-          title="Export to Postman"
+          title={t('EXPORT_COLLECTION.EXPORT_TO_POSTMAN', 'Export to Postman')}
           dataTestId="export-to-postman-modal"
-          confirmText={fileExists ? 'Replace' : 'Export'}
+          confirmText={fileExists ? t('COMMON.REPLACE', 'Replace') : t('COMMON.EXPORT', 'Export')}
+          cancelText={t('COMMON.CANCEL', 'Cancel')}
           confirmButtonColor={fileExists ? 'danger' : 'primary'}
           confirmDisabled={isExporting}
           handleConfirm={() => (fileExists ? handleReplace() : formik.handleSubmit())}
@@ -128,7 +130,7 @@ const ExportToPostman = ({ onClose, onExported, collection }) => {
                     setShowAdvancedOptions(!showAdvancedOptions);
                   }}
                 >
-                  {showAdvancedOptions ? 'Hide Advanced Options' : 'Show Advanced Options'}
+                  {showAdvancedOptions ? t('EXPORT_COLLECTION.HIDE_ADVANCED_OPTIONS', 'Hide Advanced Options') : t('EXPORT_COLLECTION.SHOW_ADVANCED_OPTIONS', 'Show Advanced Options')}
                 </div>
               </Dropdown>
             </div>
@@ -136,7 +138,7 @@ const ExportToPostman = ({ onClose, onExported, collection }) => {
         >
           <form className="bruno-form" onSubmit={(e) => e.preventDefault()}>
             <label htmlFor="fileName" className="block font-medium">
-              Name
+              {t('COMMON.NAME', 'Name')}
             </label>
             <div className="relative">
               <input
@@ -159,7 +161,7 @@ const ExportToPostman = ({ onClose, onExported, collection }) => {
             ) : null}
 
             <label htmlFor="location" className="block font-medium mt-4">
-              Location
+              {t('COMMON.LOCATION', 'Location')}
             </label>
             <input
               id="location"
@@ -179,7 +181,7 @@ const ExportToPostman = ({ onClose, onExported, collection }) => {
             ) : null}
             <div className="mt-1">
               <span className="text-link cursor-pointer hover:underline" onClick={browse}>
-                Browse
+                {t('COMMON.BROWSE', 'Browse')}
               </span>
             </div>
 
@@ -193,9 +195,9 @@ const ExportToPostman = ({ onClose, onExported, collection }) => {
                   data-testid="preserve-scripts-toggle"
                 />
                 <div>
-                  <span className="preserve-scripts-label">Preserve scripts</span>
+                  <span className="preserve-scripts-label">{t('EXPORT_COLLECTION.PRESERVE_SCRIPTS', 'Preserve scripts')}</span>
                   <p className="preserve-scripts-description">
-                    Export Bruno scripts without translating them.
+                    {t('EXPORT_COLLECTION.PRESERVE_SCRIPTS_DESC', 'Export Bruno scripts without translating them.')}
                   </p>
                 </div>
               </label>

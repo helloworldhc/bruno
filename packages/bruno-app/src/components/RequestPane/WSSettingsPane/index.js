@@ -10,6 +10,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 /**
  * @param {string} propertyKey
@@ -29,6 +30,7 @@ const ERRORS = {
 };
 
 const WSSettingsPane = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const requestPreferences = useSelector((state) => state.app.preferences.request);
@@ -56,14 +58,14 @@ const WSSettingsPane = ({ item, collection }) => {
     <StyledWrapper className="flex flex-col gap-4 w-full">
       <section className="grid gap-4 items-center grid-cols-2">
         <div>
-          <label className="font-medium mb-2">Timeout</label>
+          <label className="font-medium mb-2">{t('REQUEST.TIMEOUT_MS', 'Timeout')}</label>
           <InfoTip
             infotipId="setting-connection-timeout"
             className="tooltip-mod max-w-lg"
             content={(
               <div>
                 <p>
-                  <span>Timeout in milliseconds</span>
+                  <span>{t('REQUEST.TIMEOUT_DESC', 'Timeout in milliseconds')}</span>
                 </p>
               </div>
             )}
@@ -91,7 +93,7 @@ const WSSettingsPane = ({ item, collection }) => {
         </div>
 
         <div>
-          <label className="font-medium mb-2">Keep Alive Interval</label>
+          <label className="font-medium mb-2">{t('REQUEST.WS_KEEP_ALIVE', 'Keep Alive Interval')}</label>
           <InfoTip
             infotipId="setting-keep-alive"
             className="tooltip-mod max-w-lg"
@@ -99,7 +101,7 @@ const WSSettingsPane = ({ item, collection }) => {
               <div>
                 <p>
                   <span>
-                    Keep the websocket alive by sending ping requests to the server at every interval (in millseconds)
+                    {t('REQUEST.WS_KEEP_ALIVE_DESC', 'Keep the websocket alive by sending ping requests to the server at every interval (in millseconds)')}
                   </span>
                 </p>
                 <p className="mt-2">0 (zero) = off</p>

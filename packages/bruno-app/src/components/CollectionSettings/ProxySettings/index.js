@@ -9,8 +9,10 @@ import { saveCollectionSettings } from 'providers/ReduxStore/slices/collections/
 import { get } from 'lodash';
 import toast from 'react-hot-toast';
 import Button from 'ui/Button';
+import { useTranslation } from 'react-i18next';
 
 const ProxySettings = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const initialProxyConfig = {
     inherit: true,
@@ -198,11 +200,11 @@ const ProxySettings = ({ collection }) => {
 
   return (
     <StyledWrapper className="h-full w-full">
-      <div className="text-xs mb-4 text-muted">Configure proxy settings for this collection.</div>
+      <div className="text-xs mb-4 text-muted">{t('COLLECTION_SETTINGS.PROXY_DESC', 'Configure proxy settings for this collection.')}</div>
       <div className="bruno-form">
         <div className="mb-3 flex items-center">
           <label className="settings-label flex items-center" htmlFor="enabled">
-            Config
+            {t('COMMON.CONFIG', 'Config')}
             <InfoTip infotipId="request-var">
               <div>
                 <ul>
@@ -223,7 +225,7 @@ const ProxySettings = ({ collection }) => {
                 onChange={handleEnabledChange}
                 className="mr-1"
               />
-              inherit
+              {t('COMMON.INHERIT', 'inherit')}
             </label>
             <label className="flex items-center ml-4">
               <input
@@ -234,7 +236,7 @@ const ProxySettings = ({ collection }) => {
                 onChange={handleEnabledChange}
                 className="mr-1"
               />
-              enabled
+              {t('COMMON.ENABLED', 'enabled')}
             </label>
             <label className="flex items-center ml-4">
               <input
@@ -245,7 +247,7 @@ const ProxySettings = ({ collection }) => {
                 onChange={handleEnabledChange}
                 className="mr-1"
               />
-              disabled
+              {t('COMMON.DISABLED', 'disabled')}
             </label>
           </div>
         </div>
@@ -253,7 +255,7 @@ const ProxySettings = ({ collection }) => {
           <>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="protocol">
-                Protocol
+                {t('PREFERENCES.PROXY_PROTOCOL', 'Protocol')}
               </label>
               <div className="flex items-center">
                 <label className="flex items-center">
@@ -304,7 +306,7 @@ const ProxySettings = ({ collection }) => {
             </div>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="hostname">
-                Hostname
+                {t('PREFERENCES.PROXY_HOSTNAME', 'Hostname')}
               </label>
               <input
                 id="hostname"
@@ -321,7 +323,7 @@ const ProxySettings = ({ collection }) => {
             </div>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="port">
-                Port
+                {t('PREFERENCES.PROXY_PORT', 'Port')}
               </label>
               <input
                 id="port"
@@ -338,9 +340,10 @@ const ProxySettings = ({ collection }) => {
             </div>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="auth.disabled">
-                Auth
+                {t('REQUEST.AUTH', 'Auth')}
               </label>
               <input
+                id="auth.disabled"
                 type="checkbox"
                 name="auth.disabled"
                 checked={!currentProxyConfig.config?.auth?.disabled}
@@ -350,7 +353,7 @@ const ProxySettings = ({ collection }) => {
             <div>
               <div className="mb-3 flex items-center">
                 <label className="settings-label" htmlFor="auth.username">
-                  Username
+                  {t('PREFERENCES.PROXY_USERNAME', 'Username')}
                 </label>
                 <input
                   id="auth.username"
@@ -367,7 +370,7 @@ const ProxySettings = ({ collection }) => {
               </div>
               <div className="mb-3 flex items-center">
                 <label className="settings-label" htmlFor="auth.password">
-                  Password
+                  {t('PREFERENCES.PROXY_PASSWORD', 'Password')}
                 </label>
                 <div className="textbox flex flex-row items-center w-[13.2rem] h-[1.70rem] relative">
                   <input
@@ -394,7 +397,7 @@ const ProxySettings = ({ collection }) => {
             </div>
             <div className="mb-3 flex items-center">
               <label className="settings-label" htmlFor="bypassProxy">
-                Proxy Bypass
+                {t('PREFERENCES.PROXY_BYPASS', 'Proxy Bypass')}
               </label>
               <input
                 id="bypassProxy"
@@ -413,7 +416,7 @@ const ProxySettings = ({ collection }) => {
         )}
         <div className="mt-6">
           <Button type="submit" size="sm" onClick={handleSave}>
-            Save
+            {t('COMMON.SAVE', 'Save')}
           </Button>
         </div>
       </div>

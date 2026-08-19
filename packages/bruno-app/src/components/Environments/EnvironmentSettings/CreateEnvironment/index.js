@@ -7,8 +7,10 @@ import { useDispatch } from 'react-redux';
 import Portal from 'components/Portal';
 import Modal from 'components/Modal';
 import { validateName, validateNameError } from 'utils/common/regex';
+import { useTranslation } from 'react-i18next';
 
 const CreateEnvironment = ({ collection, onClose, onEnvironmentCreated }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const inputRef = useRef();
 
@@ -29,20 +31,20 @@ const CreateEnvironment = ({ collection, onClose, onEnvironmentCreated }) => {
           const isValid = validateName(value);
           return isValid ? true : this.createError({ message: validateNameError(value) });
         })
-        .required('Name is required')
-        .test('duplicate-name', 'Environment already exists', validateEnvironmentName)
+        .required(t('ENVIRONMENTS.NAME_REQUIRED', 'Name is required'))
+        .test('duplicate-name', t('ENVIRONMENTS.ENV_EXISTS', 'Environment already exists'), validateEnvironmentName)
     }),
     onSubmit: (values) => {
       dispatch(addEnvironment(values.name, collection.uid))
         .then(() => {
-          toast.success('Environment created in collection');
+          toast.success(t('ENVIRONMENTS.ENV_CREATED_SUCCESS', 'Environment created in collection'));
           onClose();
           // Call the callback if provided
           if (onEnvironmentCreated) {
             onEnvironmentCreated();
           }
         })
-        .catch(() => toast.error('An error occurred while creating the environment'));
+        .catch(() => toast.error(t('ENVIRONMENTS.ENV_CREATED_ERROR', 'An error occurred while creating the environment')));
     }
   });
 
@@ -60,15 +62,16 @@ const CreateEnvironment = ({ collection, onClose, onEnvironmentCreated }) => {
     <Portal>
       <Modal
         size="md"
-        title="Create Environment"
-        confirmText="Create"
+        title={t('ENVIRONMENTS.ADD_ENVIRONMENT', 'Create Environment')}
+        confirmText={t('COMMON.CREATE', 'Create')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         handleConfirm={onSubmit}
         handleCancel={onClose}
       >
         <form className="bruno-form" onSubmit={(e) => e.preventDefault()}>
           <div>
             <label htmlFor="name" className="block font-medium">
-              Environment Name
+              {t('ENVIRONMENTS.NAME', 'Environment Name')}
             </label>
             <div className="flex items-center mt-2">
               <input

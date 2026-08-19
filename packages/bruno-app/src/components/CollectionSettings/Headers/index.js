@@ -16,10 +16,12 @@ import Button from 'ui/Button';
 import { headerNameRegex, headerValueRegex } from 'utils/common/regex';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useTrackScroll } from 'hooks/useTrackScroll';
+import { useTranslation } from 'react-i18next';
 
 const headerAutoCompleteList = StandardHTTPHeaders.map((e) => e.header);
 
 const Headers = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const tabs = useSelector((state) => state.tabs.tabs);
@@ -28,43 +30,54 @@ const Headers = ({ collection }) => {
     ? get(collection, 'draft.root.request.headers', [])
     : get(collection, 'root.request.headers', []);
   const [isBulkEditMode, setIsBulkEditMode] = useState(false);
-  const wrapperRef = useRef(null);
-  const [scroll, setScroll] = usePersistedState({ key: `collection-headers-scroll-${collection.uid}`, default: 0 });
-  useTrackScroll({ ref: wrapperRef, selector: '.collection-settings-content', onChange: setScroll, initialValue: scroll });
 
-  // Get column widths from Redux
-  const focusedTab = tabs?.find((t) => t.uid === activeTabUid);
-  const collectionHeadersWidths = focusedTab?.tableColumnWidths?.['collection-headers'] || {};
+  const activeTab = tabs.find((t) => t.uid === activeTabUid);
+  const collectionHeadersWidths = get(activeTab, 'tableColumnWidths.collection-headers', {});
+
+  const [scroll, setScroll] = usePersistedState(`collection-headers-scroll-${collection.uid}`, {
+    scrollTop: 0,
+    scrollLeft: 0
+  });
+  const wrapperRef = useRef(null);
+  useTrackScroll(wrapperRef, scroll, setScroll);
+
+  const handleHeadersChange = (newHeaders) => {
+    dispatch(
+      setCollectionHeaders({
+        headers: newHeaders,
+        collectionUid: collection.uid
+      })
+    );
+  };
 
   const handleColumnWidthsChange = (tableId, widths) => {
-    dispatch(updateTableColumnWidths({ uid: activeTabUid, tableId, widths }));
+    dispatch(
+      updateTableColumnWidths({
+        tabUid: activeTabUid,
+        tableId,
+        columnWidths: widths
+      })
+    );
   };
 
   const toggleBulkEditMode = () => {
     setIsBulkEditMode(!isBulkEditMode);
   };
 
-  const handleHeadersChange = useCallback((updatedHeaders) => {
-    dispatch(setCollectionHeaders({ collectionUid: collection.uid, headers: updatedHeaders }));
-  }, [dispatch, collection.uid]);
+  const handleSave = () => {
+    dispatch(saveCollectionSettings(collection.uid));
+  };
 
-  const handleSave = () => dispatch(saveCollectionSettings(collection.uid));
-
-  const getRowError = useCallback((row, index, key) => {
-    if (key === 'name') {
-      if (!row.name || row.name.trim() === '') return null;
-      if (!headerNameRegex.test(row.name)) {
-        return 'Header name cannot contain spaces or newlines';
-      }
+  const getRowError = (row) => {
+    if (!row.name) return null;
+    if (!headerNameRegex.test(row.name)) {
+      return 'Header name contains invalid characters';
     }
-    if (key === 'value') {
-      if (!row.value) return null;
-      if (!headerValueRegex.test(row.value)) {
-        return 'Header value cannot contain newlines';
-      }
+    if (row.value && !headerValueRegex.test(row.value)) {
+      return 'Header value contains invalid characters';
     }
     return null;
-  }, []);
+  };
 
   const descriptionColumn = createDescriptionColumn({
     theme: storedTheme,
@@ -76,9 +89,9 @@ const Headers = ({ collection }) => {
   const columns = [
     {
       key: 'name',
-      name: 'Name',
+      name: t('COMMON.NAME', 'Name'),
       isKeyField: true,
-      placeholder: 'Name',
+      placeholder: t('COMMON.NAME', 'Name'),
       width: '20%',
       render: ({ value, onChange }) => (
         <SingleLineEditor
@@ -88,14 +101,14 @@ const Headers = ({ collection }) => {
           onChange={(newValue) => onChange(newValue.replace(/[\r\n]/g, ''))}
           autocomplete={headerAutoCompleteList}
           collection={collection}
-          placeholder={!value ? 'Name' : ''}
+          placeholder={!value ? t('COMMON.NAME', 'Name') : ''}
         />
       )
     },
     {
       key: 'value',
-      name: 'Value',
-      placeholder: 'Value',
+      name: t('COMMON.VALUE', 'Value'),
+      placeholder: t('COMMON.VALUE', 'Value'),
       render: ({ value, onChange }) => (
         <SingleLineEditor
           value={value || ''}
@@ -104,7 +117,7 @@ const Headers = ({ collection }) => {
           onChange={onChange}
           collection={collection}
           autocomplete={MimeTypes}
-          placeholder={!value ? 'Value' : ''}
+          placeholder={!value ? t('COMMON.VALUE', 'Value') : ''}
         />
       )
     },
@@ -121,7 +134,7 @@ const Headers = ({ collection }) => {
     return (
       <StyledWrapper className="h-full w-full">
         <div className="text-xs mb-4 text-muted">
-          Add request headers that will be sent with every request in this collection.
+          {t('COLLECTION_SETTINGS.HEADERS_DESC', 'Add request headers that will be sent with every request in this collection.')}
         </div>
         <BulkEditor
           params={headers}
@@ -136,7 +149,7 @@ const Headers = ({ collection }) => {
   return (
     <StyledWrapper className="h-full w-full" ref={wrapperRef}>
       <div className="text-xs mb-4 text-muted">
-        Add request headers that will be sent with every request in this collection.
+        {t('COLLECTION_SETTINGS.HEADERS_DESC', 'Add request headers that will be sent with every request in this collection.')}
       </div>
       <EditableTable
         tableId="collection-headers"
@@ -152,12 +165,12 @@ const Headers = ({ collection }) => {
       />
       <div className="flex justify-end mt-2">
         <button className="text-link select-none" data-testid="bulk-edit-toggle" onClick={toggleBulkEditMode}>
-          Bulk Edit
+          {t('REQUEST.BULK_EDIT', 'Bulk Edit')}
         </button>
       </div>
       <div className="mt-6">
         <Button type="submit" size="sm" onClick={handleSave}>
-          Save
+          {t('COMMON.SAVE', 'Save')}
         </Button>
       </div>
     </StyledWrapper>

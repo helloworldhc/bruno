@@ -4,12 +4,13 @@ import Modal from 'components/Modal/index';
 import toast from 'react-hot-toast';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { renameGlobalEnvironment } from 'providers/ReduxStore/slices/global-environments';
 import { validateName, validateNameError } from 'utils/common/regex';
-import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 const RenameEnvironment = ({ onClose, environment }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const globalEnvs = useSelector((state) => state?.globalEnvironments?.globalEnvironments);
   const inputRef = useRef();
@@ -33,8 +34,8 @@ const RenameEnvironment = ({ onClose, environment }) => {
           const isValid = validateName(value);
           return isValid ? true : this.createError({ message: validateNameError(value) });
         })
-        .required('name is required')
-        .test('duplicate-name', 'Environment already exists', validateEnvironmentName)
+        .required(t('ENVIRONMENTS.NAME_REQUIRED', 'Name is required'))
+        .test('duplicate-name', t('ENVIRONMENTS.GLOBAL_ENV_EXISTS', 'Global environment already exists'), validateEnvironmentName)
     }),
     onSubmit: (values) => {
       if (values.name === environment.name) {
@@ -42,11 +43,11 @@ const RenameEnvironment = ({ onClose, environment }) => {
       }
       dispatch(renameGlobalEnvironment({ name: values.name, environmentUid: environment.uid }))
         .then(() => {
-          toast.success('Environment renamed successfully');
+          toast.success(t('ENVIRONMENTS.ENV_RENAMED_SUCCESS', 'Environment renamed successfully'));
           onClose();
         })
         .catch((error) => {
-          toast.error('An error occurred while renaming the environment');
+          toast.error(t('ENVIRONMENTS.ENV_RENAME_ERROR', 'An error occurred while renaming the environment'));
           console.error(error);
         });
     }
@@ -66,15 +67,16 @@ const RenameEnvironment = ({ onClose, environment }) => {
     <Portal>
       <Modal
         size="sm"
-        title="Rename Environment"
-        confirmText="Rename"
+        title={t('ENVIRONMENTS.RENAME_ENVIRONMENT', 'Rename Environment')}
+        confirmText={t('COMMON.RENAME', 'Rename')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         handleConfirm={onSubmit}
         handleCancel={onClose}
       >
         <form className="bruno-form" onSubmit={(e) => e.preventDefault()}>
           <div>
             <label htmlFor="environment-name" className="block font-semibold">
-              Environment Name
+              {t('ENVIRONMENTS.NAME', 'Environment Name')}
             </label>
             <input
               id="environment-name"

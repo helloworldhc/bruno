@@ -8,6 +8,7 @@ import {
   IconCircleCheck,
   IconCircleX
 } from '@tabler/icons';
+import { useTranslation } from 'react-i18next';
 
 const ResultIcon = ({ status }) => (
   <span
@@ -50,6 +51,7 @@ const TestSection = ({
   onToggle,
   type = 'test'
 }) => {
+  const { t } = useTranslation();
   const passedResults = results.filter((result) => result.status === 'pass');
   const failedResults = results.filter((result) => result.status === 'fail');
 
@@ -67,7 +69,7 @@ const TestSection = ({
             : <IconChevronRight size={18} stroke={1.5} />}
         </span>
         <span className="flex-grow">
-          {title} ({results.length}), Passed: {passedResults.length}, Failed: {failedResults.length}
+          {title} ({results.length}), {t('TEST_RESULTS.PASSED', 'Passed')}: {passedResults.length}, {t('TEST_RESULTS.FAILED', 'Failed')}: {failedResults.length}
         </span>
       </div>
       {isExpanded && (
@@ -84,6 +86,7 @@ const TestSection = ({
 };
 
 const TestResults = ({ item, results, assertionResults, preRequestTestResults, postResponseTestResults }) => {
+  const { t } = useTranslation();
   results = results || [];
   assertionResults = assertionResults || [];
   preRequestTestResults = preRequestTestResults || [];
@@ -117,13 +120,13 @@ const TestResults = ({ item, results, assertionResults, preRequestTestResults, p
   };
 
   if (!results.length && !assertionResults.length && !preRequestTestResults.length && !postResponseTestResults.length) {
-    return <div>No tests found</div>;
+    return <div>{t('TEST_RESULTS.NO_TESTS_FOUND', 'No tests found')}</div>;
   }
 
   return (
     <StyledWrapper className="flex flex-col" ref={wrapperRef}>
       <TestSection
-        title="Pre-Request Tests"
+        title={t('TEST_RESULTS.PRE_REQUEST_TESTS', 'Pre-Request Tests')}
         results={preRequestTestResults}
         isExpanded={expandedSections.preRequest}
         onToggle={() => toggleSection('preRequest')}
@@ -131,7 +134,7 @@ const TestResults = ({ item, results, assertionResults, preRequestTestResults, p
       />
 
       <TestSection
-        title="Post-Response Tests"
+        title={t('TEST_RESULTS.POST_RESPONSE_TESTS', 'Post-Response Tests')}
         results={postResponseTestResults}
         isExpanded={expandedSections.postResponse}
         onToggle={() => toggleSection('postResponse')}
@@ -139,7 +142,7 @@ const TestResults = ({ item, results, assertionResults, preRequestTestResults, p
       />
 
       <TestSection
-        title="Tests"
+        title={t('TEST_RESULTS.TESTS', 'Tests')}
         results={results}
         isExpanded={expandedSections.tests}
         onToggle={() => toggleSection('tests')}
@@ -147,7 +150,7 @@ const TestResults = ({ item, results, assertionResults, preRequestTestResults, p
       />
 
       <TestSection
-        title="Assertions"
+        title={t('TEST_RESULTS.ASSERTIONS', 'Assertions')}
         results={assertionResults}
         isExpanded={expandedSections.assertions}
         onToggle={() => toggleSection('assertions')}

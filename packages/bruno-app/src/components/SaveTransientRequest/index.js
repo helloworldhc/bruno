@@ -13,19 +13,22 @@ import CollectionListItem from './CollectionListItem';
 import FolderBreadcrumbs from './FolderBreadcrumbs';
 import useCollectionFolderTree from 'hooks/useCollectionFolderTree';
 import { removeSaveTransientRequestModal } from 'providers/ReduxStore/slices/collections';
+import { addTab } from 'providers/ReduxStore/slices/tabs';
 import { insertTaskIntoQueue } from 'providers/ReduxStore/slices/app';
 import { newFolder, closeTabs, mountCollection, createCollection, browseDirectory } from 'providers/ReduxStore/slices/collections/actions';
 import { sanitizeName, validateName, validateNameError } from 'utils/common/regex';
 import { resolveRequestFilename } from 'utils/common/platform';
 import path, { normalizePath } from 'utils/common/path';
-import { transformRequestToSaveToFilesystem, findCollectionByUid, findItemInCollection, areItemsLoading } from 'utils/collections';
+import { transformRequestToSaveToFilesystem, findCollectionByUid, findItemInCollection, getDefaultRequestPaneTab } from 'utils/collections';
 import { DEFAULT_COLLECTION_FORMAT } from 'utils/common/constants';
 import { itemSchema } from '@usebruno/schema';
 import { uuid } from 'utils/common';
 import { formatIpcError } from 'utils/common/error';
 import get from 'lodash/get';
+import { useTranslation } from 'react-i18next';
 
 const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOpen = false, onClose, closeAfterSave = false }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const latestCollection = useSelector((state) =>
@@ -82,29 +85,15 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
     ? availableCollections.find((c) => (c.path || c.pathname) === selectedTargetCollectionPath)?.uid
     : collection?.uid;
 
-  const selectedTargetCollection = selectedTargetCollectionPath
-    ? availableCollections.find((c) => (c.path || c.pathname) === selectedTargetCollectionPath)
-    : null;
-
-  useEffect(() => {
-    const isMounted = selectedTargetCollection?.mountStatus === 'mounted';
-    const isFullyLoaded = isMounted && !areItemsLoading(selectedTargetCollection);
-    if (selectedTargetCollectionPath && isFullyLoaded) {
-      setIsSelectingCollection(false);
-    }
-  }, [selectedTargetCollectionPath, selectedTargetCollection]);
-
   const {
     currentFolders,
     breadcrumbs,
     selectedFolderUid,
+    isAtRoot,
     navigateIntoFolder,
-    navigateToRoot,
     navigateToBreadcrumb,
-    getCurrentParentFolder,
-    getCurrentSelectedFolder,
-    reset,
-    isAtRoot
+    navigateToRoot,
+    reset
   } = useCollectionFolderTree(folderTreeCollectionUid);
 
   const resetForm = useCallback(() => {
@@ -130,10 +119,10 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
   }, [isOpen, item, resetForm]);
 
   useEffect(() => {
-    if (pendingFolderNavigation) {
-      const newFolder = currentFolders.find((f) => f.filename === pendingFolderNavigation);
-      if (newFolder) {
-        navigateIntoFolder(newFolder.uid);
+    if (pendingFolderNavigation && currentFolders.length > 0) {
+      const createdFolder = currentFolders.find((f) => f.name === pendingFolderNavigation);
+      if (createdFolder) {
+        navigateIntoFolder(createdFolder.uid);
         setPendingFolderNavigation(null);
       }
     }
@@ -143,133 +132,130 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
     if (!searchText.trim()) {
       return currentFolders;
     }
-    const searchLower = searchText.toLowerCase();
-    return filter(currentFolders, (folder) => folder.name.toLowerCase().includes(searchLower));
+    return filter(currentFolders, (f) => f.name.toLowerCase().includes(searchText.toLowerCase()));
   }, [currentFolders, searchText]);
 
   const handleCancel = () => {
-    resetForm();
     handleClose();
   };
 
-  const handleSelectCollection = useCallback((selectedCollection) => {
-    const collectionPath = selectedCollection.path || selectedCollection.pathname;
-    const isMounted = selectedCollection.mountStatus === 'mounted';
-    const isFullyLoaded = isMounted && !areItemsLoading(selectedCollection);
-
-    setSelectedTargetCollectionPath(collectionPath);
-
-    if (isFullyLoaded) {
-      setIsSelectingCollection(false);
+  const handleConfirm = () => {
+    const trimmedName = requestName.trim();
+    if (!trimmedName) {
+      toast.error(t('NEW_REQUEST.NAME_REQUIRED', 'Request name is required'));
       return;
     }
 
-    if (!isMounted && selectedCollection.mountStatus !== 'mounting') {
+    if (!validateName(trimmedName)) {
+      toast.error(validateNameError(trimmedName));
+      return;
+    }
+
+    // Determine target collection
+    let targetCollection = collection;
+    if (isScratchCollection) {
+      if (!selectedTargetCollectionPath) {
+        toast.error(t('SAVE_TRANSIENT_REQUEST.SELECT_COLLECTION_ERROR', 'Please select a collection to save to'));
+        return;
+      }
+      targetCollection = allCollections.find(
+        (c) => normalizePath(c.pathname) === normalizePath(selectedTargetCollectionPath)
+      );
+      if (!targetCollection) {
+        toast.error(t('SAVE_TRANSIENT_REQUEST.COLLECTION_NOT_FOUND', 'Target collection not found'));
+        return;
+      }
+    }
+
+    const currentFilename = sanitizeName(trimmedName);
+    const existingFilenames = currentFolders
+      .map((i) => i.filename)
+      .filter((filename) => Boolean(filename));
+
+    let resolvedFilename;
+    try {
+      resolvedFilename = resolveRequestFilename(
+        currentFilename,
+        existingFilenames,
+        targetCollection?.format || DEFAULT_COLLECTION_FORMAT
+      );
+    } catch (err) {
+      toast.error(err.message);
+      return;
+    }
+
+    const baseRequestItem = latestItem || item;
+    const requestData = {
+      ...baseRequestItem,
+      name: trimmedName,
+      filename: resolvedFilename
+    };
+
+    if (isScratchCollection) {
+      const sourceItemUid = item.uid;
+      const targetCollectionUid = targetCollection.uid;
+      const targetFolderUid = selectedFolderUid;
+
+      const itemToSave = transformRequestToSaveToFilesystem(requestData);
+
+      itemSchema
+        .validate(itemToSave)
+        .then(() => {
+          window.ipcRenderer
+            .invoke('renderer:save-request-to-collection', {
+              item: itemToSave,
+              targetCollectionUid,
+              targetFolderUid
+            })
+            .then((result) => {
+              if (result && result.error) {
+                toast.error(formatIpcError(result.error));
+                return;
+              }
+              const savedItemUid = result?.itemUid;
+              if (savedItemUid) {
+                dispatch(
+                  insertTaskIntoQueue({
+                    uid: uuid(),
+                    type: 'SAVE_TRANSIENT_REQUEST',
+                    itemUid: savedItemUid,
+                    collectionUid: targetCollectionUid
+                  })
+                );
+                dispatch(closeTabs({ tabUids: [sourceItemUid] }));
+                dispatch(
+                  addTab({
+                    uid: savedItemUid,
+                    collectionUid: targetCollectionUid,
+                    requestPaneTab: getDefaultRequestPaneTab(itemToSave)
+                  })
+                );
+              }
+              handleClose();
+            })
+            .catch((err) => {
+              toast.error(formatIpcError(err));
+            });
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error(err.message);
+        });
+    } else {
       dispatch(
-        mountCollection({
-          collectionUid: selectedCollection.uid || uuid(),
-          collectionPathname: collectionPath,
-          brunoConfig: selectedCollection.brunoConfig
+        insertTaskIntoQueue({
+          uid: uuid(),
+          type: 'SAVE_TRANSIENT_REQUEST',
+          itemUid: item.uid,
+          collectionUid: collection.uid,
+          targetFolderUid: selectedFolderUid,
+          data: requestData
         })
       );
-    }
-  }, [dispatch]);
-
-  const handleConfirm = async () => {
-    if (!item || !collection || !latestItem) {
-      return;
-    }
-
-    const targetCollection = selectedTargetCollection || collection;
-
-    try {
-      const { ipcRenderer } = window;
-
-      const selectedFolder = getCurrentSelectedFolder();
-      const targetDirname = selectedFolder ? selectedFolder.pathname : targetCollection.pathname;
-
-      const trimmedName = requestName.trim();
-      if (!trimmedName || trimmedName.length === 0) {
-        toast.error('Request name is required');
-        return;
+      if (closeAfterSave) {
+        dispatch(closeTabs({ tabUids: [item.uid] }));
       }
-
-      if (!validateName(trimmedName)) {
-        toast.error(validateNameError(trimmedName));
-        return;
-      }
-
-      const sanitizedFilename = sanitizeName(trimmedName);
-
-      const hasFileModeEdit = latestItem.draft?.raw != null && latestItem.draft.raw !== latestItem.raw;
-      let baseItem;
-      if (hasFileModeEdit) {
-        const rawSourceFormat = collection.format || DEFAULT_COLLECTION_FORMAT;
-        try {
-          const parsed = await ipcRenderer.invoke(
-            'renderer:convert-to-json',
-            latestItem,
-            latestItem.draft.raw,
-            rawSourceFormat
-          );
-          baseItem = { ...latestItem, ...parsed, uid: latestItem.uid, pathname: latestItem.pathname };
-        } catch (err) {
-          toast.error(formatIpcError(err) || 'Invalid request content - fix it in file mode before saving');
-          return;
-        }
-      } else {
-        baseItem = latestItem.draft ? { ...latestItem, ...latestItem.draft } : { ...latestItem };
-      }
-
-      const itemToSave = { ...baseItem };
-      itemToSave.name = sanitizedFilename;
-      delete itemToSave.draft;
-      delete itemToSave.raw;
-
-      const transformedItem = transformRequestToSaveToFilesystem(itemToSave);
-      await itemSchema.validate(transformedItem);
-
-      const targetFormat = targetCollection.format || DEFAULT_COLLECTION_FORMAT;
-      const sourceFormat = collection.format || DEFAULT_COLLECTION_FORMAT;
-      const targetFilename = resolveRequestFilename(sanitizedFilename, targetFormat);
-      const targetPathname = path.join(targetDirname, targetFilename);
-
-      await ipcRenderer.invoke('renderer:save-transient-request', {
-        sourcePathname: item.pathname,
-        targetDirname,
-        targetFilename,
-        request: transformedItem,
-        format: targetFormat,
-        sourceFormat
-      });
-
-      if (!closeAfterSave) {
-        dispatch(
-          insertTaskIntoQueue({
-            uid: uuid(),
-            type: 'OPEN_REQUEST',
-            collectionUid: targetCollection.uid,
-            itemPathname: targetPathname,
-            preview: false
-          })
-        );
-      }
-
-      dispatch(closeTabs({ tabUids: [item.uid] }));
-
-      dispatch({
-        type: 'collections/deleteItem',
-        payload: {
-          itemUid: item.uid,
-          collectionUid: collection.uid
-        }
-      });
-
-      toast.success('Request saved successfully');
       handleClose();
-    } catch (err) {
-      toast.error(formatIpcError(err) || 'Failed to save request');
-      console.error('Error saving request:', err);
     }
   };
 
@@ -296,38 +282,56 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
     }
   };
 
-  const handleCreateNewFolder = async () => {
-    const trimmedFolderName = newFolderName.trim();
-
-    if (!trimmedFolderName) {
-      toast.error('Folder name is required');
+  const handleCreateNewFolder = () => {
+    const trimmedName = newFolderName.trim();
+    if (!trimmedName) {
+      toast.error(t('NEW_FOLDER.NAME_REQUIRED', 'Folder name is required'));
       return;
     }
 
-    if (!validateName(trimmedFolderName)) {
-      toast.error(validateNameError(trimmedFolderName));
+    if (!validateName(trimmedName)) {
+      toast.error(validateNameError(trimmedName));
       return;
     }
 
-    const directoryName = newFolderDirectoryName.trim() || sanitizeName(trimmedFolderName);
-    const parentFolder = getCurrentParentFolder();
-    const targetCollectionUid = selectedTargetCollection?.uid || collection?.uid;
+    const effectiveCollectionUid = folderTreeCollectionUid || collection.uid;
 
-    try {
-      await dispatch(newFolder(trimmedFolderName, directoryName, targetCollectionUid, parentFolder?.uid));
-      toast.success('New folder created!');
+    if (showFilesystemName) {
+      const trimmedDirName = newFolderDirectoryName.trim();
+      if (!trimmedDirName) {
+        toast.error(t('NEW_FOLDER.DIRECTORY_NAME_REQUIRED', 'Directory name is required'));
+        return;
+      }
+      if (!validateName(trimmedDirName)) {
+        toast.error(validateNameError(trimmedDirName));
+        return;
+      }
+      dispatch(newFolder(trimmedName, trimmedDirName, effectiveCollectionUid, selectedFolderUid));
+    } else {
+      dispatch(newFolder(trimmedName, sanitizeName(trimmedName), effectiveCollectionUid, selectedFolderUid));
+    }
 
-      setPendingFolderNavigation(directoryName);
-      handleCancelNewFolder();
-    } catch (err) {
-      const errorMessage = err?.message || 'An error occurred while adding the folder';
-      toast.error(errorMessage);
+    setPendingFolderNavigation(trimmedName);
+    handleCancelNewFolder();
+  };
+
+  const handleSelectCollection = (coll) => {
+    const collPath = coll.path || coll.pathname;
+    setSelectedTargetCollectionPath(collPath);
+    if (coll.mountStatus !== 'mounted') {
+      dispatch(mountCollection(coll.uid));
+    } else {
+      setIsSelectingCollection(false);
     }
   };
 
-  // New Collection handlers
   const handleShowNewCollection = () => {
-    setNewCollection({ show: true, name: '', location: defaultCollectionLocation, format: DEFAULT_COLLECTION_FORMAT });
+    setNewCollection({
+      show: true,
+      name: '',
+      location: defaultCollectionLocation,
+      format: DEFAULT_COLLECTION_FORMAT
+    });
   };
 
   const handleCancelNewCollection = () => {
@@ -337,17 +341,19 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
   const handleBrowseCollectionLocation = () => {
     dispatch(browseDirectory())
       .then((dirPath) => {
-        if (typeof dirPath === 'string') {
+        if (typeof dirPath === 'string' && dirPath.length > 0) {
           setNewCollection((prev) => ({ ...prev, location: dirPath }));
         }
       })
-      .catch(() => {});
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleCreateNewCollection = async () => {
     const trimmedName = newCollection.name.trim();
     if (!trimmedName) {
-      toast.error('Collection name is required');
+      toast.error(t('CREATE_COLLECTION.NAME_REQUIRED', 'Collection name is required'));
       return;
     }
     if (!validateName(trimmedName)) {
@@ -355,12 +361,12 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
       return;
     }
     if (!newCollection.location) {
-      toast.error('Location is required');
+      toast.error(t('CREATE_COLLECTION.LOCATION_REQUIRED', 'Location is required'));
       return;
     }
     try {
       await dispatch(createCollection(trimmedName, sanitizeName(trimmedName), newCollection.location, { format: newCollection.format, source: 'save-transient-request', entryPoint: 'save-transient-request' }));
-      toast.success('Collection created!');
+      toast.success(t('CREATE_COLLECTION.COLLECTION_CREATED', 'Collection created!'));
       handleCancelNewCollection();
     } catch (err) {
       toast.error(err?.message || 'An error occurred while creating the collection');
@@ -387,18 +393,18 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
     <StyledWrapper>
       <Modal
         size="sm"
-        title={isSelectingCollection ? 'Select Collection' : 'Save Request'}
+        title={isSelectingCollection ? t('SAVE_TRANSIENT_REQUEST.SELECT_COLLECTION', 'Select Collection') : t('SAVE_TRANSIENT_REQUEST.SAVE_REQUEST', 'Save Request')}
         handleCancel={handleCancel}
         handleConfirm={handleConfirm}
-        confirmText="Save"
-        cancelText="Cancel"
+        confirmText={t('COMMON.SAVE', 'Save')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         hideFooter={true}
         dataTestId="save-transient-request-modal"
       >
         <div className="save-request-form">
           <div className="form-section">
             <label htmlFor="request-name" className="form-label">
-              Request name
+              {t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
             </label>
             <input
               id="request-name"
@@ -418,7 +424,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
 
           <div className="collections-section">
             <div className="collections-label">
-              {isSelectingCollection ? 'Select a collection to save to' : 'Save to Collections'}
+              {isSelectingCollection ? t('SAVE_TRANSIENT_REQUEST.SELECT_COLLECTION_TO_SAVE', 'Select a collection to save to') : t('SAVE_TRANSIENT_REQUEST.SAVE_TO_COLLECTIONS', 'Save to Collections')}
             </div>
 
             {isScratchCollection && (
@@ -431,13 +437,13 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                     reset();
                   } : undefined}
                 >
-                  Collections
+                  {t('SIDEBAR.COLLECTIONS', 'Collections')}
                 </span>
                 {!isSelectingCollection && (
                   <>
                     <IconChevronRight size={16} strokeWidth={1.5} className="collection-name-chevron" />
                     <FolderBreadcrumbs
-                      collectionName={(selectedTargetCollection || collection).name}
+                      collectionName={(availableCollections.find((c) => (c.path || c.pathname) === selectedTargetCollectionPath) || collection).name}
                       breadcrumbs={breadcrumbs}
                       isAtRoot={isAtRoot}
                       onNavigateToRoot={navigateToRoot}
@@ -469,13 +475,13 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                       <li className="new-collection-item">
                         <div className="new-collection-field">
                           <label className="new-collection-label">
-                            Collection name
+                            {t('COMMON.COLLECTION_NAME', 'Collection Name')}
                           </label>
                           <input
                             ref={(node) => node?.focus()}
                             type="text"
                             className="new-collection-input"
-                            placeholder="Enter collection name"
+                            placeholder={t('CREATE_COLLECTION.NAME_PLACEHOLDER', 'Enter collection name')}
                             value={newCollection.name}
                             onChange={(e) => setNewCollection((prev) => ({ ...prev, name: e.target.value }))}
                             onKeyDown={(e) => {
@@ -493,13 +499,13 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
 
                         <div className="new-collection-field">
                           <label className="new-collection-label flex items-center">
-                            Location
+                            {t('COMMON.LOCATION', 'Location')}
                             <Help width={250} placement="top">
                               <p>
-                                Bruno stores your collections on your computer's filesystem.
+                                {t('CREATE_COLLECTION.LOCATION_HELP_1', 'Bruno stores your collections on your computer\'s filesystem.')}
                               </p>
                               <p className="mt-2">
-                                Choose the location where you want to store this collection.
+                                {t('IMPORT_COLLECTION.LOCATION_HELP_2', 'Choose the location where you want to store this collection.')}
                               </p>
                             </Help>
                           </label>
@@ -507,7 +513,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                             <input
                               type="text"
                               className="new-collection-input cursor-pointer"
-                              placeholder="Select location"
+                              placeholder={t('CREATE_COLLECTION.LOCATION_PLACEHOLDER', 'Select location')}
                               value={newCollection.location}
                               readOnly
                               onClick={handleBrowseCollectionLocation}
@@ -520,23 +526,23 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                               rounded="sm"
                               onClick={handleBrowseCollectionLocation}
                             >
-                              Browse
+                              {t('COMMON.BROWSE', 'Browse')}
                             </Button>
                           </div>
                         </div>
 
                         <div className="new-collection-field">
                           <label className="new-collection-label flex items-center">
-                            File Format
+                            {t('COLLECTION_SETTINGS.FILE_FORMAT', 'File Format')}
                             <Help width={300} placement="top">
                               <p>
-                                Choose the file format for storing requests in this collection.
+                                {t('COLLECTION_SETTINGS.FILE_FORMAT_DESC', 'Choose the file format for storing requests in this collection.')}
                               </p>
                               <p className="mt-2">
-                                <strong>OpenCollection (YAML):</strong> Industry-standard YAML format (.yml files)
+                                <strong>{t('CREATE_COLLECTION.FORMAT_OPENCOLLECTION_HELP', 'OpenCollection (YAML): Industry-standard YAML format (.yml files)')}</strong>
                               </p>
                               <p className="mt-1">
-                                <strong>BRU:</strong> Bruno's native file format (.bru files)
+                                <strong>{t('CREATE_COLLECTION.FORMAT_BRU_HELP', 'BRU: Bruno\'s native file format (.bru files)')}</strong>
                               </p>
                             </Help>
                           </label>
@@ -545,8 +551,8 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                             value={newCollection.format}
                             onChange={(e) => setNewCollection((prev) => ({ ...prev, format: e.target.value }))}
                           >
-                            <option value="yml">OpenCollection (YAML)</option>
-                            <option value="bru">BRU Format (.bru)</option>
+                            <option value="yml">{t('CREATE_COLLECTION.FORMAT_YAML', 'OpenCollection (YAML)')}</option>
+                            <option value="bru">{t('CREATE_COLLECTION.FORMAT_BRU', 'BRU Format (.bru)')}</option>
                           </select>
                         </div>
 
@@ -558,7 +564,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                             size="sm"
                             onClick={handleCancelNewCollection}
                           >
-                            Cancel
+                            {t('COMMON.CANCEL', 'Cancel')}
                           </Button>
                           <Button
                             type="button"
@@ -566,7 +572,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                             size="sm"
                             onClick={handleCreateNewCollection}
                           >
-                            Create
+                            {t('COMMON.CREATE', 'Create')}
                           </Button>
                         </div>
                       </li>
@@ -574,8 +580,8 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                   </ul>
                 ) : (
                   <div className="collection-empty-state">
-                    <p>No Collections Yet</p>
-                    <p className="collection-empty-state-subtitle">Collections help you organize your requests. Create your first one to save this request.</p>
+                    <p>{t('SAVE_TRANSIENT_REQUEST.NO_COLLECTIONS_YET', 'No Collections Yet')}</p>
+                    <p className="collection-empty-state-subtitle">{t('SAVE_TRANSIENT_REQUEST.NO_COLLECTIONS_SUBTITLE', 'Collections help you organize your requests. Create your first one to save this request.')}</p>
                     <Button
                       type="button"
                       color="primary"
@@ -584,17 +590,17 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                       onClick={handleShowNewCollection}
                       className="mt-4"
                     >
-                      New collection
+                      {t('CREATE_COLLECTION.TITLE', 'New Collection')}
                     </Button>
                   </div>
                 )}
               </div>
             ) : (
               <>
-                {!isScratchCollection && (selectedTargetCollection || collection) && (
+                {!isScratchCollection && (
                   <div className="collection-name">
                     <FolderBreadcrumbs
-                      collectionName={(selectedTargetCollection || collection).name}
+                      collectionName={collection.name}
                       breadcrumbs={breadcrumbs}
                       isAtRoot={isAtRoot}
                       onNavigateToRoot={navigateToRoot}
@@ -607,7 +613,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                   <SearchInput
                     searchText={searchText}
                     setSearchText={setSearchText}
-                    placeholder="Search for folder"
+                    placeholder={t('SAVE_TRANSIENT_REQUEST.SEARCH_FOR_FOLDER', 'Search for folder')}
                     autoFocus={false}
                   />
                 </div>
@@ -633,7 +639,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                           <div className="new-folder-header">
                             <IconFolder size={16} strokeWidth={1.5} />
                             <label className="new-folder-header-label">
-                              {showFilesystemName ? 'New Folder name (in bruno)' : 'New Folder name'}
+                              {showFilesystemName ? t('NEW_FOLDER.NAME_IN_BRUNO', 'New Folder name (in bruno)') : t('NEW_FOLDER.NAME_LABEL', 'New Folder Name')}
                             </label>
                           </div>
                           <div className="new-folder-input-row">
@@ -641,7 +647,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                               ref={(node) => node?.focus()}
                               type="text"
                               className="new-folder-input"
-                              placeholder="Untitled new folder"
+                              placeholder={t('NEW_FOLDER.UNTITLED_PLACEHOLDER', 'Untitled new folder')}
                               value={newFolderName}
                               onChange={(e) => handleNewFolderNameChange(e.target.value)}
                               onKeyDown={(e) => {
@@ -660,7 +666,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                                 type="button"
                                 className="new-folder-action-btn"
                                 onClick={handleCancelNewFolder}
-                                title="Cancel"
+                                title={t('COMMON.CANCEL', 'Cancel')}
                               >
                                 <IconX size={16} strokeWidth={1.5} />
                               </button>
@@ -668,7 +674,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                                 type="button"
                                 className="new-folder-action-btn"
                                 onClick={handleCreateNewFolder}
-                                title="Create folder"
+                                title={t('NEW_FOLDER.CREATE_FOLDER', 'Create Folder')}
                               >
                                 <IconCheck size={16} strokeWidth={1.5} />
                               </button>
@@ -679,10 +685,10 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                             <div className="new-folder-filesystem-wrapper">
                               <div className="flex items-center justify-between">
                                 <label className="new-folder-filesystem-label flex items-center font-medium">
-                                  Folder Name <small className="font-normal text-muted ml-1">(on filesystem)</small>
+                                  {t('NEW_FOLDER.FOLDER_NAME_ON_FILESYSTEM', 'Folder Name (on filesystem)')}
                                   <Help width={300} placement="top">
                                     <p>
-                                      You can choose to save the folder as a different name on your file system versus what is displayed in the app.
+                                      {t('NEW_FOLDER.FOLDER_NAME_HELP', 'You can choose to save the folder as a different name on your file system versus what is displayed in the app.')}
                                     </p>
                                   </Help>
                                 </label>
@@ -707,7 +713,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                                   <input
                                     type="text"
                                     className="block textbox mt-2 w-full"
-                                    placeholder="Folder Name"
+                                    placeholder={t('NEW_FOLDER.NAME_LABEL', 'Folder Name')}
                                     value={newFolderDirectoryName}
                                     autoComplete="off"
                                     autoCorrect="off"
@@ -749,12 +755,12 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                             {showFilesystemName ? (
                               <>
                                 <IconEyeOff size={16} strokeWidth={1.5} />
-                                <span>Hide filesystem name</span>
+                                <span>{t('NEW_REQUEST.HIDE_FILESYSTEM_NAME', 'Hide filesystem name')}</span>
                               </>
                             ) : (
                               <>
                                 <IconEye size={16} strokeWidth={1.5} />
-                                <span>Show filesystem name</span>
+                                <span>{t('NEW_REQUEST.SHOW_FILESYSTEM_NAME', 'Show filesystem name')}</span>
                               </>
                             )}
                           </button>
@@ -765,7 +771,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                     <div className="folder-empty-state">
                       <div className="flex flex-col items-center">
                         <span>
-                          {searchText.trim() ? 'No folders found' : 'No folders available' }
+                          {searchText.trim() ? t('SAVE_TRANSIENT_REQUEST.NO_FOLDERS_FOUND', 'No folders found') : t('SAVE_TRANSIENT_REQUEST.NO_FOLDERS_AVAILABLE', 'No folders available') }
                         </span>
                         <Button
                           type="button"
@@ -774,7 +780,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                           icon={<IconFolder size={16} strokeWidth={1.5} />}
                           onClick={handleShowNewFolder}
                         >
-                          New Folder
+                          {t('NEW_FOLDER.TITLE', 'New Folder')}
                         </Button>
                       </div>
                     </div>
@@ -795,7 +801,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                 icon={<IconFolder size={16} strokeWidth={1.5} />}
                 onClick={handleShowNewFolder}
               >
-                New Folder
+                {t('NEW_FOLDER.TITLE', 'New Folder')}
               </Button>
             )}
             {isSelectingCollection && !newCollection.show && availableCollections.length > 0 && (
@@ -806,17 +812,17 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
                 icon={<IconFolder size={16} strokeWidth={1.5} />}
                 onClick={handleShowNewCollection}
               >
-                New collection
+                {t('CREATE_COLLECTION.TITLE', 'New Collection')}
               </Button>
             )}
           </div>
           <div className="footer-right">
             <Button type="button" color="secondary" variant="ghost" onClick={handleCancel}>
-              Cancel
+              {t('COMMON.CANCEL', 'Cancel')}
             </Button>
             {!isSelectingCollection && (
               <Button type="button" color="primary" onClick={handleConfirm} data-testid="save-transient-request-submit">
-                Save
+                {t('COMMON.SAVE', 'Save')}
               </Button>
             )}
           </div>

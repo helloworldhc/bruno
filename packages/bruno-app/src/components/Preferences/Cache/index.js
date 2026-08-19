@@ -9,8 +9,10 @@ import ToggleSwitch from 'components/ToggleSwitch';
 import ActionIcon from 'ui/ActionIcon';
 import StyledWrapper from './StyledWrapper';
 import { formatSize } from 'utils/common';
+import { useTranslation } from 'react-i18next';
 
 const Cache = () => {
+  const { t } = useTranslation();
   const preferences = useSelector((state) => state.app.preferences);
   const dispatch = useDispatch();
   const { theme } = useTheme();
@@ -63,25 +65,25 @@ const Cache = () => {
       .invoke('renderer:clear-file-cache')
       .then((size) => {
         setFileCacheSize(size);
-        toast.success('File cache cleared');
+        toast.success(t('PREFERENCES.CLEAR_FILE_CACHE', 'File cache cleared'));
       })
       .catch(() => toast.error('Failed to clear file cache'));
   };
 
   const handleClearSslSession = () => {
     dispatch(clearHttpHttpsAgentCache())
-      .then(() => toast.success('SSL session cache cleared'))
+      .then(() => toast.success(t('PREFERENCES.CLEAR_SSL_CACHE', 'SSL session cache cleared')))
       .catch(() => toast.error('Failed to clear SSL session cache'));
   };
 
   return (
     <StyledWrapper className="w-full">
-      <div className="cache-section-title">Cache</div>
+      <div className="cache-section-title">{t('PREFERENCES.CACHE', 'Cache')}</div>
 
       <div className="cache-item">
         <div className="cache-item-header">
           <div className="cache-item-title-group">
-            <span className="cache-item-title">File cache</span>
+            <span className="cache-item-title">{t('PREFERENCES.FILE_CACHE', 'File cache')}</span>
             <span className="beta-badge">Beta</span>
           </div>
           <ToggleSwitch
@@ -95,15 +97,14 @@ const Cache = () => {
         <div className="cache-item-body">
           <div className="cache-item-body-text">
             <p className="cache-item-description">
-              Loads your workspace faster by caching opened collections. Bruno refreshes the cache when your collection
-              changes. Clearing it won't affect your original files.
+              {t('PREFERENCES.FILE_CACHE_DESC', 'Loads your workspace faster by caching opened collections. Bruno refreshes the cache when your collection changes. Clearing it won\'t affect your original files.')}
             </p>
             <p className="cache-item-size">
               Cache size <strong>{fileCacheSize == null ? '—' : formatSize(fileCacheSize)}</strong>
             </p>
           </div>
           <ActionIcon
-            label="Clear cache"
+            label={t('PREFERENCES.CLEAR_CACHE', 'Clear cache')}
             onClick={handleClearFileCache}
             disabled={!fileCacheSize}
             colorOnHover={theme.colors.text.danger}
@@ -116,7 +117,7 @@ const Cache = () => {
       <div className="cache-item">
         <div className="cache-item-header">
           <div className="cache-item-title-group">
-            <span className="cache-item-title">SSL session cache</span>
+            <span className="cache-item-title">{t('PREFERENCES.SSL_CACHE', 'SSL session cache')}</span>
           </div>
           <ToggleSwitch
             data-testid="sslSession.enabled"
@@ -129,12 +130,11 @@ const Cache = () => {
         <div className="cache-item-body">
           <div className="cache-item-body-text">
             <p className="cache-item-description">
-              Reuses TLS sessions and connections across requests for faster handshakes. Disable to create a fresh
-              connection for every request.
+              {t('PREFERENCES.SSL_CACHE_DESC', 'Reuses TLS sessions and connections across requests for faster handshakes. Disable to create a fresh connection for every request.')}
             </p>
           </div>
           <ActionIcon
-            label="Clear cache"
+            label={t('PREFERENCES.CLEAR_CACHE', 'Clear cache')}
             onClick={handleClearSslSession}
             colorOnHover={theme.colors.text.danger}
           >

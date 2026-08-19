@@ -15,10 +15,12 @@ import BulkEditor from '../../BulkEditor';
 import { headerNameRegex, headerValueRegex } from 'utils/common/regex';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useTrackScroll } from 'hooks/useTrackScroll';
+import { useTranslation } from 'react-i18next';
 
 const headerAutoCompleteList = StandardHTTPHeaders.map((e) => e.header);
 
 const RequestHeaders = ({ item, collection, addHeaderText }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const tabs = useSelector((state) => state.tabs.tabs);
@@ -87,9 +89,9 @@ const RequestHeaders = ({ item, collection, addHeaderText }) => {
   const columns = [
     {
       key: 'name',
-      name: 'Name',
+      name: t('COMMON.NAME', 'Name'),
       isKeyField: true,
-      placeholder: 'Name',
+      placeholder: t('COMMON.NAME', 'Name'),
       width: '20%',
       render: ({ value, onChange }) => (
         <SingleLineEditor
@@ -101,14 +103,14 @@ const RequestHeaders = ({ item, collection, addHeaderText }) => {
           onRun={handleRun}
           collection={collection}
           item={item}
-          placeholder={!value ? 'Name' : ''}
+          placeholder={!value ? t('COMMON.NAME', 'Name') : ''}
         />
       )
     },
     {
       key: 'value',
-      name: 'Value',
-      placeholder: 'Value',
+      name: t('COMMON.VALUE', 'Value'),
+      placeholder: t('COMMON.VALUE', 'Value'),
       render: ({ value, onChange }) => (
         <SingleLineEditor
           value={value || ''}
@@ -119,7 +121,7 @@ const RequestHeaders = ({ item, collection, addHeaderText }) => {
           autocomplete={MimeTypes}
           collection={collection}
           item={item}
-          placeholder={!value ? 'Value' : ''}
+          placeholder={!value ? t('COMMON.VALUE', 'Value') : ''}
         />
       )
     },
@@ -164,7 +166,7 @@ const RequestHeaders = ({ item, collection, addHeaderText }) => {
       />
       <div className="bulk-edit-bar flex justify-end mt-2">
         <button className="btn-action text-link select-none" data-testid="bulk-edit-toggle" onClick={toggleBulkEditMode}>
-          Bulk Edit
+          {t('COMMON.BULK_EDIT', 'Bulk Edit')}
         </button>
       </div>
     </StyledWrapper>

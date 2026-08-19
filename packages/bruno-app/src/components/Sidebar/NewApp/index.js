@@ -7,8 +7,10 @@ import Modal from 'components/Modal';
 import Portal from 'components/Portal';
 import { newApp } from 'providers/ReduxStore/slices/collections/actions';
 import { sanitizeName, validateName, validateNameError } from 'utils/common/regex';
+import { useTranslation } from 'react-i18next';
 
 const NewApp = ({ collectionUid, item, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const submitLockRef = useRef(false);
 
@@ -22,10 +24,10 @@ const NewApp = ({ collectionUid, item, onClose }) => {
     validationSchema: Yup.object({
       appName: Yup.string()
         .trim()
-        .min(1, 'App name is required')
+        .min(1, t('NEW_APP.NAME_REQUIRED', 'App name is required'))
         .max(255, 'Must be 255 characters or less')
         .test('valid-name', validateNameError, (value) => validateName(value || ''))
-        .required('App name is required')
+        .required(t('NEW_APP.NAME_REQUIRED', 'App name is required'))
     }),
     onSubmit: (values) => {
       const name = values.appName.trim();
@@ -38,7 +40,7 @@ const NewApp = ({ collectionUid, item, onClose }) => {
         })
       )
         .then(() => {
-          toast.success('App created');
+          toast.success(t('NEW_APP.APP_CREATED', 'App created'));
           onClose();
         })
         .catch((err) => toast.error(err?.message || 'Failed to create app'))
@@ -53,12 +55,17 @@ const NewApp = ({ collectionUid, item, onClose }) => {
     setTimeout(() => { submitLockRef.current = false; }, 0);
   };
 
+  const folderOrCollectionTarget = item
+    ? t('NEW_APP.THIS_FOLDER', 'this folder')
+    : t('NEW_APP.COLLECTION_NAME', `collection "${collection?.name || ''}"`, { name: collection?.name || '' });
+
   return (
     <Portal>
       <Modal
         size="md"
-        title="New App"
-        confirmText="Create"
+        title={t('SIDEBAR.NEW_APP', 'New App')}
+        confirmText={t('COMMON.CREATE', 'Create')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         handleConfirm={onSubmit}
         handleCancel={onClose}
         disableEscapeKey={false}
@@ -71,7 +78,7 @@ const NewApp = ({ collectionUid, item, onClose }) => {
           data-testid="new-app-form"
         >
           <label htmlFor="appName" className="block font-semibold">
-            Name
+            {t('COMMON.NAME', 'Name')}
           </label>
           <input
             id="appName"
@@ -89,7 +96,7 @@ const NewApp = ({ collectionUid, item, onClose }) => {
             <div className="text-red-500 text-xs mt-2">{formik.errors.appName}</div>
           ) : (
             <div className="text-xs mt-2 opacity-70">
-              Creates a standalone app file in {item ? 'this folder' : `collection "${collection?.name || ''}"`}.
+              {t('NEW_APP.CREATES_APP_HINT', `Creates a standalone app file in ${folderOrCollectionTarget}.`, { target: folderOrCollectionTarget })}
             </div>
           )}
         </form>

@@ -13,6 +13,7 @@ import { getLanguages } from 'utils/codegenerator/targets';
 import { useSelector } from 'react-redux';
 import { getAllVariables, getGlobalEnvironmentVariables } from 'utils/collections/index';
 import { resolveInheritedAuth } from 'utils/auth';
+import { useTranslation } from 'react-i18next';
 
 const TEMPLATE_VAR_PATTERN = /\{\{([^}]+)\}\}/;
 
@@ -121,8 +122,10 @@ const GenerateCodeItem = ({ collectionUid, item, onClose, isExample = false, exa
     }
   };
 
+  const { t } = useTranslation();
+
   // Update modal title based on mode
-  const modalTitle = isExample ? `Generate Code - ${get(item, 'draft.examples', []).find((e) => e.uid === exampleUid)?.name || 'Example'}` : 'Generate Code';
+  const modalTitle = isExample ? `${t('GENERATE_CODE.TITLE', 'Generate Code')} - ${get(item, 'draft.examples', []).find((e) => e.uid === exampleUid)?.name || 'Example'}` : t('GENERATE_CODE.TITLE', 'Generate Code');
 
   return (
     <Modal size="lg" title={modalTitle} handleCancel={onClose} hideFooter={true}>
@@ -138,8 +141,8 @@ const GenerateCodeItem = ({ collectionUid, item, onClose, isExample = false, exa
               />
             ) : (
               <div className="error-message">
-                <h1>Invalid URL: {validationUrl}</h1>
-                <p>Please check the URL and try again</p>
+                <h1>{t('GENERATE_CODE.INVALID_URL', 'Invalid URL')}: {validationUrl}</h1>
+                <p>{t('GENERATE_CODE.CHECK_URL', 'Please check the URL and try again')}</p>
               </div>
             )}
           </div>

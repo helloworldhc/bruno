@@ -13,8 +13,10 @@ import { Tooltip } from 'react-tooltip';
 import useProtoFileManagement from '../../../hooks/useProtoFileManagement';
 import { saveCollectionSettings } from 'providers/ReduxStore/slices/collections/actions';
 import Button from 'ui/Button';
+import { useTranslation } from 'react-i18next';
 
 const ProtobufSettings = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const {
     protoFiles,
@@ -38,74 +40,68 @@ const ProtobufSettings = ({ collection }) => {
     const files = event?.files;
     if (files && files.length > 0) {
       for (let i = 0; i < files.length; i++) {
-        const filePath = window?.ipcRenderer?.getFilePath(files[i]);
+        const file = files[i];
+        const filePath = window.ipcRenderer.getFilePath(file);
         if (filePath) {
-          await addProtoFileToCollection(filePath);
+          addProtoFileToCollection(filePath);
         }
       }
-      // Reset the file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   };
 
-  const handleRemoveProtoFile = async (index) => {
-    await removeProtoFileFromCollection(index);
+  const handleFileInputChange = (event) => {
+    getProtoFile(event.target);
   };
 
-  const handleBrowseClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  const handleBrowseClick = async () => {
+    const filePath = await browseForProtoFile();
+    if (filePath) {
+      addProtoFileToCollection(filePath);
     }
+  };
+
+  const handleBrowseImportPathClick = async () => {
+    const dirPath = await browseForImportDirectory();
+    if (dirPath) {
+      addImportPathToCollection(dirPath);
+    }
+  };
+
+  const handleRemoveProtoFile = (index) => {
+    removeProtoFileFromCollection(index);
+  };
+
+  const handleRemoveImportPath = (index) => {
+    removeImportPathFromCollection(index);
   };
 
   const handleReplaceProtoFile = async (index) => {
-    const result = await browseForProtoFile();
-    if (result.success) {
-      await replaceProtoFileInCollection(index, result.filePath);
+    const newFilePath = await browseForProtoFile();
+    if (newFilePath) {
+      replaceProtoFileInCollection(index, newFilePath);
     }
   };
 
   const handleReplaceImportPath = async (index) => {
-    const result = await browseForImportDirectory();
-    if (result.success) {
-      await replaceImportPathInCollection(index, result.directoryPath);
+    const newDirPath = await browseForImportDirectory();
+    if (newDirPath) {
+      replaceImportPathInCollection(index, newDirPath);
     }
   };
 
-  const handleFileInputChange = (e) => {
-    getProtoFile(e.target);
-  };
-
-  const getImportPath = async () => {
-    const result = await browseForImportDirectory();
-    if (result.success) {
-      await addImportPathToCollection(result.directoryPath);
-    }
-  };
-
-  const handleRemoveImportPath = async (index) => {
-    await removeImportPathFromCollection(index);
-  };
-
-  const handleToggleImportPath = async (index) => {
-    await toggleImportPath(index);
-  };
-
-  const handleBrowseImportPathClick = () => {
-    getImportPath();
+  const handleToggleImportPath = (index) => {
+    toggleImportPath(index);
   };
 
   return (
     <StyledWrapper className="h-full w-full">
-      {/* Hidden file input for file selection */}
+      {/* Hidden file input for drag and drop fallback */}
       <input
-        type="file"
         ref={fileInputRef}
-        style={{ display: 'none' }}
+        type="file"
         accept=".proto"
         multiple
+        style={{ display: 'none' }}
         onChange={handleFileInputChange}
       />
 
@@ -114,7 +110,7 @@ const ProtobufSettings = ({ collection }) => {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
             <label className="flex items-center" htmlFor="protoFiles">
-              Proto Files (
+              {t('COLLECTION_SETTINGS.PROTO_FILES', 'Proto Files')} (
               {protoFiles.length}
               )
               <span id="proto-files-tooltip" className="ml-2">
@@ -123,7 +119,7 @@ const ProtobufSettings = ({ collection }) => {
               <Tooltip
                 anchorId="proto-files-tooltip"
                 className="tooltip-mod font-normal"
-                html="Keep your proto files within the collection folder or the corresponding git repository to ensure paths remain valid when sharing the collection."
+                html={t('COLLECTION_SETTINGS.PROTO_FILES_TOOLTIP', 'Keep your proto files within the collection folder or the corresponding git repository to ensure paths remain valid when sharing the collection.')}
               />
             </label>
           </div>
@@ -133,7 +129,7 @@ const ProtobufSettings = ({ collection }) => {
           {protoFiles.some((file) => !file.exists) && (
             <div className="error-message text-xs mb-2 flex items-center p-2" data-testid="protobuf-invalid-files-message">
               <IconAlertCircle size={14} className="mr-1" />
-              Some proto files cannot be found. Use the replace option to update their locations.
+              {t('COLLECTION_SETTINGS.PROTO_FILES_MISSING', 'Some proto files cannot be found. Use the replace option to update their locations.')}
             </div>
           )}
 
@@ -141,13 +137,13 @@ const ProtobufSettings = ({ collection }) => {
             <thead>
               <tr>
                 <th>
-                  File
+                  {t('COMMON.FILE', 'File')}
                 </th>
                 <th>
-                  Path
+                  {t('COMMON.PATH', 'Path')}
                 </th>
                 <th className="text-right">
-                  Actions
+                  {t('COMMON.ACTIONS', 'Actions')}
                 </th>
               </tr>
             </thead>
@@ -157,7 +153,7 @@ const ProtobufSettings = ({ collection }) => {
                   <td colSpan="3" className="text-center">
                     <div className="empty-state flex flex-col items-center">
                       <IconFile size={24} className="empty-icon mb-2" />
-                      <span className="empty-text">No proto files added</span>
+                      <span className="empty-text">{t('COLLECTION_SETTINGS.NO_PROTO_FILES', 'No proto files added')}</span>
                     </div>
                   </td>
                 </tr>
@@ -188,7 +184,7 @@ const ProtobufSettings = ({ collection }) => {
                               type="button"
                               onClick={() => handleReplaceProtoFile(index)}
                               className="action-button replace-button"
-                              title="Replace file"
+                              title={t('COLLECTION_SETTINGS.REPLACE_FILE', 'Replace file')}
                             >
                               <IconFileImport size={14} />
                             </button>
@@ -197,7 +193,7 @@ const ProtobufSettings = ({ collection }) => {
                             type="button"
                             onClick={() => handleRemoveProtoFile(index)}
                             className="action-button remove-button"
-                            title="Remove file"
+                            title={t('COMMON.REMOVE', 'Remove')}
                             data-testid="protobuf-remove-file-button"
                           >
                             <IconTrash size={14} />
@@ -211,7 +207,7 @@ const ProtobufSettings = ({ collection }) => {
             </tbody>
           </table>
           <button type="button" className="btn-add-param text-link pr-2 py-3 mt-2 select-none" onClick={handleBrowseClick} data-testid="protobuf-add-file-button">
-            + Add Proto File
+            + {t('COLLECTION_SETTINGS.ADD_PROTO_FILE', 'Add Proto File')}
           </button>
         </div>
       </div>
@@ -221,7 +217,7 @@ const ProtobufSettings = ({ collection }) => {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
             <label className="flex items-center" htmlFor="importPaths">
-              Import Paths (
+              {t('COLLECTION_SETTINGS.IMPORT_PATHS', 'Import Paths')} (
               {importPaths.length}
               )
               <span id="import-paths-tooltip" className="ml-2">
@@ -230,7 +226,7 @@ const ProtobufSettings = ({ collection }) => {
               <Tooltip
                 anchorId="import-paths-tooltip"
                 className="tooltip-mod font-normal"
-                html="Add directories that contain proto files to be imported. These paths help resolve import statements in your proto files."
+                html={t('COLLECTION_SETTINGS.IMPORT_PATHS_TOOLTIP', 'Add directories that contain proto files to be imported. These paths help resolve import statements in your proto files.')}
               />
             </label>
           </div>
@@ -240,7 +236,7 @@ const ProtobufSettings = ({ collection }) => {
           {importPaths.some((path) => !path.exists) && (
             <div className="error-message text-xs mb-2 flex items-center p-2" data-testid="protobuf-invalid-import-paths-message">
               <IconAlertCircle size={14} className="mr-1" />
-              Some import paths cannot be found at their specified locations.
+              {t('COLLECTION_SETTINGS.IMPORT_PATHS_MISSING', 'Some import paths cannot be found at their specified locations.')}
             </div>
           )}
 
@@ -250,13 +246,13 @@ const ProtobufSettings = ({ collection }) => {
                 <th>
                 </th>
                 <th>
-                  Directory
+                  {t('COLLECTION_SETTINGS.DIRECTORY', 'Directory')}
                 </th>
                 <th>
-                  Path
+                  {t('COMMON.PATH', 'Path')}
                 </th>
                 <th className="text-right">
-                  Actions
+                  {t('COMMON.ACTIONS', 'Actions')}
                 </th>
               </tr>
             </thead>
@@ -266,7 +262,7 @@ const ProtobufSettings = ({ collection }) => {
                   <td colSpan="4" className="text-center">
                     <div className="empty-state flex flex-col items-center">
                       <IconFolder size={24} className="empty-icon mb-2" />
-                      <span className="empty-text">No import paths added</span>
+                      <span className="empty-text">{t('COLLECTION_SETTINGS.NO_IMPORT_PATHS', 'No import paths added')}</span>
                     </div>
                   </td>
                 </tr>
@@ -282,7 +278,7 @@ const ProtobufSettings = ({ collection }) => {
                           checked={importPath.enabled}
                           onChange={() => handleToggleImportPath(index)}
                           className="h-4 w-4"
-                          title={importPath.enabled ? 'Disable this import path' : 'Enable this import path'}
+                          title={importPath.enabled ? t('COLLECTION_SETTINGS.DISABLE_IMPORT_PATH', 'Disable this import path') : t('COLLECTION_SETTINGS.ENABLE_IMPORT_PATH', 'Enable this import path')}
                           data-testid="protobuf-import-path-checkbox"
                         />
                       </td>
@@ -307,7 +303,7 @@ const ProtobufSettings = ({ collection }) => {
                               type="button"
                               onClick={() => handleReplaceImportPath(index)}
                               className="action-button replace-button"
-                              title="Replace directory"
+                              title={t('COLLECTION_SETTINGS.REPLACE_DIRECTORY', 'Replace directory')}
                             >
                               <IconFileImport size={14} />
                             </button>
@@ -316,7 +312,7 @@ const ProtobufSettings = ({ collection }) => {
                             type="button"
                             onClick={() => handleRemoveImportPath(index)}
                             className="action-button remove-button"
-                            title="Remove import path"
+                            title={t('COMMON.REMOVE', 'Remove')}
                             data-testid="protobuf-remove-import-path-button"
                           >
                             <IconTrash size={14} />
@@ -330,14 +326,14 @@ const ProtobufSettings = ({ collection }) => {
             </tbody>
           </table>
           <button type="button" className="btn-add-param text-link pr-2 py-3 mt-2 select-none" onClick={handleBrowseImportPathClick} data-testid="protobuf-add-import-path-button">
-            + Add Import Path
+            + {t('COLLECTION_SETTINGS.ADD_IMPORT_PATH', 'Add Import Path')}
           </button>
         </div>
       </div>
 
       <div className="mt-6">
         <Button type="button" size="sm" onClick={handleSave}>
-          Save
+          {t('COMMON.SAVE', 'Save')}
         </Button>
       </div>
 

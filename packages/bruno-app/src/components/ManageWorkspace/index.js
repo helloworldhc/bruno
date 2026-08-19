@@ -17,8 +17,10 @@ import MenuDropdown from 'ui/MenuDropdown/index';
 import Button from 'ui/Button';
 import { getRevealInFolderLabel } from 'utils/common/platform';
 import { openDevtoolsAndSwitchToTerminal } from 'utils/terminal';
+import { useTranslation } from 'react-i18next';
 
 const ManageWorkspace = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { workspaces, activeWorkspaceUid } = useSelector((state) => state.workspaces);
   const preferences = useSelector((state) => state.app.preferences);
@@ -39,13 +41,13 @@ const ManageWorkspace = () => {
   const handleOpenWorkspace = (workspace) => {
     dispatch(switchWorkspace(workspace.uid));
     dispatch(showHomePage());
-    toast.success(`Switched to ${workspace.name}`);
+    toast.success(t('WORKSPACE.SWITCHED_TO', 'Switched to {{name}}', { name: workspace.name }));
   };
 
   const handleShowInFolder = (workspace) => {
     if (workspace.pathname) {
       dispatch(showInFolder(workspace.pathname)).catch(() => {
-        toast.error('Error opening the folder');
+        toast.error(t('COMMON.ERROR_OPENING_FOLDER', 'Error opening the folder'));
       });
     }
   };
@@ -56,7 +58,7 @@ const ManageWorkspace = () => {
 
   const handleCloseClick = (workspace) => {
     if (workspace.type === 'default') {
-      toast.error('Cannot remove the default workspace');
+      toast.error(t('WORKSPACE.REMOVE_DEFAULT_WARN', 'Cannot remove the default workspace'));
       return;
     }
     setDeleteWorkspaceModal({ open: true, workspace });
@@ -72,7 +74,7 @@ const ManageWorkspace = () => {
     try {
       await dispatch(createWorkspaceWithUniqueName(defaultLocation));
     } catch (error) {
-      toast.error(error?.message || 'Failed to create workspace');
+      toast.error(error?.message || t('WORKSPACE.FAILED_CREATE_WORKSPACE', 'Failed to create workspace'));
     }
   };
 
@@ -101,17 +103,17 @@ const ManageWorkspace = () => {
           <div className="back-button" onClick={handleBack}>
             <IconArrowLeft size={18} strokeWidth={1.5} />
           </div>
-          <span className="header-title">Manage Workspace</span>
+          <span className="header-title">{t('WORKSPACE.MANAGE_WORKSPACE', 'Manage Workspace')}</span>
         </div>
         <Button size="sm" onClick={handleCreateWorkspace} icon={<IconPlus size={14} strokeWidth={2} />}>
-          Create Workspace
+          {t('WORKSPACE.CREATE_WORKSPACE', 'Create Workspace')}
         </Button>
       </div>
 
       <div className="workspace-list">
         {sortedWorkspaces.length === 0 ? (
           <div className="empty-state">
-            <span>No workspaces found</span>
+            <span>{t('WORKSPACE.NO_WORKSPACES_FOUND', 'No workspaces found')}</span>
           </div>
         ) : (
           sortedWorkspaces.map((workspace) => {
@@ -130,7 +132,7 @@ const ManageWorkspace = () => {
                       )}
                     </span>
                     <span className="workspace-name">{workspace.name}</span>
-                    {isDefault && <span className="default-badge">Default</span>}
+                    {isDefault && <span className="default-badge">{t('WORKSPACE.DEFAULT_BADGE', 'Default')}</span>}
                   </div>
                   {workspace.pathname && (
                     <div className="workspace-path">{workspace.pathname}</div>
@@ -143,7 +145,7 @@ const ManageWorkspace = () => {
                     onClick={() => handleOpenWorkspace(workspace)}
                   >
                     <IconLogin size={14} strokeWidth={1.5} />
-                    <span>Open</span>
+                    <span>{t('WORKSPACE.OPEN_WORKSPACE', 'Open')}</span>
                   </button>
                   {workspace.pathname && workspace.type !== 'default' && (
                     <button
@@ -158,9 +160,9 @@ const ManageWorkspace = () => {
                     <MenuDropdown
                       placement="bottom-end"
                       items={[
-                        { id: 'open-in-terminal', label: 'Open in Terminal', onClick: () => openDevtoolsAndSwitchToTerminal(dispatch, workspace.pathname) },
-                        { id: 'rename', label: 'Rename', onClick: () => handleRenameClick(workspace) },
-                        { id: 'remove', label: 'Remove', onClick: () => handleCloseClick(workspace) }
+                        { id: 'open-in-terminal', label: t('SIDEBAR.OPEN_IN_TERMINAL', 'Open in Terminal'), onClick: () => openDevtoolsAndSwitchToTerminal(dispatch, workspace.pathname) },
+                        { id: 'rename', label: t('COMMON.RENAME', 'Rename'), onClick: () => handleRenameClick(workspace) },
+                        { id: 'remove', label: t('COMMON.REMOVE', 'Remove'), onClick: () => handleCloseClick(workspace) }
                       ]}
                     >
                       <button className="more-actions-btn">

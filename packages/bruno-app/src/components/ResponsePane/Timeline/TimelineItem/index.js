@@ -14,6 +14,7 @@ import { getRelativePath } from 'utils/common/path';
 import { addTab, updateRequestPaneTab, updateScriptPaneTab } from 'providers/ReduxStore/slices/tabs';
 import { updateSettingsSelectedTab, updatedFolderSettingsSelectedTab } from 'providers/ReduxStore/slices/collections';
 import { getBadge } from '../entryMeta';
+import { useTranslation } from 'react-i18next';
 
 const findFolderByScopeFile = (collection, sourceFile) => {
   if (!collection?.pathname || !sourceFile) return null;
@@ -37,6 +38,7 @@ const TimelineItem = ({
   scope,
   phase
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [isExpanded, _toggleExpand] = usePersistedState({
     key: `timeline-${timestamp}`,
@@ -130,9 +132,9 @@ const TimelineItem = ({
   };
 
   const tabs = [
-    { id: 'request', label: 'Request' },
-    { id: 'response', label: 'Response' },
-    ...(showNetworkLogs ? [{ id: 'network', label: 'Network' }] : [])
+    { id: 'request', label: t('REQUEST.REQUEST', 'Request') },
+    { id: 'response', label: t('RESPONSE.RESPONSE', 'Response') },
+    ...(showNetworkLogs ? [{ id: 'network', label: t('RESPONSE.NETWORK', 'Network') }] : [])
   ];
 
   return (

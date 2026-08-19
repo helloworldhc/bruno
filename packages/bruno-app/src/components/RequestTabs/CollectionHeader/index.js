@@ -50,6 +50,7 @@ import { useTheme } from 'providers/Theme';
 import { useBetaFeature, BETA_FEATURES } from 'utils/beta-features';
 import CreateMockServerModal from 'components/MockServer/CreateMockServerModal';
 import { getMockServerInstances, openMockServerDashboard } from 'utils/mock-server/mock-server-instances';
+import { useTranslation } from 'react-i18next';
 
 const readDismissedCollections = () => {
   try {
@@ -63,6 +64,7 @@ const readDismissedCollections = () => {
 };
 
 const CollectionHeader = ({ collection, isScratchCollection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const workspaces = useSelector((state) => state.workspaces.workspaces);
   const activeWorkspaceUid = useSelector((state) => state.workspaces.activeWorkspaceUid);
@@ -323,19 +325,19 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
 
   // Build overflow menu items for the "..." dropdown
   const overflowMenuItems = [
-    { id: 'variables', label: 'Variables', leftSection: IconEye, onClick: viewVariables },
+    { id: 'variables', label: t('WORKSPACE.VARIABLES', 'Variables'), leftSection: IconEye, onClick: viewVariables },
     // File mode is exposed via the Request/App/File view-mode toggle when the active
     // request has apps enabled; keep it in the overflow as a fallback everywhere else.
     ...(!appAvailable
-      ? [{ id: 'file-mode', label: collection.fileMode ? 'Switch to Code Mode' : 'Switch to File Mode', leftSection: collection.fileMode ? IconFileOff : IconFileCode, onClick: handleFileModeClick }]
+      ? [{ id: 'file-mode', label: collection.fileMode ? t('COLLECTION.SWITCH_TO_CODE_MODE', 'Switch to Code Mode') : t('COLLECTION.SWITCH_TO_FILE_MODE', 'Switch to File Mode'), leftSection: collection.fileMode ? IconFileOff : IconFileCode, onClick: handleFileModeClick }]
       : []),
     ...(!hasOpenApiSyncConfigured
       ? [{ id: 'openapi-sync', label: 'OpenAPI', leftSection: OpenAPISyncIcon, onClick: viewOpenApiSync }]
       : []),
     ...(isMockServerEnabled
-      ? [{ id: 'mock-server', label: 'Mock Server', leftSection: IconServer2, onClick: viewMockServer }]
+      ? [{ id: 'mock-server', label: t('MOCK_SERVER.MOCK_SERVER', 'Mock Server'), leftSection: IconServer2, onClick: viewMockServer }]
       : []),
-    { id: 'collection-settings', label: 'Collection Settings', leftSection: IconSettings, onClick: viewCollectionSettings }
+    { id: 'collection-settings', label: t('COLLECTION.COLLECTION_SETTINGS', 'Collection Settings'), leftSection: IconSettings, onClick: viewCollectionSettings }
   ];
 
   // Workspace action handlers (only used when isScratchCollection is true)
@@ -349,7 +351,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
   const handleCloseWorkspaceClick = () => {
     workspaceActionsRef.current?.hide();
     if (currentWorkspace?.type === 'default') {
-      toast.error('Cannot close the default workspace');
+      toast.error(t('WORKSPACE.CANNOT_CLOSE_DEFAULT', 'Cannot close the default workspace'));
       return;
     }
     setCloseWorkspaceModalOpen(true);
@@ -360,7 +362,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
     const pathname = currentWorkspace?.pathname;
     if (pathname) {
       dispatch(showInFolder(pathname)).catch(() => {
-        toast.error('Error opening the folder');
+        toast.error(t('WORKSPACE.ERROR_OPENING_FOLDER', 'Error opening the folder'));
       });
     }
   };
@@ -373,21 +375,21 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
     dispatch(exportWorkspaceAction(uid))
       .then((result) => {
         if (!result?.canceled) {
-          toast.success('Workspace exported successfully');
+          toast.success(t('WORKSPACE.EXPORTED_SUCCESSFULLY', 'Workspace exported successfully'));
         }
       })
       .catch((error) => {
-        toast.error(error?.message || 'Error exporting workspace');
+        toast.error(error?.message || t('WORKSPACE.ERROR_EXPORTING', 'Error exporting workspace'));
       });
   };
 
   const validateWorkspaceName = (name) => {
     const trimmed = name?.trim();
     if (!trimmed) {
-      return 'Name is required';
+      return t('WORKSPACE.NAME_REQUIRED', 'Name is required');
     }
     if (trimmed.length > 255) {
-      return 'Must be 255 characters or less';
+      return t('WORKSPACE.NAME_MAX_LENGTH', 'Must be 255 characters or less');
     }
     return null;
   };
@@ -405,7 +407,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
         dispatch(cancelWorkspaceCreation(currentWorkspace.uid));
         return;
       }
-      setWorkspaceNameError('Name is required');
+      setWorkspaceNameError(t('WORKSPACE.NAME_REQUIRED', 'Name is required'));
       return;
     }
 
@@ -429,10 +431,10 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
           setIsRenamingWorkspace(false);
           setWorkspaceNameInput('');
           setWorkspaceNameError('');
-          toast.success('Workspace created!');
+          toast.success(t('WORKSPACE.CREATED_SUCCESSFULLY', 'Workspace created!'));
         })
         .catch((err) => {
-          toast.error(err?.message || 'An error occurred while creating the workspace');
+          toast.error(err?.message || t('WORKSPACE.ERROR_CREATING', 'An error occurred while creating the workspace'));
         })
         .finally(() => {
           isSavingRef.current = false;
@@ -440,14 +442,14 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
     } else {
       dispatch(renameWorkspaceAction(uid, workspaceNameInput))
         .then(() => {
-          toast.success('Workspace renamed!');
+          toast.success(t('WORKSPACE.RENAMED_SUCCESSFULLY', 'Workspace renamed!'));
           setIsRenamingWorkspace(false);
           setWorkspaceNameInput('');
           setWorkspaceNameError('');
         })
         .catch((err) => {
-          toast.error(err?.message || 'An error occurred while renaming the workspace');
-          setWorkspaceNameError(err?.message || 'Failed to rename workspace');
+          toast.error(err?.message || t('WORKSPACE.ERROR_RENAMING', 'An error occurred while renaming the workspace'));
+          setWorkspaceNameError(err?.message || t('WORKSPACE.FAILED_TO_RENAME', 'Failed to rename workspace'));
         })
         .finally(() => {
           isSavingRef.current = false;
@@ -556,7 +558,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                     className="cog-btn"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={handleOpenAdvancedCreate}
-                    title="Advanced options"
+                    title={t('COMMON.ADVANCED_OPTIONS', 'Advanced options')}
                   >
                     <IconSettings size={13} strokeWidth={1.5} />
                   </button>
@@ -567,7 +569,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                   className="inline-action-btn save"
                   onClick={handleSaveWorkspaceRename}
                   onMouseDown={(e) => e.preventDefault()}
-                  title={currentWorkspace?.isCreating ? 'Create' : 'Save'}
+                  title={currentWorkspace?.isCreating ? t('COMMON.CREATE', 'Create') : t('COMMON.SAVE', 'Save')}
                 >
                   <IconCheck size={14} strokeWidth={2} />
                 </button>
@@ -575,7 +577,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                   className="inline-action-btn cancel"
                   onClick={handleCancelWorkspaceRename}
                   onMouseDown={(e) => e.preventDefault()}
-                  title="Cancel"
+                  title={t('COMMON.CANCEL', 'Cancel')}
                 >
                   <IconX size={14} strokeWidth={2} />
                 </button>
@@ -601,7 +603,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                 <div className="max-w-124 overflow-hidden">
                   {currentWorkspace && (
                     <>
-                      <div className="label-item">Workspace</div>
+                      <div className="label-item">{t('WORKSPACE.TITLE', 'Workspace')}</div>
                       <div
                         className={classNames('dropdown-item', {
                           'dropdown-item-active': isScratchCollection
@@ -612,7 +614,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                           <IconCategory size={16} strokeWidth={1.5} />
                         </div>
                         <span className="dropdown-label collection-header-dropdown-label">
-                          {currentWorkspace.name || 'Untitled Workspace'}
+                          {currentWorkspace.name || t('WORKSPACE.UNTITLED_WORKSPACE', 'Untitled Workspace')}
                         </span>
                         {workspaceTabCount > 0 && (
                           <span className="dropdown-tab-count">{workspaceTabCount}</span>
@@ -624,7 +626,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                   {mountedCollections.length > 0 && (
                     <>
                       <div className="dropdown-separator" />
-                      <div className="label-item">Collections</div>
+                      <div className="label-item">{t('CREATE_COLLECTION.TITLE', 'Collections')}</div>
                       {mountedCollections.map((col) => {
                         const colTabCount = getTabCount(col.uid);
                         return (
@@ -638,7 +640,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                             <div className="dropdown-icon">
                               <IconBox size={16} strokeWidth={1.5} />
                             </div>
-                            <span className="dropdown-label collection-header-dropdown-label">{col.name || 'Untitled Collection'}</span>
+                            <span className="dropdown-label collection-header-dropdown-label">{col.name || t('COLLECTION.UNTITLED_COLLECTION', 'Untitled Collection')}</span>
                             {colTabCount > 0 && (
                               <span className="dropdown-tab-count">{colTabCount}</span>
                             )}
@@ -664,7 +666,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                 <div className="dropdown-icon">
                   <IconEdit size={16} strokeWidth={1.5} />
                 </div>
-                <span>Rename</span>
+                <span>{t('COMMON.RENAME', 'Rename')}</span>
               </div>
               <div className="dropdown-item" onClick={handleShowInFolder}>
                 <div className="dropdown-icon">
@@ -676,13 +678,13 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                 <div className="dropdown-icon">
                   <IconUpload size={16} strokeWidth={1.5} />
                 </div>
-                <span>Export</span>
+                <span>{t('COMMON.EXPORT', 'Export')}</span>
               </div>
               <div className="dropdown-item" onClick={handleCloseWorkspaceClick}>
                 <div className="dropdown-icon">
                   <IconX size={16} strokeWidth={1.5} />
                 </div>
-                <span>Close</span>
+                <span>{t('COMMON.CLOSE', 'Close')}</span>
               </div>
             </Dropdown>
           )}
@@ -693,7 +695,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
             <>
               {appAvailable && (
                 <div className="mode-toggle" data-testid="view-mode-toggle">
-                  <ToolHint text="Request" toolhintId="ViewModeRequestToolhintId" place="bottom">
+                  <ToolHint text={t('COMMON.REQUEST', 'Request')} toolhintId="ViewModeRequestToolhintId" place="bottom">
                     <button
                       type="button"
                       data-testid="view-mode-request"
@@ -707,7 +709,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                       <IconCode size={16} strokeWidth={1.5} />
                     </button>
                   </ToolHint>
-                  <ToolHint text="App" toolhintId="ViewModeAppToolhintId" place="bottom">
+                  <ToolHint text={t('COMMON.APP', 'App')} toolhintId="ViewModeAppToolhintId" place="bottom">
                     <button
                       type="button"
                       data-testid="view-mode-app"
@@ -721,7 +723,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                       <IconAppWindow size={16} strokeWidth={1.5} />
                     </button>
                   </ToolHint>
-                  <ToolHint text="File" toolhintId="ViewModeFileToolhintId" place="bottom">
+                  <ToolHint text={t('COMMON.FILE', 'File')} toolhintId="ViewModeFileToolhintId" place="bottom">
                     <button
                       type="button"
                       data-testid="view-mode-file"
@@ -738,7 +740,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                 </div>
               )}
               {isAiEnabled && (
-                <ToolHint text="AI Assistant" toolhintId="AiAssistantToolhintId" place="bottom">
+                <ToolHint text={t('AI.ASSISTANT', 'AI Assistant')} toolhintId="AiAssistantToolhintId" place="bottom">
                   <ActionIcon
                     onClick={() => dispatch(toggleAiSidebar())}
                     aria-label="AI Assistant"
@@ -754,7 +756,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                 <div
                   className="migrate-yml-pill"
                   data-testid="migrate-yml-pill"
-                  title="Migrate this collection to YML"
+                  title={t('COLLECTION.MIGRATE_TO_YML', 'Migrate this collection to YML')}
                 >
                   <button
                     type="button"
@@ -762,7 +764,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                     onClick={openMigrateToYmlModal}
                   >
                     <IconTransform size={13} strokeWidth={1.5} />
-                    <span className="pill-label">Migrate to YML</span>
+                    <span className="pill-label">{t('COLLECTION.MIGRATE_TO_YML', 'Migrate to YML')}</span>
                   </button>
                   <button
                     type="button"
@@ -778,7 +780,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
               {/* OpenAPI Sync - standalone only when configured and beta enabled */}
               {hasOpenApiSyncConfigured && (
                 <ToolHint
-                  text={hasOpenApiError ? 'OpenAPI Error' : hasOpenApiUpdates ? 'OpenAPI Updates Available' : 'OpenAPI'}
+                  text={hasOpenApiError ? t('OPENAPI.ERROR', 'OpenAPI Error') : hasOpenApiUpdates ? t('OPENAPI.UPDATES_AVAILABLE', 'OpenAPI Updates Available') : 'OpenAPI'}
                   toolhintId="OpenApiSyncToolhintId"
                   place="bottom"
                 >
@@ -791,7 +793,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                 </ToolHint>
               )}
               {/* Runner - always visible */}
-              <ToolHint text="Runner" toolhintId="RunnerToolhintId" place="bottom">
+              <ToolHint text={t('RUNNER.TITLE', 'Runner')} toolhintId="RunnerToolhintId" place="bottom">
                 <ActionIcon onClick={handleRun} aria-label="Runner" size="sm" data-testid="runner">
                   <IconRun size={16} strokeWidth={1.5} />
                 </ActionIcon>
@@ -800,7 +802,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
               <JsSandboxMode collection={collection} />
               {/* Overflow menu */}
               <MenuDropdown items={overflowMenuItems} placement="bottom-end" data-testid="more-actions">
-                <ActionIcon label="More actions" size="sm" style={{ border: `1px solid ${theme.border.border1}`, borderRadius: theme.border.radius.base, width: 24, marginRight: 4, marginLeft: 4 }}>
+                <ActionIcon label={t('COMMON.MORE_ACTIONS', 'More actions')} size="sm" style={{ border: `1px solid ${theme.border.border1}`, borderRadius: theme.border.radius.base, width: 24, marginRight: 4, marginLeft: 4 }}>
                   <IconDots size={16} strokeWidth={1.5} />
                 </ActionIcon>
               </MenuDropdown>

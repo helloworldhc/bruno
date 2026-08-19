@@ -20,8 +20,10 @@ import GenerateCodeItem from '../GenerateCodeItem';
 import toast from 'react-hot-toast';
 import StyledWrapper from './StyledWrapper';
 import { useSidebarAccordion } from 'components/Sidebar/SidebarAccordionContext';
+import { useTranslation } from 'react-i18next';
 
 const ExampleItem = ({ example, item, collection }) => {
+  const { t } = useTranslation();
   const { dropdownContainerRef } = useSidebarAccordion();
   const dispatch = useDispatch();
   const activeTabUid = useSelector((state) => state.tabs?.activeTabUid);
@@ -141,21 +143,21 @@ const ExampleItem = ({ example, item, collection }) => {
       {
         id: 'rename',
         leftSection: IconEdit,
-        label: 'Rename',
+        label: t('COMMON.RENAME', 'Rename'),
         onClick: handleRename,
         testId: 'response-example-rename-option'
       },
       {
         id: 'clone',
         leftSection: IconCopy,
-        label: 'Clone',
+        label: t('COMMON.CLONE', 'Clone'),
         onClick: handleClone,
         testId: 'response-example-clone-option'
       },
       {
         id: 'generate-code',
         leftSection: IconCode,
-        label: 'Generate Code',
+        label: t('SIDEBAR.GENERATE_CODE', 'Generate Code'),
         onClick: handleGenerateCode,
         testId: 'response-example-generate-code-option'
       },
@@ -163,7 +165,7 @@ const ExampleItem = ({ example, item, collection }) => {
       {
         id: 'delete',
         leftSection: IconTrash,
-        label: 'Delete',
+        label: t('COMMON.DELETE', 'Delete'),
         className: 'delete-item',
         onClick: handleDelete,
         testId: 'response-example-delete-option'
@@ -226,19 +228,19 @@ const ExampleItem = ({ example, item, collection }) => {
       {showRenameModal && (
         <Modal
           size="sm"
-          title="Rename Example"
+          title={t('RESPONSE_EXAMPLE.RENAME_EXAMPLE', 'Rename Example')}
           handleCancel={() => {
             setShowRenameModal(false);
             setEditName(example.name); // Reset to original name on cancel
           }}
           handleConfirm={() => handleRenameConfirm(editName)}
-          confirmText="Rename"
-          cancelText="Cancel"
+          confirmText={t('COMMON.RENAME', 'Rename')}
+          cancelText={t('COMMON.CANCEL', 'Cancel')}
           confirmDisabled={!editName || !editName.trim()}
         >
           <div>
             <label htmlFor="renameExampleName" className="block font-medium">
-              Example Name
+              {t('RESPONSE_EXAMPLE.EXAMPLE_NAME', 'Example Name')}
             </label>
             <input
               data-testid="rename-example-name-input"
@@ -247,7 +249,7 @@ const ExampleItem = ({ example, item, collection }) => {
               className="textbox mt-2"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              placeholder="Enter example name..."
+              placeholder={t('RESPONSE_EXAMPLE.ENTER_EXAMPLE_NAME_PLACEHOLDER', 'Enter example name...')}
               autoFocus
               required
             />

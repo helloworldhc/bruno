@@ -30,6 +30,7 @@ import { isEnvironmentValidationError } from 'utils/environments';
 import ExampleTab from '../ExampleTab';
 import MockResponseTab from 'components/MockServer/RequestTabs/MockResponseTab';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUid, hasOverflow, setHasOverflow, dropdownContainerRef }) => {
   const dispatch = useDispatch();
@@ -669,6 +670,7 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
 };
 
 function RequestTabMenu({ menuDropdownRef, tabLabelRef, collectionRequestTabs, tabIndex, collection, dispatch, dropdownContainerRef }) {
+  const { t } = useTranslation();
   const [showCloneRequestModal, setShowCloneRequestModal] = useState(false);
   const [showAddNewRequestModal, setShowAddNewRequestModal] = useState(false);
 
@@ -774,54 +776,54 @@ function RequestTabMenu({ menuDropdownRef, tabLabelRef, collectionRequestTabs, t
   const menuItems = useMemo(() => [
     {
       id: 'new-request',
-      label: 'New Request',
+      label: t('COMMON.NEW_REQUEST', 'New Request'),
       onClick: () => setShowAddNewRequestModal(true)
     },
     {
       id: 'clone-request',
-      label: 'Clone Request',
+      label: t('REQUEST.CLONE_REQUEST', 'Clone Request'),
       onClick: () => setShowCloneRequestModal(true)
     },
     {
       id: 'revert-changes',
-      label: 'Revert Changes',
+      label: t('REQUEST.REVERT_CHANGES', 'Revert Changes'),
       onClick: handleRevertChanges,
       disabled: !currentTabItem?.draft
     },
     {
       id: 'close',
-      label: 'Close',
+      label: t('COMMON.CLOSE', 'Close'),
       onClick: () => handleCloseTab(currentTabUid)
     },
     {
       id: 'close-others',
-      label: 'Close Others',
+      label: t('REQUEST_TAB.CLOSE_OTHERS', 'Close Others'),
       onClick: handleCloseOtherTabs,
       disabled: !hasOtherTabs
     },
     {
       id: 'close-left',
-      label: 'Close to the Left',
+      label: t('REQUEST_TAB.CLOSE_LEFT', 'Close to the Left'),
       onClick: handleCloseTabsToTheLeft,
       disabled: !hasLeftTabs
     },
     {
       id: 'close-right',
-      label: 'Close to the Right',
+      label: t('REQUEST_TAB.CLOSE_RIGHT', 'Close to the Right'),
       onClick: handleCloseTabsToTheRight,
       disabled: !hasRightTabs
     },
     {
       id: 'close-saved',
-      label: 'Close Saved',
+      label: t('REQUEST_TAB.CLOSE_SAVED', 'Close Saved'),
       onClick: handleCloseSavedTabs
     },
     {
       id: 'close-all',
-      label: 'Close All',
+      label: t('REQUEST_TAB.CLOSE_ALL', 'Close All'),
       onClick: handleCloseAllTabs
     }
-  ], [currentTabUid, currentTabItem, hasOtherTabs, hasLeftTabs, hasRightTabs, collection, collectionRequestTabs, tabIndex, dispatch]);
+  ], [currentTabUid, currentTabItem, hasOtherTabs, hasLeftTabs, hasRightTabs, collection, collectionRequestTabs, tabIndex, dispatch, t]);
 
   const menuDropdown = (
     <MenuDropdown

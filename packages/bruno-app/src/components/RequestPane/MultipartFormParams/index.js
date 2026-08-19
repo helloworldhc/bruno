@@ -21,11 +21,13 @@ import path, { getRelativePathWithinBasePath, normalizePath } from 'utils/common
 import { getMultipartAutoContentType } from 'utils/common/multipartContentType';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useTrackScroll } from 'hooks/useTrackScroll';
+import { useTranslation } from 'react-i18next';
 
 const fileBasename = (filePath) =>
   filePath ? path.basename(normalizePath(String(filePath))) : '';
 
 const MultipartFormParams = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const wrapperRef = useRef(null);
@@ -165,15 +167,15 @@ const MultipartFormParams = ({ item, collection }) => {
   const columns = [
     {
       key: 'name',
-      name: 'Key',
+      name: t('COMMON.KEY', 'Key'),
       isKeyField: true,
-      placeholder: 'Key',
+      placeholder: t('COMMON.KEY', 'Key'),
       width: '20%'
     },
     {
       key: 'value',
-      name: 'Value',
-      placeholder: 'Value',
+      name: t('COMMON.VALUE', 'Value'),
+      placeholder: t('COMMON.VALUE', 'Value'),
       width: '35%',
       render: ({ row, value, onChange }) => {
         const files = row.type === 'file' ? getFileList(value) : [];
@@ -199,14 +201,14 @@ const MultipartFormParams = ({ item, collection }) => {
                 allowNewlines={true}
                 collection={collection}
                 item={item}
-                placeholder={!value ? 'Value' : ''}
+                placeholder={!value ? t('COMMON.VALUE', 'Value') : ''}
               />
             </div>
             <button
               data-testid="multipart-file-upload"
               className="upload-btn ml-1"
               onClick={() => handleBrowseFiles(row, onChange)}
-              title="Select File"
+              title={t('COMMON.SELECT_FILE', 'Select File')}
             >
               <IconUpload size={16} />
             </button>
@@ -217,13 +219,13 @@ const MultipartFormParams = ({ item, collection }) => {
     {
       key: 'contentType',
       name: 'Content-Type',
-      placeholder: 'Auto',
+      placeholder: t('COMMON.AUTO', 'Auto'),
       width: '20%',
       render: ({ value, onChange }) => (
         <SingleLineEditor
           onSave={onSave}
           theme={storedTheme}
-          placeholder={!value ? 'Auto' : ''}
+          placeholder={!value ? t('COMMON.AUTO', 'Auto') : ''}
           value={value || ''}
           onChange={onChange}
           onRun={handleRun}

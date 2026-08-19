@@ -96,7 +96,7 @@ const RenameCollectionItem = ({ collectionUid, item, onClose }) => {
           className="btn-advanced"
           type="button"
         >
-          Options
+          {t('COMMON.OPTIONS', 'Options')}
         </button>
         <IconCaretDown className="caret ml-1" size={14} strokeWidth={2} />
       </div>
@@ -109,16 +109,18 @@ const RenameCollectionItem = ({ collectionUid, item, onClose }) => {
         <Modal
           size="md"
           title={`${t('COMMON.RENAME', 'Rename')} ${isFolder ? t('NEW_FOLDER.TITLE', 'Folder') : t('REQUEST.REQUEST', 'Request')}`}
+          confirmText={t('COMMON.RENAME', 'Rename')}
+          handleConfirm={formik.handleSubmit}
           handleCancel={onClose}
-          hideFooter
+          hideFooter={true}
         >
           <form className="bruno-form" onSubmit={formik.handleSubmit}>
-            <div className="flex flex-col mt-2">
+            <div>
               <label htmlFor="name" className="block font-medium">
                 {isFolder ? t('NEW_FOLDER.NAME_LABEL', 'Folder Name') : t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
               </label>
               <input
-                id="collection-item-name"
+                id="item-name"
                 type="text"
                 name="name"
                 ref={inputRef}
@@ -132,6 +134,7 @@ const RenameCollectionItem = ({ collectionUid, item, onClose }) => {
                   !isEditing && formik.setFieldValue('filename', sanitizeName(e.target.value));
                 }}
                 value={formik.values.name || ''}
+                data-testid="rename-request-name"
               />
               {formik.touched.name && formik.errors.name ? <div className="text-red-500">{formik.errors.name}</div> : null}
             </div>
@@ -140,20 +143,21 @@ const RenameCollectionItem = ({ collectionUid, item, onClose }) => {
               <div className="mt-4">
                 <div className="flex items-center justify-between">
                   <label htmlFor="filename" className="flex items-center font-medium">
-                    {isFolder ? 'Folder' : 'File'} Name <small className="font-normal text-muted ml-1">(on filesystem)</small>
-                    { isFolder ? (
+                    {isFolder ? t('NEW_FOLDER.NAME_LABEL', 'Folder Name') : t('NEW_REQUEST.FILE_NAME_LABEL', 'File Name')}{' '}
+                    <small className="font-normal text-muted ml-1">(on filesystem)</small>
+                    {isFolder ? (
                       <Help width="300">
                         <p>
-                          You can choose to save the folder as a different name on your file system versus what is displayed in the app.
+                          {t('NEW_FOLDER.FOLDER_NAME_HELP', 'You can choose to save the folder as a different name on your file system versus what is displayed in the app.')}
                         </p>
                       </Help>
                     ) : (
                       <Help width="300">
                         <p>
-                          Bruno saves each request as a file in your collection's folder.
+                          {t('CREATE_COLLECTION.FOLDER_NAME_HELP_1', 'Bruno saves each request as a file in your collection\'s folder.')}
                         </p>
                         <p className="mt-2">
-                          You can choose a file name different from your request's name or one compatible with filesystem rules.
+                          {t('CREATE_COLLECTION.FOLDER_NAME_HELP_2', 'You can choose a file name different from your request\'s name or one compatible with filesystem rules.')}
                         </p>
                       </Help>
                     )}
@@ -181,7 +185,7 @@ const RenameCollectionItem = ({ collectionUid, item, onClose }) => {
                       id="file-name"
                       type="text"
                       name="filename"
-                      placeholder={isFolder ? 'Folder Name' : 'File Name'}
+                      placeholder={isFolder ? t('NEW_FOLDER.NAME_LABEL', 'Folder Name') : t('NEW_REQUEST.FILE_NAME_LABEL', 'File Name')}
                       className="!pr-10 block textbox mt-2 w-full"
                       autoComplete="off"
                       autoCorrect="off"
@@ -215,7 +219,7 @@ const RenameCollectionItem = ({ collectionUid, item, onClose }) => {
                       toggleShowFilesystemName(!showFilesystemName);
                     }}
                   >
-                    {showFilesystemName ? 'Hide Filesystem Name' : 'Show Filesystem Name'}
+                    {showFilesystemName ? t('NEW_REQUEST.HIDE_FILESYSTEM_NAME', 'Hide Filesystem Name') : t('NEW_REQUEST.SHOW_FILESYSTEM_NAME', 'Show Filesystem Name')}
                   </div>
                 </Dropdown>
               </div>

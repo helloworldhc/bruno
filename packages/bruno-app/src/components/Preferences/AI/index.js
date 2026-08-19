@@ -17,6 +17,7 @@ import CompatEndpointCard from './CompatEndpointCard';
 import AutocompletePane from './AutocompletePane';
 import SecurityPane from './SecurityPane';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const OPENAI_COMPATIBLE_PREFIX = 'openai-compatible:';
 const isCompatProviderId = (id) => typeof id === 'string' && id.startsWith(OPENAI_COMPATIBLE_PREFIX);
@@ -58,6 +59,7 @@ const aiPreferencesSchema = Yup.object().shape({
 let lastActiveSubTab = 'config';
 
 const AI = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const preferences = useSelector((state) => state.app.preferences);
   const [status, setStatus] = useState(null);
@@ -301,7 +303,7 @@ const AI = () => {
   return (
     <StyledWrapper className="w-full flex flex-col text-xs self-stretch min-h-0">
       <div className="flex items-center gap-2">
-        <div className="section-header">AI</div>
+        <div className="section-header">{t('PREFERENCES.AI', 'AI')}</div>
         <StatusBadge status="info" size="xs">
           Beta
         </StatusBadge>
@@ -317,7 +319,7 @@ const AI = () => {
           data-testid="ai-tab-config"
         >
           <IconSettings size={14} strokeWidth={1.5} />
-          Configuration
+          {t('COMMON.CONFIG', 'Configuration')}
         </button>
         <button
           type="button"
@@ -328,7 +330,7 @@ const AI = () => {
           data-testid="ai-tab-autocomplete"
         >
           <IconTerminal2 size={14} strokeWidth={1.5} />
-          Autocomplete
+          {t('COMMON.AUTOCOMPLETE', 'Autocomplete')}
         </button>
         <button
           type="button"
@@ -339,7 +341,7 @@ const AI = () => {
           data-testid="ai-tab-security"
         >
           <IconShieldLock size={14} strokeWidth={1.5} />
-          Security
+          {t('COMMON.SECURITY', 'Security')}
         </button>
       </div>
 
