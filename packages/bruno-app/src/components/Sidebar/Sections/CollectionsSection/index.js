@@ -86,7 +86,7 @@ const CollectionsSection = () => {
       }
     };
     dispatch(savePreferences(updatedPreferences)).catch(() => {
-      toast.error('Failed to save preferences');
+      toast.error(t('PREFERENCES.SAVE_ERROR', 'Failed to save preferences'));
     });
   };
 
@@ -192,13 +192,13 @@ const CollectionsSection = () => {
   const handleStartRequest = () => {
     const scratchCollectionUid = activeWorkspace?.scratchCollectionUid;
     if (!scratchCollectionUid) {
-      toast.error('Unable to create request');
+      toast.error(t('REQUEST.UNABLE_TO_CREATE', 'Unable to create request'));
       return;
     }
 
     const scratchCollection = collections.find((c) => c.uid === scratchCollectionUid);
     if (!scratchCollection) {
-      toast.error('Unable to create request');
+      toast.error(t('REQUEST.UNABLE_TO_CREATE', 'Unable to create request'));
       return;
     }
 
@@ -229,7 +229,7 @@ const CollectionsSection = () => {
         isTransient: true
       })
     ).catch((err) => {
-      toast.error('An error occurred while creating the request');
+      toast.error(t('REQUEST.CREATE_ERROR', 'An error occurred while creating the request'));
     });
   };
 

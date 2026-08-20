@@ -412,7 +412,7 @@ const RunConfigurationPanel = ({ collection, selectedItems, setSelectedItems, ta
           <Button
             variant="ghost"
             onClick={handleReset}
-            title="Reset selection and order"
+            title={t('RUNNER.RESET_SELECTION_AND_ORDER', 'Reset selection and order')}
             data-testid="runner-config-reset"
           >
             {t('COMMON.RESET', 'Reset')}

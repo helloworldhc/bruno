@@ -1,8 +1,10 @@
 import React, { useMemo } from 'react';
 import StyledWrapper from './StyledWrapper';
 import TimelineItem from '../Timeline/TimelineItem';
+import { useTranslation } from 'react-i18next';
 
 const RunnerTimeline = ({ request = {}, response = {}, item, collection }) => {
+  const { t } = useTranslation();
   // Reads from the runner item only, never collection.timeline, so a later
   // single-request invocation of the same item can't bleed into this view.
   const entries = useMemo(() => {

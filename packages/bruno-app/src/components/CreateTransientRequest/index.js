@@ -11,15 +11,16 @@ import filter from 'lodash/filter';
 import { get } from 'lodash';
 import { formatIpcError } from 'utils/common/error';
 import { PRESET_REQUEST_TYPES as REQUEST_TYPE } from 'utils/common/constants';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Generate a request name for transient requests in the pattern "Untitled {Count}"
  * @param {Object} collection - The collection object
  * @returns {string} A request name like "Untitled 1", "Untitled 2", etc.
  */
-const generateTransientRequestName = (collection) => {
+const generateTransientRequestName = (collection, untitledPrefix = 'Untitled') => {
   if (!collection || !collection.items) {
-    return 'Untitled 1';
+    return `${untitledPrefix} 1`;
   }
   const allItems = flattenItems(collection.items);
   const transientRequests = filter(allItems, (item) => {
@@ -28,8 +29,9 @@ const generateTransientRequestName = (collection) => {
 
   // Find the highest "Untitled X" number among transient requests
   let maxNumber = 0;
+  const regex = new RegExp(`^${untitledPrefix} (\\d+)$`);
   transientRequests.forEach((item) => {
-    const match = item.name?.match(/^Untitled (\d+)$/);
+    const match = item.name?.match(regex) || item.name?.match(/^Untitled (\d+)$/);
     if (match) {
       const number = parseInt(match[1], 10);
       if (number > maxNumber) {
@@ -41,10 +43,11 @@ const generateTransientRequestName = (collection) => {
   // Increment from the highest number found, or start at 1 if none found
   const count = maxNumber + 1;
 
-  return `Untitled ${count}`;
+  return `${untitledPrefix} ${count}`;
 };
 
 const CreateTransientRequest = ({ collectionUid }) => {
+  const { t } = useTranslation();
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownTippyRef = useRef();
   const dispatch = useDispatch();
@@ -75,7 +78,7 @@ const CreateTransientRequest = ({ collectionUid }) => {
   const handleCreateHttpRequest = useCallback(() => {
     if (!collection) return;
 
-    const uniqueName = generateTransientRequestName(collection);
+    const uniqueName = generateTransientRequestName(collection, t('COMMON.UNTITLED', 'Untitled'));
     const filename = sanitizeName(uniqueName);
 
     dispatch(
@@ -89,13 +92,13 @@ const CreateTransientRequest = ({ collectionUid }) => {
         itemUid: null,
         isTransient: true
       })
-    ).catch((err) => toast.error(formatIpcError(err) || 'An error occurred while adding the request'));
-  }, [dispatch, collection, collectionPresets.requestUrl]);
+    ).catch((err) => toast.error(formatIpcError(err) || t('REQUEST.ADD_REQUEST_ERROR', 'An error occurred while adding the request')));
+  }, [dispatch, collection, collectionPresets.requestUrl, t]);
 
   const handleCreateGraphQLRequest = useCallback(() => {
     if (!collection) return;
 
-    const uniqueName = generateTransientRequestName(collection);
+    const uniqueName = generateTransientRequestName(collection, t('COMMON.UNTITLED', 'Untitled'));
     const filename = sanitizeName(uniqueName);
 
     dispatch(
@@ -116,13 +119,13 @@ const CreateTransientRequest = ({ collectionUid }) => {
           }
         }
       })
-    ).catch((err) => toast.error(formatIpcError(err) || 'An error occurred while adding the request'));
-  }, [dispatch, collection, collectionPresets.requestUrl]);
+    ).catch((err) => toast.error(formatIpcError(err) || t('REQUEST.ADD_REQUEST_ERROR', 'An error occurred while adding the request')));
+  }, [dispatch, collection, collectionPresets.requestUrl, t]);
 
   const handleCreateWebSocketRequest = useCallback(() => {
     if (!collection) return;
 
-    const uniqueName = generateTransientRequestName(collection);
+    const uniqueName = generateTransientRequestName(collection, t('COMMON.UNTITLED', 'Untitled'));
     const filename = sanitizeName(uniqueName);
 
     dispatch(
@@ -135,13 +138,13 @@ const CreateTransientRequest = ({ collectionUid }) => {
         itemUid: null,
         isTransient: true
       })
-    ).catch((err) => toast.error(formatIpcError(err) || 'An error occurred while adding the request'));
-  }, [dispatch, collection, collectionPresets.requestUrl]);
+    ).catch((err) => toast.error(formatIpcError(err) || t('REQUEST.ADD_REQUEST_ERROR', 'An error occurred while adding the request')));
+  }, [dispatch, collection, collectionPresets.requestUrl, t]);
 
   const handleCreateGrpcRequest = useCallback(() => {
     if (!collection) return;
 
-    const uniqueName = generateTransientRequestName(collection);
+    const uniqueName = generateTransientRequestName(collection, t('COMMON.UNTITLED', 'Untitled'));
     const filename = sanitizeName(uniqueName);
 
     dispatch(
@@ -153,8 +156,8 @@ const CreateTransientRequest = ({ collectionUid }) => {
         itemUid: null,
         isTransient: true
       })
-    ).catch((err) => toast.error(formatIpcError(err) || 'An error occurred while adding the request'));
-  }, [dispatch, collection, collectionPresets.requestUrl]);
+    ).catch((err) => toast.error(formatIpcError(err) || t('REQUEST.ADD_REQUEST_ERROR', 'An error occurred while adding the request')));
+  }, [dispatch, collection, collectionPresets.requestUrl, t]);
 
   const handleItemClick = (type) => {
     if (dropdownTippyRef.current) {
@@ -193,7 +196,7 @@ const CreateTransientRequest = ({ collectionUid }) => {
     <ActionIcon
       onClick={handleLeftClick}
       onContextMenu={handleRightClick}
-      aria-label="New Transient Request"
+      aria-label={t('REQUEST.NEW_TRANSIENT_REQUEST', 'New Transient Request')}
       size="lg"
       style={{ marginBottom: '3px' }}
     >

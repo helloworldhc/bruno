@@ -4,6 +4,7 @@ import { search } from 'fast-fuzzy';
 import StyledWrapper from './StyledWrapper';
 import { SELECTION_LIST_MAX_WIDTH } from './constants';
 import SelectionFooter from 'components/SelectionFooter';
+import { useTranslation } from 'react-i18next';
 
 export { IMPORT_COLLECTION_SELECTION_WIDTH } from './constants';
 
@@ -27,6 +28,7 @@ const SelectionList = ({
   showSelectedCount = false,
   dataTestId
 }) => {
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
   const selectAllRef = useRef(null);
   const trimmedSearchText = searchText.trim();
@@ -107,7 +109,7 @@ const SelectionList = ({
               checked={allSelected}
               onChange={handleSelectAll}
             />
-            Select all
+            {t('COMMON.SELECT_ALL', 'Select all')}
           </label>
         </div>
         <ul className="selection-list scrollbar-hover" data-testid="selection-list">

@@ -33,6 +33,7 @@ import { isEnvironmentValidationError } from 'utils/environments';
 import Modal from 'components/Modal';
 import Button from 'ui/Button';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const PHASE_LABELS = {
   parsing: 'Converting files',
@@ -96,6 +97,7 @@ const collectCollectionDrafts = (collection) => {
 // collection is removed from the store while it migrates, so a modal hosted under the
 // collection UI would unmount mid-migration.
 const MigrateCollectionToYmlModal = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const migration = useSelector((state) => state.collectionMigration);
   // Present while confirming; gone during migration — name/pathname come from the slice.
@@ -156,10 +158,10 @@ const MigrateCollectionToYmlModal = () => {
         migration.collectionName
       );
       if (result?.success) {
-        toast.success('Collection backup exported');
+        toast.success(t('MIGRATE.BACKUP_EXPORTED', 'Collection backup exported'));
       }
     } catch (error) {
-      toast.error('Failed to export backup: ' + error.message);
+      toast.error(t('MIGRATE.BACKUP_EXPORT_FAILED', 'Failed to export backup: {{error}}', { error: error.message }));
     } finally {
       setIsExporting(false);
     }
@@ -226,7 +228,7 @@ const MigrateCollectionToYmlModal = () => {
         const invalidNames = getInvalidVariableNames(draft.variables);
         if (invalidNames.length > 0) {
           hasSkippedEnvs = true;
-          toast.error(`Cannot save environment "${draft.name}": invalid variable name(s) — ${invalidNames.join(', ')}`);
+          toast.error(t('MIGRATE.INVALID_ENV_VAR_NAMES', 'Cannot save environment "{{name}}": invalid variable name(s) — {{names}}', { name: draft.name, names: invalidNames.join(', ') }));
           continue;
         }
 
@@ -236,8 +238,8 @@ const MigrateCollectionToYmlModal = () => {
           hasSkippedEnvs = true;
           toast.error(
             isEnvironmentValidationError(err)
-              ? `Cannot save environment "${draft.name}": ${err.message}`
-              : `Failed to save environment "${draft.name}"`
+              ? t('MIGRATE.CANNOT_SAVE_ENV_WITH_MSG', 'Cannot save environment "{{name}}": {{error}}', { name: draft.name, error: err.message })
+              : t('MIGRATE.FAILED_SAVE_ENV', 'Failed to save environment "{{name}}"', { name: draft.name })
           );
         }
       }
@@ -249,7 +251,7 @@ const MigrateCollectionToYmlModal = () => {
       setShowDraftsStep(false);
       startMigration();
     } catch (error) {
-      toast.error('Failed to save changes');
+      toast.error(t('COMMON.FAILED_TO_SAVE_CHANGES', 'Failed to save changes'));
     } finally {
       setIsResolvingDrafts(false);
     }
@@ -281,7 +283,7 @@ const MigrateCollectionToYmlModal = () => {
       <StyledWrapper>
         <Modal
           size="md"
-          title="Unsaved changes"
+          title={t('COMMON.UNSAVED_CHANGES', 'Unsaved changes')}
           dataTestId="migration-drafts-step"
           handleCancel={handleBackToConfirm}
           disableEscapeKey={true}
@@ -291,11 +293,11 @@ const MigrateCollectionToYmlModal = () => {
         >
           <div className="flex items-center">
             <IconAlertTriangle size={32} strokeWidth={1.5} className="warning-text" />
-            <h1 className="ml-2 text-lg font-medium">Hold on..</h1>
+            <h1 className="ml-2 text-lg font-medium">{t('COMMON.HOLD_ON', 'Hold on..')}</h1>
           </div>
           <p className="mt-4">
             You have unsaved changes in <span className="font-medium">{totalDraftsCount}</span>{' '}
-            {pluralizeWord('item', totalDraftsCount)}. Save or discard them before migrating.
+            {pluralizeWord('item', totalDraftsCount)}. {t('MIGRATE.SAVE_OR_DISCARD', 'Save or discard them before migrating.')}
           </p>
 
           <ul className="mt-4 ml-2">
@@ -316,7 +318,7 @@ const MigrateCollectionToYmlModal = () => {
           {hasBlockingTransients && (
             <div className="mt-4">
               <p className="text-xs mb-2">
-                Transient requests need to be saved individually before migrating.
+                {t('MIGRATE.TRANSIENT_REQUESTS_HINT', 'Transient requests need to be saved individually before migrating.')}
               </p>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                 {transientRequestDrafts.map((item) => (
@@ -351,7 +353,7 @@ const MigrateCollectionToYmlModal = () => {
                 onClick={handleDiscardAllDrafts}
                 disabled={isResolvingDrafts}
               >
-                Discard All
+                {t('COMMON.DISCARD_ALL', 'Discard All')}
               </Button>
             </div>
             <div className="flex gap-2">
@@ -389,7 +391,7 @@ const MigrateCollectionToYmlModal = () => {
     <StyledWrapper>
       <Modal
         size="md"
-        title="Migrate to YML format"
+        title={t('MIGRATE.TITLE', 'Migrate to YML format')}
         confirmText={isMigrating ? (isCancelling ? 'Cancelling…' : 'Cancel') : 'Migrate'}
         confirmButtonColor={isMigrating ? 'danger' : 'primary'}
         confirmDisabled={confirmDisabled}
@@ -428,7 +430,7 @@ const MigrateCollectionToYmlModal = () => {
           ) : (
             <>
               <div className="mt-4 text-sm text-muted">
-                <p className="font-medium mb-2">What will happen:</p>
+                <p className="font-medium mb-2">{t('MIGRATE.WHAT_WILL_HAPPEN', 'What will happen:')}</p>
                 <ul className="list-disc ml-5 flex flex-col gap-1">
                   <li>All <code>.bru</code> request files will be converted to <code>.yml</code></li>
                   <li>Environment files will be converted to YML format</li>
@@ -444,7 +446,7 @@ const MigrateCollectionToYmlModal = () => {
                   <span className="backup-section-title">Backup</span>
                 </div>
                 <p className="backup-section-help">
-                  Export this collection as a ZIP archive before migrating, in case you want to restore it later.
+                  {t('MIGRATE.BACKUP_HELP', 'Export this collection as a ZIP archive before migrating, in case you want to restore it later.')}
                 </p>
                 <div className="backup-section-action">
                   <Button

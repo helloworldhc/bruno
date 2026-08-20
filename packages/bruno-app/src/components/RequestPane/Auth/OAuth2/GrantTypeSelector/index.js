@@ -7,8 +7,10 @@ import { IconCaretDown, IconKey } from '@tabler/icons';
 import { humanizeGrantType } from 'utils/collections';
 import { useEffect } from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const GrantTypeSelector = ({ item = {}, request, updateAuth, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const oAuth = get(request, 'auth.oauth2', {});
   const [valuesCache, setValuesCache] = useState({
@@ -69,16 +71,16 @@ const GrantTypeSelector = ({ item = {}, request, updateAuth, collection }) => {
           <IconKey size={14} className="oauth2-icon" />
         </div>
         <span className="oauth2-section-label">
-          Grant Type
+          {t('AUTH.GRANT_TYPE', 'Grant Type')}
         </span>
       </div>
       <div className="inline-flex items-center cursor-pointer grant-type-mode-selector w-fit">
         <MenuDropdown
           items={[
-            { id: 'password', label: 'Password Credentials', onClick: () => onGrantTypeChange('password') },
-            { id: 'authorization_code', label: 'Authorization Code', onClick: () => onGrantTypeChange('authorization_code') },
-            { id: 'implicit', label: 'Implicit', onClick: () => onGrantTypeChange('implicit') },
-            { id: 'client_credentials', label: 'Client Credentials', onClick: () => onGrantTypeChange('client_credentials') }
+            { id: 'password', label: t('AUTH.GRANT_PASSWORD', 'Password Credentials'), onClick: () => onGrantTypeChange('password') },
+            { id: 'authorization_code', label: t('AUTH.GRANT_AUTH_CODE', 'Authorization Code'), onClick: () => onGrantTypeChange('authorization_code') },
+            { id: 'implicit', label: t('AUTH.GRANT_IMPLICIT', 'Implicit'), onClick: () => onGrantTypeChange('implicit') },
+            { id: 'client_credentials', label: t('AUTH.GRANT_CLIENT_CREDENTIALS', 'Client Credentials'), onClick: () => onGrantTypeChange('client_credentials') }
           ]}
           data-testid="grant-type-dropdown"
           selectedItemId={oAuth?.grantType}

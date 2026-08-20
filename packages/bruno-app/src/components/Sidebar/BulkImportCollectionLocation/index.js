@@ -889,8 +889,8 @@ export const BulkImportCollectionLocation = ({
                     value={collectionFormat}
                     onChange={(e) => setCollectionFormat(e.target.value)}
                   >
-                    <option value="yml">OpenCollection (YAML)</option>
-                    <option value="bru">BRU Format (.bru)</option>
+                    <option value="yml">{t('CREATE_COLLECTION.FORMAT_YAML', 'OpenCollection (YAML)')}</option>
+                    <option value="bru">{t('CREATE_COLLECTION.FORMAT_BRU', 'BRU Format (.bru)')}</option>
                   </select>
                 </div>
 

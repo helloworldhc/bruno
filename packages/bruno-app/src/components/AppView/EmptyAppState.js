@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { IconAppWindow } from '@tabler/icons';
+import { useTranslation } from 'react-i18next';
 
 const Wrapper = styled.div`
   flex: 1 1 0;
@@ -43,15 +44,18 @@ const Wrapper = styled.div`
   }
 `;
 
-const EmptyAppState = ({ title = 'No app yet', hint, actions }) => (
-  <Wrapper data-testid="empty-app-state">
-    <div className="empty-app-inner">
-      <IconAppWindow size={32} strokeWidth={1.25} />
-      <div className="empty-app-title">{title}</div>
-      {hint ? <div className="empty-app-hint">{hint}</div> : null}
-      {actions ? <div className="empty-app-actions">{actions}</div> : null}
-    </div>
-  </Wrapper>
-);
+const EmptyAppState = ({ title, hint, actions }) => {
+  const { t } = useTranslation();
+  return (
+    <Wrapper data-testid="empty-app-state">
+      <div className="empty-app-inner">
+        <IconAppWindow size={32} strokeWidth={1.25} />
+        <div className="empty-app-title">{title || t('APP_VIEW.NO_APP_YET', 'No app yet')}</div>
+        {hint ? <div className="empty-app-hint">{hint}</div> : null}
+        {actions ? <div className="empty-app-actions">{actions}</div> : null}
+      </div>
+    </Wrapper>
+  );
+};
 
 export default EmptyAppState;

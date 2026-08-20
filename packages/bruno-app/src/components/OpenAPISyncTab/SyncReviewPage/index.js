@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   IconCheck,
@@ -87,6 +88,7 @@ const SyncReviewPage = ({
   onApplySync
 }) => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const tabUiState = useSelector((state) => state.openapiSync?.tabUiState?.[collectionUid] || {});
   const [preserveValues, setPreserveValues] = useState(true);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -175,18 +177,18 @@ const SyncReviewPage = ({
     const isSkipped = (ep) => decisions[ep.id] === 'keep-mine';
 
     // Accepted — changes that will be applied
-    addGroup('New endpoints to add', 'add', specAddedEndpoints.filter(isAccepted));
-    addGroup('Endpoints to update', 'update', specUpdatedEndpoints.filter(isAccepted));
-    addGroup('Endpoints to delete', 'remove', specRemovedEndpoints.filter(isAccepted));
+    addGroup(t('OPENAPI.GROUP_NEW_ENDPOINTS', 'New endpoints to add'), 'add', specAddedEndpoints.filter(isAccepted));
+    addGroup(t('OPENAPI.GROUP_ENDPOINTS_TO_UPDATE', 'Endpoints to update'), 'update', specUpdatedEndpoints.filter(isAccepted));
+    addGroup(t('OPENAPI.GROUP_ENDPOINTS_TO_DELETE', 'Endpoints to delete'), 'remove', specRemovedEndpoints.filter(isAccepted));
 
     // Skipped — changes that will be preserved as-is
-    addGroup('Keeping local version', 'keep', specUpdatedEndpoints.filter((ep) => ep.conflict && isSkipped(ep)));
-    addGroup('Retaining removed endpoints', 'keep', specRemovedEndpoints.filter(isSkipped));
-    addGroup('Skipped new endpoints', 'keep', specAddedEndpoints.filter(isSkipped));
-    addGroup('Keeping current version (skipped updates)', 'keep', specUpdatedEndpoints.filter((ep) => !ep.conflict && isSkipped(ep)));
+    addGroup(t('OPENAPI.GROUP_KEEP_LOCAL', 'Keeping local version'), 'keep', specUpdatedEndpoints.filter((ep) => ep.conflict && isSkipped(ep)));
+    addGroup(t('OPENAPI.GROUP_RETAIN_REMOVED', 'Retaining removed endpoints'), 'keep', specRemovedEndpoints.filter(isSkipped));
+    addGroup(t('OPENAPI.GROUP_SKIPPED_NEW', 'Skipped new endpoints'), 'keep', specAddedEndpoints.filter(isSkipped));
+    addGroup(t('OPENAPI.GROUP_KEEP_CURRENT', 'Keeping current version (skipped updates)'), 'keep', specUpdatedEndpoints.filter((ep) => !ep.conflict && isSkipped(ep)));
 
     return groups;
-  }, [specAddedEndpoints, specUpdatedEndpoints, specRemovedEndpoints, decisions]);
+  }, [specAddedEndpoints, specUpdatedEndpoints, specRemovedEndpoints, decisions, t]);
 
   const handleConfirmApply = () => {
     setShowConfirmation(false);
@@ -220,10 +222,12 @@ const SyncReviewPage = ({
   const hasRemoteUpdates = specAddedEndpoints.length + specUpdatedEndpoints.length + specRemovedEndpoints.length > 0;
 
   const buttonLabel = unresolvedConflicts > 0
-    ? `Resolve ${unresolvedConflicts} conflict${unresolvedConflicts !== 1 ? 's and sync' : ' and sync'}`
+    ? (unresolvedConflicts === 1
+        ? t('OPENAPI.RESOLVE_X_CONFLICTS_AND_SYNC', 'Resolve {{count}} conflict and sync', { count: unresolvedConflicts })
+        : t('OPENAPI.RESOLVE_X_CONFLICTS_AND_SYNC_PLURAL', 'Resolve {{count}} conflicts and sync', { count: unresolvedConflicts }))
     : !hasRemoteUpdates && specDrift?.storedSpecMissing
-        ? 'Restore Spec File'
-        : 'Sync Collection';
+        ? t('OPENAPI.RESTORE_SPEC_FILE', 'Restore Spec File')
+        : t('OPENAPI.SYNC_COLLECTION', 'Sync Collection');
 
   return (
     <div className="sync-review-page sync-mode">
@@ -231,10 +235,10 @@ const SyncReviewPage = ({
         <div className="sync-review-header">
           <div className="title-row">
             <div className="title-left">
-              <h3 className="review-title">Review Changes</h3>
+              <h3 className="review-title">{t('OPENAPI.REVIEW_CHANGES', 'Review Changes')}</h3>
               {totalChanges > 0 && (
                 <p className="review-subtitle">
-                  Choose to keep the current version or accept the updated one.
+                  {t('OPENAPI.REVIEW_SUBTITLE', 'Choose to keep the current version or accept the updated one.')}
                 </p>
               )}
             </div>
@@ -315,12 +319,12 @@ const SyncReviewPage = ({
               <div className="review-group">
 
                 <EndpointChangeSection
-                  title="Updated in Spec"
+                  title={t('OPENAPI.UPDATED_IN_SPEC', 'Updated in Spec')}
                   type="spec-modified"
                   endpoints={specUpdatedEndpoints}
                   defaultExpanded={true}
                   expandableLayout
-                  subtitle="The spec has updates for these endpoints"
+                  subtitle={t('OPENAPI.UPDATED_IN_SPEC_SUBTITLE', 'The spec has updates for these endpoints')}
                   headerExtra={conflictCount > 0 ? (
                     <StatusBadge
                       status="danger"
@@ -330,7 +334,7 @@ const SyncReviewPage = ({
                         </Help>
                       )}
                     >
-                      {conflictCount} {conflictCount === 1 ? 'Conflict' : 'Conflicts'}
+                      {conflictCount} {conflictCount === 1 ? t('OPENAPI.CONFLICT', 'Conflict') : t('OPENAPI.CONFLICTS', 'Conflicts')}
                     </StatusBadge>
                   ) : null}
                   collectionUid={collectionUid}
@@ -344,7 +348,7 @@ const SyncReviewPage = ({
                       collectionPath={collectionPath}
                       newSpec={newSpec}
                       showDecisions={true}
-                      decisionLabels={{ keep: 'Keep Current', accept: 'Update' }}
+                      decisionLabels={{ keep: t('OPENAPI.KEEP_CURRENT', 'Keep Current'), accept: t('OPENAPI.UPDATE', 'Update') }}
                       collectionUid={collectionUid}
                       preserveValues={preserveValues}
                     />
@@ -352,12 +356,12 @@ const SyncReviewPage = ({
                 />
 
                 <EndpointChangeSection
-                  title="New in Spec"
+                  title={t('OPENAPI.NEW_IN_SPEC', 'New in Spec')}
                   type="added"
                   endpoints={specAddedEndpoints}
                   defaultExpanded={true}
                   expandableLayout
-                  subtitle="New endpoints from the spec"
+                  subtitle={t('OPENAPI.NEW_IN_SPEC_SUBTITLE', 'New endpoints from the spec')}
                   collectionUid={collectionUid}
                   sectionKey="review-added"
                   renderItem={(endpoint, idx) => (
@@ -369,7 +373,7 @@ const SyncReviewPage = ({
                       collectionPath={collectionPath}
                       newSpec={newSpec}
                       showDecisions={true}
-                      decisionLabels={{ keep: 'Skip', accept: 'Add' }}
+                      decisionLabels={{ keep: t('OPENAPI.SKIP', 'Skip'), accept: t('OPENAPI.ADD', 'Add') }}
                       collectionUid={collectionUid}
                       preserveValues={preserveValues}
                     />
@@ -377,12 +381,12 @@ const SyncReviewPage = ({
                 />
 
                 <EndpointChangeSection
-                  title="Removed from Spec"
+                  title={t('OPENAPI.REMOVED_FROM_SPEC', 'Removed from Spec')}
                   type="removed"
                   endpoints={specRemovedEndpoints}
                   defaultExpanded={true}
                   expandableLayout
-                  subtitle="These endpoints are in your collection but not in the spec"
+                  subtitle={t('OPENAPI.REMOVED_FROM_SPEC_SUBTITLE', 'These endpoints are in your collection but not in the spec')}
                   collectionUid={collectionUid}
                   sectionKey="review-removed"
                   renderItem={(endpoint, idx) => (
@@ -394,7 +398,7 @@ const SyncReviewPage = ({
                       collectionPath={collectionPath}
                       newSpec={newSpec}
                       showDecisions={true}
-                      decisionLabels={{ keep: 'Keep', accept: 'Delete' }}
+                      decisionLabels={{ keep: t('OPENAPI.KEEP', 'Keep'), accept: t('COMMON.DELETE', 'Delete') }}
                       collectionUid={collectionUid}
                       preserveValues={preserveValues}
                     />
@@ -410,7 +414,7 @@ const SyncReviewPage = ({
       {hasRemoteUpdates && (
         <div className="sync-info-notice mt-4">
           <IconInfoCircle size={14} className="sync-info-icon" />
-          <span><span className="whats-updated-title">What gets updated:</span> Parameters, headers, body and auth will be updated. Tests, scripts, and assertions are always preserved.</span>
+          <span><span className="whats-updated-title">{t('OPENAPI.WHAT_GETS_UPDATED_TITLE', 'What gets updated:')}</span> {t('OPENAPI.WHAT_GETS_UPDATED_DESC', 'Parameters, headers, body and auth will be updated. Tests, scripts, and assertions are always preserved.')}</span>
         </div>
       )}
 
@@ -419,7 +423,7 @@ const SyncReviewPage = ({
           <div className="bar-stats">
             {totalChanges === 0 && (
               <span className="stats-prefix">
-                {specDrift?.storedSpecMissing ? 'Sync will update the spec file' : 'No endpoint changes to apply'}
+                {specDrift?.storedSpecMissing ? t('OPENAPI.SYNC_WILL_UPDATE_SPEC', 'Sync will update the spec file') : t('OPENAPI.NO_ENDPOINT_CHANGES_TO_APPLY', 'No endpoint changes to apply')}
               </span>
             )}
           </div>

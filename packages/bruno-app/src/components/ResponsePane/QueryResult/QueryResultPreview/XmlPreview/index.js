@@ -1,18 +1,20 @@
 import ErrorBanner from 'ui/ErrorBanner';
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import StyledWrapper from './StyledWrapper';
 
 // The expected "data" prop must be an XML string.
 export default function XmlPreview({ data, defaultExpanded = true }) {
+  const { t } = useTranslation();
   // Parse XML string
   const parsedData = useMemo(() => {
     if (typeof data !== 'string') {
-      return { error: 'Invalid input. Expected an XML string.' };
+      return { error: t('RESPONSE.XML_INVALID_INPUT', 'Invalid input. Expected an XML string.') };
     }
 
     const parsed = parseXMLString(data);
     if (parsed === null) {
-      return { error: 'Failed to parse XML string. Invalid XML format.' };
+      return { error: t('RESPONSE.XML_PARSE_FAILED', 'Failed to parse XML string. Invalid XML format.') };
     }
     return parsed;
   }, [data]);
@@ -21,7 +23,7 @@ export default function XmlPreview({ data, defaultExpanded = true }) {
   if (parsedData && typeof parsedData === 'object' && parsedData.error) {
     return (
       <div className="px-2">
-        <ErrorBanner errors={[{ title: 'Cannot preview as XML', message: parsedData.error }]} />
+        <ErrorBanner errors={[{ title: t('RESPONSE.CANNOT_PREVIEW_XML', 'Cannot preview as XML'), message: parsedData.error }]} />
       </div>
     );
   }
@@ -37,7 +39,7 @@ export default function XmlPreview({ data, defaultExpanded = true }) {
   if (!isValidTreeData(parsedData)) {
     return (
       <div className="px-2">
-        <ErrorBanner errors={[{ title: 'Cannot preview as XML', message: 'Data cannot be rendered as a tree. Expected a valid XML string.' }]} />
+        <ErrorBanner errors={[{ title: t('RESPONSE.CANNOT_PREVIEW_XML', 'Cannot preview as XML'), message: t('RESPONSE.XML_TREE_INVALID', 'Data cannot be rendered as a tree. Expected a valid XML string.') }]} />
       </div>
     );
   }
@@ -55,7 +57,7 @@ export default function XmlPreview({ data, defaultExpanded = true }) {
       // Empty object with no children
       return (
         <div className="px-2">
-          <ErrorBanner errors={[{ title: 'Cannot preview as XML', message: 'Cannot render XML tree. Root object is empty.' }]} />
+          <ErrorBanner errors={[{ title: t('RESPONSE.CANNOT_PREVIEW_XML', 'Cannot preview as XML'), message: t('RESPONSE.XML_ROOT_EMPTY', 'Cannot render XML tree. Root object is empty.') }]} />
         </div>
       );
     }
@@ -125,6 +127,7 @@ const XmlNode = ({
   defaultExpanded = true,
   depth = 0
 }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   let displayNodeName = nodeName;
@@ -219,8 +222,9 @@ const XmlNode = ({
 
   // If no display name at non-root level, use a fallback
   if (!displayNodeName) {
-    displayNodeName = '(unnamed)';
+    displayNodeName = t('RESPONSE.XML_UNNAMED_NODE', '(unnamed)');
   }
+
 
   // Determine if this node's value is an array
   const hasArrayValue = Array.isArray(node);

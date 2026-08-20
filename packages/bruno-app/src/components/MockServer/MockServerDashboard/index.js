@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { startMockServer, stopMockServer, refreshMockRoutes, loadMockResponses, syncMockServerState } from 'providers/ReduxStore/slices/mock-server/index';
 import { IconRefresh, IconCopy, IconCheck, IconPlayerPlay, IconPlayerStop, IconSettings } from '@tabler/icons';
 import toast from 'react-hot-toast';
@@ -40,6 +41,7 @@ const MockServerLogCount = ({ mockServerUid }) => {
 };
 
 const MockServerDashboard = ({ instance, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const mockServerUid = instance.uid;
   const [activeTab, setActiveTab] = useState('responses');
@@ -104,42 +106,33 @@ const MockServerDashboard = ({ instance, collection }) => {
       return error;
     }
 
-    try {
-      const portCheck = await checkMockServerPortAvailable(nextPort, workspaceInstances, {
-        excludeUid: storedInstance.uid
-      });
-      const error = getMockServerPortError(portCheck, nextPort);
-      setPortError(error);
-      return error;
-    } catch (err) {
-      const error = err.message || 'Failed to validate port';
-      setPortError(error);
-      return error;
-    }
+    const portCheck = await checkMockServerPortAvailable(nextPort, workspaceInstances, {
+      excludeUid: mockServerUid
+    });
+    const error = getMockServerPortError(portCheck, nextPort);
+    setPortError(error);
+    return error;
   };
 
   useEffect(() => {
     dispatch(syncMockServerState(location));
   }, [dispatch, location.mockServerUid, location.workspacePath]);
 
-  const resolveStartPayload = () => resolveMockServerStartPayload(storedInstance, {
-    collection,
-    apiSpecs,
-    workspacePath: resolveMockServerWorkspacePath(storedInstance, workspaces, activeWorkspace)
-  });
-
   const handleStart = async () => {
-    const validationError = await validatePort(activePort);
-    if (validationError) {
-      toast.error(validationError || 'Fix the port before starting the mock server');
-      return;
-    }
-
     try {
-      const payload = resolveStartPayload();
+      const error = await validatePort();
+      if (error) {
+        toast.error(error);
+        return;
+      }
+
+      const payload = resolveMockServerStartPayload(storedInstance, {
+        collection,
+        apiSpecs,
+        workspacePath: resolveMockServerWorkspacePath(storedInstance, workspaces, activeWorkspace)
+      });
       const result = await dispatch(startMockServer(payload)).unwrap();
       await dispatch(syncMockServerState(location));
-
       toast.success(`Mock server started at ${result.baseUrl}`);
     } catch (err) {
       toast.error(err.message || 'Failed to start mock server');
@@ -150,61 +143,69 @@ const MockServerDashboard = ({ instance, collection }) => {
     try {
       await dispatch(stopMockServer({ mockServerUid })).unwrap();
       await dispatch(syncMockServerState(location));
-      toast.success('Mock server stopped');
+      toast.success(t('MOCK_SERVER.SERVER_STOPPED', 'Mock server stopped'));
     } catch (err) {
-      toast.error(err.message || 'Failed to stop mock server');
+      toast.error(err.message || t('MOCK_SERVER.STOP_ERROR', 'Failed to stop mock server'));
     }
   };
 
   const handleRefresh = async () => {
     try {
-      await dispatch(refreshMockRoutes(location)).unwrap();
-      const { responses } = await dispatch(loadMockResponses(location)).unwrap();
-      toast.success(`Routes refreshed: ${countMockRoutes(responses)} routes, ${responses.length} responses`);
+      await dispatch(refreshMockRoutes({ mockServerUid })).unwrap();
+      await dispatch(loadMockResponses(location));
+      toast.success(t('MOCK_SERVER.ROUTES_REFRESHED', 'Routes refreshed'));
     } catch (err) {
-      toast.error(err.message || 'Failed to refresh routes');
+      toast.error(err.message || t('MOCK_SERVER.REFRESH_ROUTES_ERROR', 'Failed to refresh routes'));
     }
   };
 
-  const persistInstance = async (updates) => {
-    const nextInstance = {
-      ...storedInstance,
-      ...updates
-    };
+  const handleCopyUrl = async () => {
+    if (!baseUrl) {
+      return;
+    }
 
-    await dispatch(saveMockServerInstance(nextInstance));
-
-    if (updates.name !== undefined) {
-      dispatch(updateMockServerTabName(nextInstance));
+    try {
+      await navigator.clipboard.writeText(baseUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast.success(t('MOCK_SERVER.URL_COPIED', 'URL copied'));
+    } catch {
+      toast.error(t('COMMON.FAILED_TO_COPY', 'Failed to copy to clipboard'));
     }
   };
 
   const handleNameBlur = async () => {
-    const trimmedName = nameValue.trim();
+    if (nameDraft === null) {
+      return;
+    }
 
-    if (!trimmedName || trimmedName === storedInstance.name) {
+    const trimmed = nameDraft.trim();
+    if (trimmed === storedInstance.name) {
       setNameDraft(null);
       return;
     }
 
-    const nameError = getMockServerNameError(trimmedName);
+    const nameError = getMockServerNameError(trimmed);
     if (nameError) {
       toast.error(nameError);
       setNameDraft(null);
       return;
     }
 
-    if (isMockServerNameTaken(workspaceInstances, trimmedName, storedInstance.uid)) {
-      toast.error('A mock server with this name already exists');
+    if (isMockServerNameTaken(workspaceInstances, trimmed, mockServerUid)) {
+      toast.error(t('MOCK_SERVER.NAME_EXISTS', 'A mock server with this name already exists'));
       setNameDraft(null);
       return;
     }
 
+    const nextInstance = { ...storedInstance, name: trimmed };
     try {
-      await persistInstance({ name: trimmedName });
-    } catch {
-      toast.error('Failed to save mock server name');
-    } finally {
+      await dispatch(saveMockServerInstance(nextInstance));
+      dispatch(updateMockServerTabName(nextInstance));
+      setNameDraft(null);
+      toast.success(t('MOCK_SERVER.NAME_UPDATED', 'Mock server name updated'));
+    } catch (err) {
+      toast.error(err.message || t('MOCK_SERVER.UPDATE_NAME_ERROR', 'Failed to update mock server name'));
       setNameDraft(null);
     }
   };
@@ -214,43 +215,47 @@ const MockServerDashboard = ({ instance, collection }) => {
   };
 
   const handleDelayBlur = async () => {
-    const newDelay = Number(delayValue) || 0;
+    if (delayDraft === null) {
+      return;
+    }
 
-    if (newDelay === activeDelay) {
+    const parsed = typeof delayDraft === 'number' ? delayDraft : (parseInt(delayDraft, 10) || 0);
+    const normalized = Math.max(0, parsed);
+    if (normalized === (storedInstance.globalDelay || 0)) {
       setDelayDraft(null);
       return;
     }
 
+    const nextInstance = { ...storedInstance, globalDelay: normalized };
     try {
-      await persistInstance({ globalDelay: newDelay });
+      await dispatch(saveMockServerInstance(nextInstance));
+      setDelayDraft(null);
+      toast.success(t('MOCK_SERVER.DELAY_UPDATED', 'Delay updated'));
     } catch (err) {
-      toast.error(err.message || 'Failed to update delay');
-    } finally {
+      toast.error(err.message || t('MOCK_SERVER.UPDATE_DELAY_ERROR', 'Failed to update delay'));
       setDelayDraft(null);
     }
   };
 
-  const handleCopyUrl = async () => {
-    if (!baseUrl) return;
-    try {
-      await navigator.clipboard.writeText(baseUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      toast.error('Failed to copy URL');
-    }
-  };
-
-  const statusDotClass = isRunning ? 'running' : isStarting ? 'starting' : isStopping ? 'stopping' : serverState.status === 'error' ? 'error' : '';
-  const statusLabel = isRunning
-    ? `Running on port ${serverState.port}`
+  const statusDotClass = isRunning
+    ? 'running'
     : isStarting
-      ? 'Starting...'
+      ? 'starting'
       : isStopping
-        ? 'Stopping...'
+        ? 'stopping'
         : serverState.status === 'error'
-          ? 'Error'
-          : 'Stopped';
+          ? 'error'
+          : 'stopped';
+
+  const statusLabel = isRunning
+    ? t('MOCK_SERVER.RUNNING', 'Running')
+    : isStarting
+      ? t('MOCK_SERVER.STARTING', 'Starting...')
+      : isStopping
+        ? t('MOCK_SERVER.STOPPING', 'Stopping...')
+        : serverState.status === 'error'
+          ? t('COMMON.ERROR', 'Error')
+          : t('MOCK_SERVER.STOPPED', 'Stopped');
 
   const getTabPanel = (tab) => {
     switch (tab) {
@@ -267,7 +272,7 @@ const MockServerDashboard = ({ instance, collection }) => {
 
   const sourceLabel = useMemo(() => {
     if (instance.sourceType === 'manual') {
-      return 'Standalone';
+      return t('MOCK_SERVER.SOURCE_STANDALONE', 'Standalone');
     }
 
     if (instance.sourceType === 'spec') {
@@ -275,11 +280,11 @@ const MockServerDashboard = ({ instance, collection }) => {
       if (spec?.pathname) {
         return spec.name || spec.filename || spec.pathname;
       }
-      return spec.name || spec.filename || spec.pathname || 'API Spec';
+      return spec.name || spec.filename || spec.pathname || t('MOCK_SERVER.API_SPEC', 'API Spec');
     }
 
-    return collection?.name || 'Collection';
-  }, [apiSpecs, collection?.name, instance]);
+    return collection?.name || t('MOCK_SERVER.COLLECTION', 'Collection');
+  }, [apiSpecs, collection?.name, instance, t]);
 
   return (
     <StyledWrapper className="flex flex-col h-full relative px-4 py-4 overflow-hidden" data-testid="mock-server-dashboard" data-mock-server-uid={mockServerUid}>
@@ -305,7 +310,7 @@ const MockServerDashboard = ({ instance, collection }) => {
           <input
             type="text"
             className="mock-server-name-input"
-            aria-label="Mock server name"
+            aria-label={t('MOCK_SERVER.MOCK_SERVER_NAME', 'Mock server name')}
             value={nameValue}
             onChange={(event) => setNameDraft(event.target.value)}
             onBlur={handleNameBlur}
@@ -317,11 +322,11 @@ const MockServerDashboard = ({ instance, collection }) => {
             data-testid="mock-server-title-input"
           />
           <div className="source-label" data-testid="mock-server-source-label">
-            Source: {sourceLabel}
+            {t('MOCK_SERVER.SOURCE_LABEL', { source: sourceLabel, defaultValue: `Source: ${sourceLabel}` })}
           </div>
         </div>
         <ActionIcon
-          label="Mock server settings"
+          label={t('MOCK_SERVER.MOCK_SERVER_SETTINGS', 'Mock server settings')}
           onClick={() => setSettingsOpen(true)}
           data-testid="mock-server-settings-btn"
         >
@@ -337,7 +342,7 @@ const MockServerDashboard = ({ instance, collection }) => {
           </div>
 
           {isRunning && baseUrl && (
-            <button className="copy-url-btn" onClick={handleCopyUrl} title="Copy mock server URL" data-testid="mock-server-copy-url">
+            <button className="copy-url-btn" onClick={handleCopyUrl} title={t('MOCK_SERVER.COPY_MOCK_SERVER_URL', 'Copy mock server URL')} data-testid="mock-server-copy-url">
               {copied ? <IconCheck size={13} strokeWidth={2} /> : <IconCopy size={13} strokeWidth={1.5} />}
               <span className="url-text">{baseUrl}</span>
             </button>
@@ -345,14 +350,14 @@ const MockServerDashboard = ({ instance, collection }) => {
 
           {isRunning && (
             <div className="server-stats" data-testid="mock-server-stats">
-              <span>{routeCount} routes</span>
-              <span>{exampleCount} responses</span>
+              <span>{t('MOCK_SERVER.ROUTES_COUNT', { count: routeCount, defaultValue: `${routeCount} routes` })}</span>
+              <span>{t('MOCK_SERVER.RESPONSES_COUNT', { count: exampleCount, defaultValue: `${exampleCount} responses` })}</span>
             </div>
           )}
 
           <div className="server-controls">
             <div className="control-group">
-              <label htmlFor="mock-server-delay-input">Delay (ms)</label>
+              <label htmlFor="mock-server-delay-input">{t('MOCK_SERVER.DELAY_MS', 'Delay (ms)')}</label>
               <input
                 id="mock-server-delay-input"
                 type="number"
@@ -375,7 +380,7 @@ const MockServerDashboard = ({ instance, collection }) => {
                 disabled={isStarting || Boolean(portError)}
                 data-testid="mock-server-start-btn"
               >
-                {isStarting ? 'Starting...' : 'Start Server'}
+                {isStarting ? t('MOCK_SERVER.STARTING', 'Starting...') : t('MOCK_SERVER.START_SERVER', 'Start Server')}
               </Button>
             ) : (
               <>
@@ -388,10 +393,10 @@ const MockServerDashboard = ({ instance, collection }) => {
                   disabled={isStopping}
                   data-testid="mock-server-stop-btn"
                 >
-                  {isStopping ? 'Stopping...' : 'Stop Server'}
+                  {isStopping ? t('MOCK_SERVER.STOPPING', 'Stopping...') : t('MOCK_SERVER.STOP_SERVER', 'Stop Server')}
                 </Button>
                 {!isStopping && (
-                  <ActionIcon label="Refresh routes" onClick={handleRefresh} data-testid="mock-server-refresh-btn">
+                  <ActionIcon label={t('MOCK_SERVER.REFRESH_ROUTES', 'Refresh routes')} onClick={handleRefresh} data-testid="mock-server-refresh-btn">
                     <IconRefresh size={16} stroke={1.5} aria-hidden="true" />
                   </ActionIcon>
                 )}
@@ -402,7 +407,11 @@ const MockServerDashboard = ({ instance, collection }) => {
 
         {isRunning && storedInstance.port && serverState.port && Number(storedInstance.port) !== Number(serverState.port) && (
           <div className="server-notice" data-testid="mock-server-port-mismatch">
-            Configured port {storedInstance.port} differs from the running port {serverState.port}.
+            {t('MOCK_SERVER.PORT_MISMATCH_NOTICE', {
+              configured: storedInstance.port,
+              running: serverState.port,
+              defaultValue: `Configured port ${storedInstance.port} differs from the running port ${serverState.port}.`
+            })}
           </div>
         )}
 
@@ -414,14 +423,14 @@ const MockServerDashboard = ({ instance, collection }) => {
       <div className="flex flex-wrap items-center tabs" role="tablist">
         <Tab
           name="responses"
-          label="Responses"
+          label={t('MOCK_SERVER.RESPONSES', 'Responses')}
           isActive={activeTab === 'responses'}
           onClick={setActiveTab}
           data-testid="mock-server-tab-responses"
         />
         <Tab
           name="routes"
-          label="Routes"
+          label={t('MOCK_SERVER.ROUTES', 'Routes')}
           count={routeCount}
           isActive={activeTab === 'routes'}
           onClick={setActiveTab}
@@ -429,7 +438,7 @@ const MockServerDashboard = ({ instance, collection }) => {
         />
         <Tab
           name="log"
-          label={<>Request Log<MockServerLogCount mockServerUid={mockServerUid} /></>}
+          label={<>{t('MOCK_SERVER.REQUEST_LOG', 'Request Log')}<MockServerLogCount mockServerUid={mockServerUid} /></>}
           isActive={activeTab === 'log'}
           onClick={setActiveTab}
           data-testid="mock-server-tab-log"

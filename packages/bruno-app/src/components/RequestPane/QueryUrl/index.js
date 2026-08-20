@@ -25,9 +25,11 @@ import StyledWrapper from './StyledWrapper';
 import GenerateCodeItem from 'components/Sidebar/Collections/Collection/CollectionItem/GenerateCodeItem/index';
 import ToolHint from 'components/ToolHint';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const QueryUrl = ({ item, collection, handleRun }) => {
   const { theme, storedTheme } = useTheme();
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const method = item.draft ? get(item, 'draft.request.method') : get(item, 'request.method');
   const url = item.draft ? get(item, 'draft.request.url', '') : get(item, 'request.url', '');
@@ -89,7 +91,7 @@ const QueryUrl = ({ item, collection, handleRun }) => {
     if (item?.request?.url !== '' || (item.draft?.request?.url !== undefined && item.draft?.request?.url !== '')) {
       setGenerateCodeItemModalOpen(true);
     } else {
-      toast.error('URL is required');
+      toast.error(t('QUERY_URL.URL_REQUIRED', 'URL is required'));
     }
   };
 
@@ -110,7 +112,7 @@ const QueryUrl = ({ item, collection, handleRun }) => {
     try {
       const request = getRequestFromCurlCommand(pastedData, 'graphql-request');
       if (!request || !request.url) {
-        toast.error('Invalid cURL command');
+        toast.error(t('QUERY_URL.INVALID_CURL', 'Invalid cURL command'));
         return;
       }
       // Update URL
@@ -165,11 +167,11 @@ const QueryUrl = ({ item, collection, handleRun }) => {
           }));
         }
 
-        toast.success('GraphQL query imported successfully');
+        toast.success(t('QUERY_URL.GRAPHQL_IMPORTED', 'GraphQL query imported successfully'));
       }
     } catch (error) {
       console.error('Error parsing cURL command:', error);
-      toast.error('Failed to parse GraphQL query');
+      toast.error(t('QUERY_URL.GRAPHQL_PARSE_FAILED', 'Failed to parse GraphQL query'));
     }
   }, [dispatch, item.uid, collection.uid]);
 
@@ -196,7 +198,7 @@ const QueryUrl = ({ item, collection, handleRun }) => {
       // Parse the curl command
       const request = getRequestFromCurlCommand(pastedData);
       if (!request || !request.url) {
-        toast.error('Invalid cURL command');
+        toast.error(t('QUERY_URL.INVALID_CURL', 'Invalid cURL command'));
         return;
       }
 
@@ -377,10 +379,10 @@ const QueryUrl = ({ item, collection, handleRun }) => {
         }
       }
 
-      toast.success('cURL command imported successfully');
+      toast.success(t('QUERY_URL.CURL_IMPORTED', 'cURL command imported successfully'));
     } catch (error) {
       console.error('Error parsing cURL command:', error);
-      toast.error('Failed to parse cURL command');
+      toast.error(t('QUERY_URL.CURL_PARSE_FAILED', 'Failed to parse cURL command'));
     }
   },
   [dispatch, item.uid, item.type, collection.uid]
@@ -404,7 +406,7 @@ const QueryUrl = ({ item, collection, handleRun }) => {
           <SingleLineEditor
             ref={editorRef}
             value={url}
-            placeholder="Enter URL or paste a cURL request"
+            placeholder={t('QUERY_URL.ENTER_URL_PLACEHOLDER', 'Enter URL or paste a cURL request')}
             onSave={(finalValue) => onSave(finalValue)}
             theme={storedTheme}
             onChange={(newValue) => onUrlChange(newValue)}
@@ -416,7 +418,7 @@ const QueryUrl = ({ item, collection, handleRun }) => {
             showNewlineArrow={true}
           />
           <div className="flex items-center h-full mx-2 gap-3" id="request-actions">
-            <ToolHint text="Generate Code" toolhintId="http-generate-code" place="top" positionStrategy="fixed">
+            <ToolHint text={t('GENERATE_CODE.GENERATE_CODE', 'Generate Code')} toolhintId="http-generate-code" place="top" positionStrategy="fixed">
               <div
                 className="flex items-center"
                 data-testid="generate-code-button"
@@ -427,7 +429,7 @@ const QueryUrl = ({ item, collection, handleRun }) => {
                 <IconCode color={theme.requestTabs.icon.color} strokeWidth={1.5} size={20} className="cursor-pointer" />
               </div>
             </ToolHint>
-            <ToolHint text={`Save (${saveShortcut})`} toolhintId="http-save-request" place="top" positionStrategy="fixed">
+            <ToolHint text={t('QUERY_URL.SAVE_SHORTCUT', `Save (${saveShortcut})`, { shortcut: saveShortcut })} toolhintId="http-save-request" place="top" positionStrategy="fixed">
               <div
                 className="flex items-center"
                 data-testid="save-request-button"

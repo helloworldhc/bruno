@@ -11,6 +11,7 @@ import BulkEditor from 'components/BulkEditor';
 import { headers as StandardHTTPHeaders } from 'know-your-http-well';
 import { MimeTypes } from 'utils/codemirror/autocompleteConstants';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const headerAutoCompleteList = StandardHTTPHeaders.map((e) => e.header);
 

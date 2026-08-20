@@ -2,8 +2,10 @@ import React, { useCallback, useState, useMemo, useRef } from 'react';
 import { IconChevronRight, IconChevronDown, IconTrash, IconInfoCircle } from '@tabler/icons';
 import { nanoid } from 'nanoid';
 import { getInputObjectFields } from 'utils/graphql/queryBuilder';
+import { useTranslation } from 'react-i18next';
 
 const ListArgValueInput = ({ values, onChange, field, indent }) => {
+  const { t } = useTranslation();
   const [items, setItems] = useState(() => {
     const vals = Array.isArray(values) ? values : (values ? [values] : []);
     const mapped = vals.map((v) => ({ id: nanoid(), value: v }));
@@ -43,8 +45,14 @@ const ListArgValueInput = ({ values, onChange, field, indent }) => {
       {items.map((item, index) => {
         const isEmptyRow = index === items.length - 1 && item.value === '';
         return (
-          <div key={item.id} className="arg-row" style={{ paddingLeft: indent }} onClick={(e) => e.stopPropagation()}>
-            <ArgValueInput value={item.value} onChange={(v) => handleItemChange(item.id, v)} field={field} />
+          <div key={item.id} className="list-arg-row">
+            <input
+              type="text"
+              value={item.value}
+              onChange={(e) => handleItemChange(item.id, e.target.value)}
+              placeholder={t('QUERY_BUILDER.ENTER_VALUE', 'Enter value')}
+              className="list-arg-input"
+            />
             {isEmptyRow ? (
               <span className="list-arg-remove-spacer" />
             ) : (
@@ -55,7 +63,7 @@ const ListArgValueInput = ({ values, onChange, field, indent }) => {
                   e.stopPropagation();
                   handleRemove(item.id);
                 }}
-                aria-label="Remove item"
+                aria-label={t('COMMON.REMOVE_ITEM', 'Remove item')}
               >
                 <IconTrash size={13} strokeWidth={1.5} />
               </button>
@@ -68,10 +76,11 @@ const ListArgValueInput = ({ values, onChange, field, indent }) => {
 };
 
 const ArgValueInput = ({ value, onChange, field }) => {
+  const { t } = useTranslation();
   if (field.isEnum && field.enumValues) {
     return (
       <select value={value} onChange={(e) => onChange(e.target.value)} onClick={(e) => e.stopPropagation()}>
-        <option value="">Select option</option>
+        <option value="">{t('QUERY_BUILDER.SELECT_OPTION', 'Select option')}</option>
         {field.enumValues.map((v) => (
           <option key={v} value={v}>{v}</option>
         ))}
@@ -81,7 +90,7 @@ const ArgValueInput = ({ value, onChange, field }) => {
   if (field.isBoolean) {
     return (
       <select value={value} onChange={(e) => onChange(e.target.value)} onClick={(e) => e.stopPropagation()}>
-        <option value="">Select option</option>
+        <option value="">{t('QUERY_BUILDER.SELECT_OPTION', 'Select option')}</option>
         <option value="true">true</option>
         <option value="false">false</option>
       </select>
@@ -93,7 +102,7 @@ const ArgValueInput = ({ value, onChange, field }) => {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onClick={(e) => e.stopPropagation()}
-      placeholder="Enter value"
+      placeholder={t('QUERY_BUILDER.ENTER_VALUE', 'Enter value')}
       className="mousetrap"
     />
   );
@@ -160,7 +169,7 @@ const InputObjectFields = ({ namedType, parentKey, fieldPath, indent, argValues,
           {field.isRequired && <span className="arg-required">!</span>}
           {(!isEnabled || field.isInputObject) && <span className="field-type">{field.typeLabel}</span>}
           {isListOfInputObject && (
-            <span className="list-complex-unsupported" title="List arguments for complex types are not currently supported.">
+            <span className="list-complex-unsupported" title={t('QUERY_BUILDER.LIST_COMPLEX_UNSUPPORTED', 'List arguments for complex types are not currently supported.')}>
               <IconInfoCircle size={13} strokeWidth={1.5} />
             </span>
           )}
@@ -290,7 +299,7 @@ const FieldNode = ({
       {showSections && hasArgs && (
         <>
           <div className="section-header" style={{ paddingLeft: sectionIndent }}>
-            ARGUMENTS
+            {t('QUERY_BUILDER.ARGUMENTS', 'ARGUMENTS')}
           </div>
           {field.args.map((arg) => {
             const argKey = `${field.path}.${arg.name}`;
@@ -312,7 +321,7 @@ const FieldNode = ({
                   <span className="arg-name">{arg.name}</span>
                   {arg.isRequired && <span className="arg-required">!</span>}
                   <span className="field-type">{arg.typeLabel}</span>
-                  <span className="list-complex-unsupported" title="List arguments for complex types are not currently supported.">
+                  <span className="list-complex-unsupported" title={t('QUERY_BUILDER.LIST_COMPLEX_UNSUPPORTED', 'List arguments for complex types are not currently supported.')}>
                     <IconInfoCircle size={13} strokeWidth={1.5} />
                   </span>
                 </div>
@@ -377,7 +386,7 @@ const FieldNode = ({
 
       {showSections && hasChildren && hasArgs && (
         <div className="section-header" style={{ paddingLeft: sectionIndent }}>
-          FIELDS
+          {t('QUERY_BUILDER.FIELDS', 'FIELDS')}
         </div>
       )}
     </>

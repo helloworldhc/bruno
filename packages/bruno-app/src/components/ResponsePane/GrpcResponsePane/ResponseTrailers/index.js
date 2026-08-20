@@ -1,7 +1,9 @@
 import React from 'react';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const ResponseTrailers = ({ trailers }) => {
+  const { t } = useTranslation();
   const trailersArray = Array.isArray(trailers) ? trailers : [];
 
   return (
@@ -9,8 +11,8 @@ const ResponseTrailers = ({ trailers }) => {
       <table>
         <thead>
           <tr>
-            <td>Name</td>
-            <td>Value</td>
+            <td>{t('COMMON.NAME', 'Name')}</td>
+            <td>{t('COMMON.VALUE', 'Value')}</td>
           </tr>
         </thead>
         <tbody>
@@ -24,7 +26,7 @@ const ResponseTrailers = ({ trailers }) => {
           ) : (
             <tr>
               <td colSpan="2" className="text-center py-4 empty-message">
-                No trailers received
+                {t('GRPC.NO_TRAILERS_RECEIVED', 'No trailers received')}
               </td>
             </tr>
           )}

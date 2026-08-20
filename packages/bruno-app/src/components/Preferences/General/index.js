@@ -131,8 +131,8 @@ const General = () => {
           language: newPreferences.language
         }
       }))
-      .catch((err) => console.log(err) && toast.error('Failed to update preferences'));
-  }, [dispatch, preferences]);
+      .catch((err) => console.log(err) && toast.error(t('PREFERENCES.UPDATE_ERROR', 'Failed to update preferences')));
+  }, [dispatch, preferences, t]);
 
   const handleSaveRef = useRef(handleSave);
   handleSaveRef.current = handleSave;

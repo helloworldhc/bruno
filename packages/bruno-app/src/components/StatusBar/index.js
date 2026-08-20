@@ -83,7 +83,7 @@ const StatusBar = () => {
                 data-trigger="preferences"
                 onClick={handlePreferencesClick}
                 tabIndex={0}
-                aria-label="Open Preferences"
+                aria-label={t('PREFERENCES.OPEN_PREFERENCES', 'Open Preferences')}
               >
                 <IconSettings size={16} strokeWidth={1.5} aria-hidden="true" />
               </button>
@@ -94,7 +94,7 @@ const StatusBar = () => {
                 className="status-bar-button"
                 data-trigger="theme"
                 tabIndex={0}
-                aria-label="Change Theme"
+                aria-label={t('THEMES.CHANGE_THEME', 'Change Theme')}
               >
                 <IconPalette size={16} strokeWidth={1.5} aria-hidden="true" />
               </button>
@@ -113,7 +113,7 @@ const StatusBar = () => {
                   window?.ipcRenderer?.openExternal('https://github.com/usebruno/bruno');
                 }}
                 tabIndex={0}
-                aria-label="Open GitHub Repository"
+                aria-label={t('COMMON.OPEN_GITHUB_REPO', 'Open GitHub Repository')}
               >
                 <IconBrandGithub size={16} strokeWidth={1.5} aria-hidden="true" />
               </button>
@@ -128,7 +128,7 @@ const StatusBar = () => {
               data-trigger="search"
               onClick={openGlobalSearch}
               tabIndex={0}
-              aria-label="Global Search"
+              aria-label={t('GLOBAL_SEARCH.TITLE', 'Global Search')}
             >
               <div className="console-button-content">
                 <IconSearch size={16} strokeWidth={1.5} aria-hidden="true" />
@@ -141,7 +141,7 @@ const StatusBar = () => {
               data-trigger="cookies"
               onClick={() => setCookiesOpen(true)}
               tabIndex={0}
-              aria-label="Open Cookies"
+              aria-label={t('COOKIES.OPEN_COOKIES', 'Open Cookies')}
             >
               <div className="console-button-content">
                 <IconCookie size={16} strokeWidth={1.5} aria-hidden="true" />
@@ -154,7 +154,7 @@ const StatusBar = () => {
               data-trigger="dev-tools"
               onClick={handleConsoleClick}
               tabIndex={0}
-              aria-label={`Open Dev Tools${errorCount > 0 ? ` (${errorCount} errors)` : ''}`}
+              aria-label={`${t('DEVTOOLS.OPEN_DEVTOOLS', 'Open Dev Tools')}${errorCount > 0 ? ` (${errorCount} errors)` : ''}`}
             >
               <div className="console-button-content">
                 <IconTool size={16} strokeWidth={1.5} aria-hidden="true" />

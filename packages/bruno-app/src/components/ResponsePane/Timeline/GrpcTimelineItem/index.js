@@ -14,6 +14,7 @@ import {
   IconArrowsRightLeft
 } from '@tabler/icons';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 import { usePersistedState } from 'hooks/usePersistedState/index';
 
 // Event type display names
@@ -82,9 +83,7 @@ const GrpcTimelineItem = ({ timestamp, request, response, eventType, collection,
             {effectiveRequest.proxy && effectiveRequest.proxy.mode !== 'off' && (
               <div>
                 <div className="content-request-label mb-1">
-                  <IconArrowsRightLeft size={14} strokeWidth={1.5} className="inline-block mr-1" />
-                  Proxy
-                </div>
+                  <IconArrowsRightLeft size={14} strokeWidth={1.5} className="inline-block mr-1" />{t('COMMON.PROXY', 'Proxy')}</div>
                 <div className="content-box">
                   {effectiveRequest.proxy.url ? (
                     <div>
@@ -103,7 +102,7 @@ const GrpcTimelineItem = ({ timestamp, request, response, eventType, collection,
 
             {effectiveRequest.headers && Object.keys(effectiveRequest.headers).length > 0 && (
               <div>
-                <div className="content-request-label mb-1">Metadata</div>
+                <div className="content-request-label mb-1">{t('TIMELINE.METADATA', 'Metadata')}</div>
                 <div className="content-box grid grid-cols-2 gap-1">
                   {Object.entries(effectiveRequest.headers).map(([key, value], idx) => (
                     <div key={idx} className="contents">

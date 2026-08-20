@@ -3,6 +3,7 @@ import { IconTrash } from '@tabler/icons';
 import SingleLineEditor from 'components/SingleLineEditor';
 import AssertionOperator from '../AssertionOperator';
 import { useTheme } from 'providers/Theme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Assertion operators
@@ -141,6 +142,7 @@ const AssertionRow = ({
   onSave,
   handleRun
 }) => {
+  const { t } = useTranslation();
   const { storedTheme } = useTheme();
 
   const { operator, value } = parseAssertionOperator(assertion.value);

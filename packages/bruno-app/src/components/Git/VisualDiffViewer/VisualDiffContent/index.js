@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import CollapsibleDiffRow from '../CollapsibleDiffRow';
 import StyledWrapper from './StyledWrapper';
 
@@ -24,10 +25,13 @@ const VisualDiffContent = ({
   newData,
   sections,
   sectionHasChanges,
-  oldLabel = 'Before',
-  newLabel = 'After',
+  oldLabel,
+  newLabel,
   hideUnchanged = false
 }) => {
+  const { t } = useTranslation();
+  const effectiveOldLabel = oldLabel || t('GIT.BEFORE', 'Before');
+  const effectiveNewLabel = newLabel || t('GIT.AFTER', 'After');
   const [collapsedSections, setCollapsedSections] = useState({});
 
   const toggleSection = (sectionKey) => {
@@ -54,7 +58,7 @@ const VisualDiffContent = ({
     return (
       <StyledWrapper>
         <div className="empty-state">
-          No content to display
+          {t('GIT.NO_CONTENT_TO_DISPLAY', 'No content to display')}
         </div>
       </StyledWrapper>
     );
@@ -62,13 +66,11 @@ const VisualDiffContent = ({
 
   return (
     <StyledWrapper>
-
+      <div className="diff-header-labels">
+        <div className="diff-label-left">{effectiveOldLabel}</div>
+        <div className="diff-label-right">{effectiveNewLabel}</div>
+      </div>
       <div className="visual-diff-content">
-        <div className="diff-header-row">
-          <div className="diff-header-pane old">{oldLabel}</div>
-          <div className="diff-header-pane new">{newLabel}</div>
-        </div>
-
         <div className="diff-sections">
           {sections.map(({ key, title, Component, hasContent: checkContent }) => {
             const hasOld = oldData && checkContent(oldData);

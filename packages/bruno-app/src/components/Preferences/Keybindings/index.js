@@ -551,7 +551,7 @@ const Keybindings = () => {
     };
 
     dispatch(savePreferences(updatedPreferences));
-    toast.success('All shortcuts have been reset to default');
+    toast.success(t('PREFERENCES.SHORTCUTS_RESET_SUCCESS', 'All shortcuts have been reset to default'));
   };
 
   const startEditing = (action) => {
@@ -894,7 +894,7 @@ const Keybindings = () => {
                                       onClick={(e) => {
                                         e.stopPropagation(); resetRowToDefault(action);
                                       }}
-                                      title="Reset to default"
+                                      title={t('KEYBINDINGS.RESET_TO_DEFAULT', 'Reset to default')}
                                     >
                                       <IconReload size={14} stroke={1.5} />
                                     </button>
@@ -904,7 +904,7 @@ const Keybindings = () => {
                                     <span
                                       className="pencil-icon"
                                       data-testid={`keybinding-edit-${action}`}
-                                      title="Customize keys"
+                                      title={t('KEYBINDINGS.CUSTOMIZE_KEYS', 'Customize keys')}
                                     >
                                       <IconPencil size={14} stroke={1.5} />
                                     </span>
@@ -915,7 +915,7 @@ const Keybindings = () => {
                                       type="button"
                                       className="edit-btn"
                                       data-testid={`keybinding-locked-${action}`}
-                                      title="Reserved shortcut"
+                                      title={t('KEYBINDINGS.RESERVED_SHORTCUT', 'Reserved shortcut')}
                                     >
                                       <IconLock size={14} stroke={1.5} />
                                     </button>

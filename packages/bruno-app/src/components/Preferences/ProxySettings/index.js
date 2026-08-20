@@ -88,12 +88,12 @@ const ProxySettings = ({ close }) => {
             proxy: validatedProxy
           })
         ).catch(() => {
-          toast.error('Failed to save preferences');
+          toast.error(t('PREFERENCES.SAVE_ERROR', 'Failed to save preferences'));
         });
       })
       .catch((error) => {
       });
-  }, [dispatch, preferences, proxySchema]);
+  }, [dispatch, preferences, proxySchema, t]);
 
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
@@ -107,8 +107,8 @@ const ProxySettings = ({ close }) => {
 
   const handleRefreshPac = () => {
     dispatch(refreshPacCache())
-      .then(() => toast.success('PAC cache refreshed'))
-      .catch(() => toast.error('Failed to refresh PAC cache'));
+      .then(() => toast.success(t('PREFERENCES.PAC_REFRESHED', 'PAC cache refreshed')))
+      .catch(() => toast.error(t('PREFERENCES.PAC_REFRESH_ERROR', 'Failed to refresh PAC cache')));
   };
 
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -442,7 +442,7 @@ const ProxySettings = ({ close }) => {
                             formik.setFieldValue('pac.source', fileUrl);
                           }
                         })
-                        .catch(() => toast.error('Failed to open file picker'));
+                        .catch(() => toast.error(t('PREFERENCES.OPEN_FILE_PICKER_ERROR', 'Failed to open file picker')));
                     }}
                   >
                     {formik.values.pac.source

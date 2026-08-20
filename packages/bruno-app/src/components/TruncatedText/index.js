@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const TruncatedText = ({
   text,
@@ -6,16 +7,20 @@ const TruncatedText = ({
   className = '',
   textClassName = '',
   buttonClassName = '',
-  viewMoreText = 'View More',
-  viewLessText = 'View Less',
+  viewMoreText,
+  viewLessText,
   showButton = true,
   onToggle = null,
   children,
   dataTestId = ''
 }) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [shouldTruncate, setShouldTruncate] = useState(false);
   const textRef = useRef(null);
+
+  const resolvedViewMoreText = viewMoreText ?? t('COMMON.VIEW_MORE', 'View More');
+  const resolvedViewLessText = viewLessText ?? t('COMMON.VIEW_LESS', 'View Less');
 
   useEffect(() => {
     if (textRef.current) {
@@ -95,9 +100,9 @@ const TruncatedText = ({
           className={buttonClassName}
           style={defaultButtonStyles}
           onClick={handleToggle}
-          aria-label={isExpanded ? viewLessText : viewMoreText}
+          aria-label={isExpanded ? resolvedViewLessText : resolvedViewMoreText}
         >
-          {isExpanded ? viewLessText : viewMoreText}
+          {isExpanded ? resolvedViewLessText : resolvedViewMoreText}
         </button>
       )}
     </div>

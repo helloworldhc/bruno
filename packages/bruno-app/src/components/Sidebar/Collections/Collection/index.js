@@ -214,17 +214,17 @@ const Collection = ({ collection, searchText }) => {
   const handleShowInFolder = () => {
     dispatch(showInFolder(collection.pathname)).catch((error) => {
       console.error('Error opening the folder', error);
-      toast.error('Error opening the folder');
+      toast.error(t('COLLECTION.ERROR_OPENING_FOLDER', 'Error opening the folder'));
     });
   };
 
   const handlePasteItem = () => {
     dispatch(pasteItem(collection.uid, null))
       .then(() => {
-        toast.success('Item pasted successfully');
+        toast.success(t('COLLECTION.ITEM_PASTED_SUCCESS', 'Item pasted successfully'));
       })
       .catch((err) => {
-        toast.error(err ? err.message : 'An error occurred while pasting the item');
+        toast.error(err ? err.message : t('COLLECTION.PASTE_ITEM_ERROR', 'An error occurred while pasting the item'));
       });
   };
 
@@ -470,7 +470,7 @@ const Collection = ({ collection, searchText }) => {
       id: 'create-mock-server',
       leftSection: IconServer,
       label: t('MOCK_SERVER.CREATE_MOCK_SERVER', 'Create Mock server'),
-      rightSection: <StatusBadge status="info" size="xs">Beta</StatusBadge>,
+      rightSection: <StatusBadge status="info" size="xs">{t('COMMON.BETA', 'Beta')}</StatusBadge>,
       onClick: openMockServerDashboard
     }] : []),
     {

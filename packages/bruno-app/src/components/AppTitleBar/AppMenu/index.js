@@ -145,7 +145,7 @@ const AppMenu = () => {
         showTickMark={false}
         items={menuItems}
       >
-        <ActionIcon label="Menu" size="lg">
+        <ActionIcon label={t('COMMON.MENU', 'Menu')} size="lg">
           <IconMenu2 size={16} stroke={1.5} />
         </ActionIcon>
       </MenuDropdown>

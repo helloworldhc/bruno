@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   IconCheck,
   IconPlus,
@@ -28,6 +29,7 @@ const CollectionStatusSection = ({
   isLoading,
   onTabSelect
 }) => {
+  const { t } = useTranslation();
   const {
     pendingAction, setPendingAction,
     confirmPendingAction,
@@ -53,8 +55,8 @@ const CollectionStatusSection = ({
       collectionPath={collection.pathname}
       newSpec={spec}
       showDecisions={false}
-      diffLeftLabel="Last Synced Spec"
-      diffRightLabel="Current (in collection)"
+      diffLeftLabel={t('OPENAPI.DIFF_LEFT_LAST_SYNCED', 'Last Synced Spec')}
+      diffRightLabel={t('OPENAPI.DIFF_RIGHT_CURRENT_COLLECTION', 'Current (in collection)')}
       swapDiffSides
       collectionUid={collection.uid}
       actions={actions}
@@ -70,13 +72,13 @@ const CollectionStatusSection = ({
     if (hasDrift) {
       return {
         variant: 'muted',
-        message: 'Collection has changes since last sync',
+        message: t('OPENAPI.COLLECTION_HAS_CHANGES_SINCE_SYNC', 'Collection has changes since last sync'),
         badges: { modifiedCount, missingCount, localOnlyCount },
         actions: ['revert-all']
       };
     }
     return null;
-  }, [hasDrift, modifiedCount, missingCount, localOnlyCount, version, lastSyncDate]);
+  }, [hasDrift, modifiedCount, missingCount, localOnlyCount, version, lastSyncDate, t]);
 
   return (
     <div className="collection-status-section">
@@ -91,16 +93,16 @@ const CollectionStatusSection = ({
             </span>
             {bannerState.badges && (
               <span className="banner-details">
-                {bannerState.badges.modifiedCount > 0 && <StatusBadge status="warning" radius="full">{bannerState.badges.modifiedCount} modified</StatusBadge>}
-                {bannerState.badges.missingCount > 0 && <StatusBadge status="danger" radius="full">{bannerState.badges.missingCount} deleted</StatusBadge>}
-                {bannerState.badges.localOnlyCount > 0 && <StatusBadge status="muted" radius="full">{bannerState.badges.localOnlyCount} added</StatusBadge>}
+                {bannerState.badges.modifiedCount > 0 && <StatusBadge status="warning" radius="full">{t('OPENAPI.MODIFIED_COUNT_BADGE', { count: bannerState.badges.modifiedCount, defaultValue: `${bannerState.badges.modifiedCount} modified` })}</StatusBadge>}
+                {bannerState.badges.missingCount > 0 && <StatusBadge status="danger" radius="full">{t('OPENAPI.DELETED_COUNT_BADGE', { count: bannerState.badges.missingCount, defaultValue: `${bannerState.badges.missingCount} deleted` })}</StatusBadge>}
+                {bannerState.badges.localOnlyCount > 0 && <StatusBadge status="muted" radius="full">{t('OPENAPI.ADDED_COUNT_BADGE', { count: bannerState.badges.localOnlyCount, defaultValue: `${bannerState.badges.localOnlyCount} added` })}</StatusBadge>}
               </span>
             )}
           </div>
           {bannerState.actions.includes('revert-all') && (
             <div className="banner-actions">
               <Button size="sm" variant="ghost" color="danger" onClick={handleRevertAllChanges}>
-                Revert All to Spec
+                {t('OPENAPI.REVERT_ALL_TO_SPEC', 'Revert All to Spec')}
               </Button>
             </div>
           )}
@@ -110,7 +112,7 @@ const CollectionStatusSection = ({
       {hasDrift && (
         <div className="sync-info-notice mt-4">
           <IconInfoCircle size={14} className="sync-info-icon" />
-          <span><span className="whats-updated-title">What's tracked:</span> Changes to parameters, headers, body and auth compared to the synced spec. Your variables, scripts, tests, assertions, settings etc. are not tracked here.</span>
+          <span><span className="whats-updated-title">{t('OPENAPI.WHATS_TRACKED', "What's tracked:")}</span> {t('OPENAPI.WHATS_TRACKED_DESC', 'Changes to parameters, headers, body and auth compared to the synced spec. Your variables, scripts, tests, assertions, settings etc. are not tracked here.')}</span>
         </div>
       )}
 
@@ -118,7 +120,7 @@ const CollectionStatusSection = ({
         <div className="mt-5">
           {/* Modified in Collection */}
           <EndpointChangeSection
-            title="Modified in Collection"
+            title={t('OPENAPI.MODIFIED_IN_COLLECTION', 'Modified in Collection')}
             type="modified"
             endpoints={collectionDrift.modified || []}
             expandableLayout
@@ -127,11 +129,11 @@ const CollectionStatusSection = ({
             renderItem={(endpoint, idx) =>
               renderDriftRow(endpoint, idx, (
                 <>
-                  <Button size="xs" variant="ghost" onClick={() => onOpenEndpoint(endpoint.id)} title="Open in tab" icon={<IconExternalLink size={14} />}>
-                    Open
+                  <Button size="xs" variant="ghost" onClick={() => onOpenEndpoint(endpoint.id)} title={t('OPENAPI.OPEN_IN_TAB', 'Open in tab')} icon={<IconExternalLink size={14} />}>
+                    {t('OPENAPI.OPEN', 'Open')}
                   </Button>
-                  <Button size="xs" variant="ghost" onClick={() => handleResetEndpoint(endpoint)} title="Reset to spec" icon={<IconArrowBackUp size={14} />}>
-                    Reset
+                  <Button size="xs" variant="ghost" onClick={() => handleResetEndpoint(endpoint)} title={t('OPENAPI.RESET_TO_SPEC', 'Reset to spec')} icon={<IconArrowBackUp size={14} />}>
+                    {t('OPENAPI.RESET', 'Reset')}
                   </Button>
                 </>
               ))}
@@ -140,17 +142,17 @@ const CollectionStatusSection = ({
                 size="xs"
                 variant="outline"
                 onClick={handleResetAllModified}
-                title="Reset all modified endpoints to match the spec"
+                title={t('OPENAPI.RESET_ALL_MODIFIED_TITLE', 'Reset all modified endpoints to match the spec')}
                 icon={<IconArrowBackUp size={14} />}
               >
-                Reset All
+                {t('OPENAPI.RESET_ALL', 'Reset All')}
               </Button>
             )}
           />
 
           {/* Deleted from Collection */}
           <EndpointChangeSection
-            title="Deleted from Collection"
+            title={t('OPENAPI.DELETED_FROM_COLLECTION', 'Deleted from Collection')}
             type="missing"
             endpoints={collectionDrift.missing || []}
             expandableLayout
@@ -158,8 +160,8 @@ const CollectionStatusSection = ({
             sectionKey="drift-missing"
             renderItem={(endpoint, idx) =>
               renderDriftRow(endpoint, idx, (
-                <Button size="xs" variant="ghost" onClick={() => handleAddMissingEndpoint(endpoint)} title="Restore to collection" icon={<IconPlus size={14} />}>
-                  Restore
+                <Button size="xs" variant="ghost" onClick={() => handleAddMissingEndpoint(endpoint)} title={t('OPENAPI.RESTORE_TO_COLLECTION', 'Restore to collection')} icon={<IconPlus size={14} />}>
+                  {t('OPENAPI.RESTORE', 'Restore')}
                 </Button>
               ))}
             actions={(
@@ -167,17 +169,17 @@ const CollectionStatusSection = ({
                 size="xs"
                 variant="outline"
                 onClick={handleAddAllMissing}
-                title="Add all deleted endpoints back to collection"
+                title={t('OPENAPI.RESTORE_ALL_TITLE', 'Add all deleted endpoints back to collection')}
                 icon={<IconPlus size={14} />}
               >
-                Restore All
+                {t('OPENAPI.RESTORE_ALL', 'Restore All')}
               </Button>
             )}
           />
 
           {/* Added to Collection */}
           <EndpointChangeSection
-            title="Added to Collection"
+            title={t('OPENAPI.ADDED_TO_COLLECTION', 'Added to Collection')}
             type="local-only"
             endpoints={collectionDrift.localOnly || []}
             expandableLayout
@@ -186,11 +188,11 @@ const CollectionStatusSection = ({
             renderItem={(endpoint, idx) =>
               renderDriftRow(endpoint, idx, (
                 <>
-                  <Button size="xs" variant="ghost" onClick={() => onOpenEndpoint(endpoint.id)} title="Open in tab" icon={<IconExternalLink size={14} />}>
-                    Open
+                  <Button size="xs" variant="ghost" onClick={() => onOpenEndpoint(endpoint.id)} title={t('OPENAPI.OPEN_IN_TAB', 'Open in tab')} icon={<IconExternalLink size={14} />}>
+                    {t('OPENAPI.OPEN', 'Open')}
                   </Button>
-                  <Button size="xs" variant="ghost" color="danger" onClick={() => handleDeleteEndpoint(endpoint)} title="Delete endpoint" icon={<IconTrash size={14} />}>
-                    Delete
+                  <Button size="xs" variant="ghost" color="danger" onClick={() => handleDeleteEndpoint(endpoint)} title={t('OPENAPI.DELETE_ENDPOINT', 'Delete endpoint')} icon={<IconTrash size={14} />}>
+                    {t('COMMON.DELETE', 'Delete')}
                   </Button>
                 </>
               ))}
@@ -200,10 +202,10 @@ const CollectionStatusSection = ({
                 variant="outline"
                 color="danger"
                 onClick={handleDeleteAllLocalOnly}
-                title="Delete all locally added endpoints"
+                title={t('OPENAPI.DELETE_ALL_TITLE', 'Delete all locally added endpoints')}
                 icon={<IconTrash size={14} />}
               >
-                Delete All
+                {t('OPENAPI.DELETE_ALL', 'Delete All')}
               </Button>
             )}
           />
@@ -211,24 +213,24 @@ const CollectionStatusSection = ({
       ) : isLoading ? (
         <div className="sync-review-empty-state mt-5">
           <IconLoader2 size={40} className="empty-state-icon animate-spin" />
-          <h4>Checking for updates</h4>
-          <p>Comparing your collection with the last synced spec...</p>
+          <h4>{t('OPENAPI.CHECKING_FOR_UPDATES', 'Checking for updates')}</h4>
+          <p>{t('OPENAPI.COMPARING_COLLECTION_WITH_SPEC', 'Comparing your collection with the last synced spec...')}</p>
         </div>
       ) : !hasStoredSpec ? (
         <div className="sync-review-empty-state mt-5">
           <IconAlertTriangle size={40} className="empty-state-icon" />
-          <h4>{lastSyncDate ? 'Cannot track collection changes' : 'Waiting for initial sync'}</h4>
+          <h4>{lastSyncDate ? t('OPENAPI.CANNOT_TRACK_CHANGES', 'Cannot track collection changes') : t('OPENAPI.WAITING_INITIAL_SYNC', 'Waiting for initial sync')}</h4>
           <p>{lastSyncDate
-            ? 'The last synced spec is missing. Go to the \'Spec Updates\' tab to restore it, or sync the collection if updates are available to track future changes.'
-            : 'Once you sync your collection with the spec, local changes will appear here.'}
+            ? t('OPENAPI.SPEC_MISSING_RESTORE_DESC', "The last synced spec is missing. Go to the 'Spec Updates' tab to restore it, or sync the collection if updates are available to track future changes.")
+            : t('OPENAPI.ONCE_SYNC_DESC', 'Once you sync your collection with the spec, local changes will appear here.')}
           </p>
-          <Button variant="outline" size="sm" className="mt-4" onClick={() => onTabSelect('spec-updates')}>Go to Spec Updates</Button>
+          <Button variant="outline" size="sm" className="mt-4" onClick={() => onTabSelect('spec-updates')}>{t('OPENAPI.GO_TO_SPEC_UPDATES', 'Go to Spec Updates')}</Button>
         </div>
       ) : (
         <div className="sync-review-empty-state mt-5">
           <IconCheck size={40} className="empty-state-icon" />
-          <h4>No changes in collection</h4>
-          <p>The collection endpoints match the last synced spec. Nothing to review.</p>
+          <h4>{t('OPENAPI.NO_CHANGES_IN_COLLECTION', 'No changes in collection')}</h4>
+          <p>{t('OPENAPI.NO_CHANGES_REVIEW_DESC', 'The collection endpoints match the last synced spec. Nothing to review.')}</p>
         </div>
       )}
       {/* Action confirmation modal */}
@@ -238,13 +240,13 @@ const CollectionStatusSection = ({
             <p className="confirm-message">{pendingAction.message}</p>
             <div className="confirm-actions">
               <Button variant="ghost" onClick={() => setPendingAction(null)}>
-                Cancel
+                {t('COMMON.CANCEL', 'Cancel')}
               </Button>
               <Button
                 color={pendingAction.type.includes('delete') ? 'danger' : 'primary'}
                 onClick={confirmPendingAction}
               >
-                Confirm
+                {t('COMMON.CONFIRM', 'Confirm')}
               </Button>
             </div>
           </div>

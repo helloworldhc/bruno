@@ -3,6 +3,7 @@ import { IconChevronRight, IconChevronDown } from '@tabler/icons';
 import StyledWrapper from './StyledWrapper';
 import { useSidebarAccordion } from '../SidebarAccordionContext';
 import ActionIcon from 'ui/ActionIcon/index';
+import { useTranslation } from 'react-i18next';
 
 const SidebarSection = ({
   id,
@@ -12,6 +13,7 @@ const SidebarSection = ({
   children,
   className = ''
 }) => {
+  const { t } = useTranslation();
   const { isExpanded, setSectionExpanded, getExpandedCount } = useSidebarAccordion();
   const [localExpanded, setLocalExpanded] = useState(() => isExpanded(id));
   const sectionRef = useRef(null);

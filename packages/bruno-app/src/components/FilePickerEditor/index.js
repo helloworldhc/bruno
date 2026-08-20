@@ -7,6 +7,7 @@ import { Tooltip } from 'react-tooltip';
 import IconAlertTriangleFilled from 'components/Icons/IconAlertTriangleFilled';
 import useMissingFileCheck from 'hooks/useMissingFileCheck';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 /**
  * FilePickerEditor component for selecting files
@@ -31,6 +32,7 @@ const FilePickerEditor = ({
   label,
   icon: CustomIcon
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const warningTooltipId = `file-picker-warning-${useId().replace(/:/g, '')}`;
 
@@ -71,10 +73,10 @@ const FilePickerEditor = ({
     if (filenames.length == 1) {
       return filenames[0];
     }
-    return filenames.length + ' file(s) selected';
+    return t('FILE_PICKER.FILES_SELECTED', '{{count}} file(s) selected', { count: filenames.length });
   };
 
-  const defaultLabel = isSingleFilePicker ? 'Select File' : 'Select Files';
+  const defaultLabel = isSingleFilePicker ? t('FILE_PICKER.SELECT_FILE', 'Select File') : t('FILE_PICKER.SELECT_FILES', 'Select Files');
   const displayLabel = label || defaultLabel;
   const IconComponent = CustomIcon || IconUpload;
 
@@ -120,7 +122,7 @@ const FilePickerEditor = ({
             <button
               className="clear-btn"
               onClick={clear}
-              title="Remove file"
+              title={t('FILE_PICKER.REMOVE_FILE', 'Remove file')}
               type="button"
             >
               <IconX size={16} />
@@ -134,7 +136,7 @@ const FilePickerEditor = ({
             >
               <div className="warning-tooltip" data-testid="file-picker-warning-tooltip">
                 <IconAlertTriangleFilled size={14} />
-                <span>The file above is not in the given directory, please upload it again.</span>
+                <span>{t('FILE_PICKER.MISSING_FILE_WARNING', 'The file above is not in the given directory, please upload it again.')}</span>
               </div>
             </Tooltip>
           )}

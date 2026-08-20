@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { IconCopy, IconCheck } from '@tabler/icons';
 import toast from 'react-hot-toast';
 import EditableTable from 'components/EditableTable';
@@ -10,6 +11,7 @@ import { buildMockRouteTable, countMatchedRouteHits } from 'utils/mock-server/mo
 import StyledWrapper from './StyledWrapper';
 
 const RouteTable = ({ mockServerUid }) => {
+  const { t } = useTranslation();
   const responses = useSelector((state) => state.mockServer.mockResponses[mockServerUid]) || [];
   const requestLogs = useSelector((state) => state.mockServer.requestLogs[mockServerUid]) || [];
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,14 +57,14 @@ const RouteTable = ({ mockServerUid }) => {
       clearTimeout(copyResetTimeoutRef.current);
       copyResetTimeoutRef.current = setTimeout(() => setCopiedRouteUid(null), 1500);
     } catch {
-      toast.error('Failed to copy URL');
+      toast.error(t('COMMON.FAILED_TO_COPY', 'Failed to copy to clipboard'));
     }
   };
 
   const columns = [
     {
       key: 'method',
-      name: 'Method',
+      name: t('MOCK_SERVER.METHOD', 'Method'),
       width: '80px',
       render: ({ value }) => (
         <MethodBadge method={value} className="method-badge" />
@@ -70,7 +72,7 @@ const RouteTable = ({ mockServerUid }) => {
     },
     {
       key: 'path',
-      name: 'Path',
+      name: t('MOCK_SERVER.PATH', 'Path'),
       render: ({ value, row }) => (
         <div className="path-cell">
           <span className="route-path">{value}</span>
@@ -82,8 +84,8 @@ const RouteTable = ({ mockServerUid }) => {
                 e.stopPropagation();
                 handleCopyRouteUrl(row.uid, value);
               }}
-              title="Copy route URL"
-              aria-label="Copy route URL"
+              title={t('MOCK_SERVER.COPY_ROUTE_URL', 'Copy route URL')}
+              aria-label={t('MOCK_SERVER.COPY_ROUTE_URL', 'Copy route URL')}
             >
               {copiedRouteUid === row.uid
                 ? <IconCheck size={13} strokeWidth={2} />
@@ -95,25 +97,25 @@ const RouteTable = ({ mockServerUid }) => {
     },
     {
       key: 'responseCount',
-      name: 'Responses',
+      name: t('MOCK_SERVER.RESPONSES', 'Responses'),
       width: '90px',
       render: ({ row }) => <span>{row.responseCount}</span>
     },
     {
       key: 'defaultResponse',
-      name: 'Default',
+      name: t('MOCK_SERVER.DEFAULT', 'Default'),
       width: '140px',
       render: ({ row }) => <span>{row.defaultResponse || '-'}</span>
     },
     {
       key: 'source',
-      name: 'Source',
+      name: t('MOCK_SERVER.SOURCE', 'Source'),
       width: '120px',
       render: ({ value }) => <span className="text-muted source-file" title={value}>{value}</span>
     },
     {
       key: 'hits',
-      name: 'Hits',
+      name: t('MOCK_SERVER.HITS', 'Hits'),
       width: '60px',
       render: ({ value }) => <span>{value}</span>
     }
@@ -123,7 +125,7 @@ const RouteTable = ({ mockServerUid }) => {
     return (
       <StyledWrapper className="h-full w-full">
         <div className="text-xs text-muted empty-state">
-          No routes registered yet. Create mock responses to define routes for this server.
+          {t('MOCK_SERVER.NO_ROUTES_REGISTERED_YET', 'No routes registered yet. Create mock responses to define routes for this server.')}
         </div>
       </StyledWrapper>
     );
@@ -134,17 +136,17 @@ const RouteTable = ({ mockServerUid }) => {
       <div className="flex items-center gap-2 mb-4">
         <MockSearchInput
           className="flex-1"
-          placeholder="Search routes"
+          placeholder={t('MOCK_SERVER.SEARCH_ROUTES', 'Search routes')}
           value={searchQuery}
           onChange={setSearchQuery}
           data-testid="mock-server-route-search"
         />
         <FilterDropdown
-          label="Method"
+          label={t('MOCK_SERVER.METHOD', 'Method')}
           options={methodOptions}
           value={methodFilter}
           onChange={setMethodFilter}
-          allLabel="All Methods"
+          allLabel={t('MOCK_SERVER.ALL_METHODS', 'All Methods')}
           placement="right"
           testId="mock-server-method-filter"
         />
@@ -161,7 +163,7 @@ const RouteTable = ({ mockServerUid }) => {
       />
 
       {filteredRoutes.length === 0 && routes.length > 0 && (
-        <div className="text-xs text-muted mt-4 empty-state">No routes match your filter.</div>
+        <div className="text-xs text-muted mt-4 empty-state">{t('MOCK_SERVER.NO_ROUTES_MATCH_FILTER', 'No routes match your filter.')}</div>
       )}
     </StyledWrapper>
   );

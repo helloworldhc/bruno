@@ -13,6 +13,7 @@ import prettierPluginGraphql from 'prettier/parser-graphql';
 import { getAllVariables } from 'utils/collections';
 import { PLACEHOLDER } from 'utils/graphql/queryBuilder';
 import toast from 'react-hot-toast';
+import { withTranslation } from 'react-i18next';
 import StyledWrapper from './StyledWrapper';
 import onHasCompletion from './onHasCompletion';
 import { setupLinkAware } from 'utils/codemirror/linkAware';
@@ -42,7 +43,7 @@ const createSafeGraphQLLinter = () => {
   };
 };
 
-export default class QueryEditor extends React.Component {
+class QueryEditorComponent extends React.Component {
   constructor(props) {
     super(props);
 
@@ -227,9 +228,9 @@ export default class QueryEditor extends React.Component {
       prettyQuery = prettyQuery.replace(/\{\s*__empty:\s*true\s*\}/g, '{}');
 
       this.editor.setValue(prettyQuery);
-      toast.success('Query prettified');
+      toast.success(this.props.t('QUERY_EDITOR.PRETTIFIED', 'Query prettified'));
     } catch (e) {
-      toast.error('Error occurred while prettifying GraphQL query');
+      toast.error(this.props.t('QUERY_EDITOR.PRETTIFY_ERROR', 'Error occurred while prettifying GraphQL query'));
     }
   };
 
@@ -246,7 +247,7 @@ export default class QueryEditor extends React.Component {
     return (
       <StyledWrapper
         className="h-full w-full flex flex-col relative graphiql-container"
-        aria-label="Query Editor"
+        aria-label={this.props.t('QUERY_EDITOR.LABEL', 'Query Editor')}
         font={this.props.font}
         fontSize={this.props.fontSize}
         ref={(node) => {
@@ -301,3 +302,5 @@ export default class QueryEditor extends React.Component {
     }
   }
 }
+
+export default withTranslation()(QueryEditorComponent);

@@ -538,7 +538,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
   const handleShowInFolder = () => {
     dispatch(showInFolder(item.pathname)).catch((error) => {
       console.error('Error opening the folder', error);
-      toast.error('Error opening the folder');
+      toast.error(t('COLLECTION.ERROR_OPENING_FOLDER', 'Error opening the folder'));
     });
   };
 
@@ -587,7 +587,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       openInEditMode: true
     }));
 
-    toast.success(`Example "${name}" created successfully`);
+    toast.success(t('RESPONSE.EXAMPLE_CREATED', 'Example "{{name}}" created successfully', { name }));
     setCreateExampleModalOpen(false);
   };
 
@@ -606,7 +606,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
     ) {
       setGenerateCodeItemModalOpen(true);
     } else {
-      toast.error('URL is required');
+      toast.error(t('REQUEST.URL_REQUIRED', 'URL is required'));
     }
   };
 
@@ -629,8 +629,8 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
 
   const handleCopyItem = () => {
     dispatch(copyRequest(item));
-    const itemType = isFolder ? 'Folder' : 'Request';
-    toast.success(`${itemType} copied`);
+    const itemType = isFolder ? t('COMMON.FOLDER', 'Folder') : t('COMMON.REQUEST', 'Request');
+    toast.success(t('COMMON.ITEM_COPIED', '{{item}} copied', { item: itemType }));
   };
 
   const handlePasteItem = () => {
@@ -643,10 +643,10 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
 
     dispatch(pasteItem(collectionUid, targetFolderUid))
       .then(() => {
-        toast.success('Item pasted successfully');
+        toast.success(t('COLLECTION.ITEM_PASTED_SUCCESS', 'Item pasted successfully'));
       })
       .catch((err) => {
-        toast.error(err ? err.message : 'An error occurred while pasting the item');
+        toast.error(err ? err.message : t('COLLECTION.PASTE_ITEM_ERROR', 'An error occurred while pasting the item'));
       });
   };
 
@@ -697,7 +697,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
         isOpen={createExampleModalOpen}
         onClose={() => setCreateExampleModalOpen(false)}
         onSave={handleCreateExample}
-        title="Create Response Example"
+        title={t('RESPONSE.CREATE_EXAMPLE', 'Create Response Example')}
         initialName={getInitialExampleName(item)}
         showMockFields={isMockServerEnabled}
       />

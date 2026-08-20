@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import classnames from 'classnames';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 import { IconExclamationCircle, IconChevronRight, IconInfoCircle, IconChevronDown, IconArrowUpRight, IconArrowDownLeft } from '@tabler/icons';
 import CodeEditor from 'components/CodeEditor/index';
 import { useTheme } from 'providers/Theme';
@@ -177,6 +178,7 @@ const WSMessageItem = memo(({ message, isOpen, onToggle }) => {
 });
 
 const WSMessagesList = ({ messages = [] }) => {
+  const { t } = useTranslation();
   const virtuosoRef = useRef(null);
   const [scrollerElement, setScrollerElement] = useState(null);
   const [openMessages, setOpenMessages] = useState(new Set());
@@ -240,7 +242,7 @@ const WSMessagesList = ({ messages = [] }) => {
   }, []);
 
   if (!messages.length) {
-    return <StyledWrapper><div className="empty-state">No messages yet.</div></StyledWrapper>;
+    return <StyledWrapper><div className="empty-state">{t('WS.NO_MESSAGES_YET', 'No messages yet.')}</div></StyledWrapper>;
   }
 
   return (

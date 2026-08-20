@@ -102,7 +102,7 @@ const WSRequestPane = ({ item, collection, handleRun }) => {
         collectionUid: collection.uid
       }));
     } else {
-      toast.error('Nothing to prettify');
+      toast.error(t('COMMON.NOTHING_TO_PRETTIFY', 'Nothing to prettify'));
     }
   }, [body, dispatch, item.uid, collection.uid]);
 

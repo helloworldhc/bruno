@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import classnames from 'classnames';
 import { IconChevronRight, IconCopy, IconDots, IconPencil, IconPlayerPlay, IconPlayerStop, IconSettings, IconTrash } from '@tabler/icons';
 import toast from 'react-hot-toast';
@@ -51,6 +52,7 @@ const MockServerItem = React.memo(({
   onClone,
   onDelete
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const workspaceInstances = useSelector((state) => getMockServerInstances(state, instance.workspaceUid));
   const serverState = useSelector((state) => state.mockServer.servers[instance.uid]);
@@ -107,18 +109,18 @@ const MockServerItem = React.memo(({
       });
       const result = await dispatch(startMockServer(payload)).unwrap();
 
-      toast.success(`Mock server started at ${result.baseUrl}`);
+      toast.success(t('MOCK_SERVER.SERVER_STARTED_AT', 'Mock server started at {{url}}', { url: result.baseUrl }));
     } catch (err) {
-      toast.error(err.message || 'Failed to start mock server');
+      toast.error(err.message || t('MOCK_SERVER.START_ERROR', 'Failed to start mock server'));
     }
   };
 
   const handleStop = async () => {
     try {
       await dispatch(stopMockServer({ mockServerUid: instance.uid })).unwrap();
-      toast.success('Mock server stopped');
+      toast.success(t('MOCK_SERVER.SERVER_STOPPED', 'Mock server stopped'));
     } catch (err) {
-      toast.error(err.message || 'Failed to stop mock server');
+      toast.error(err.message || t('MOCK_SERVER.STOP_ERROR', 'Failed to stop mock server'));
     }
   };
 
@@ -127,7 +129,7 @@ const MockServerItem = React.memo(({
       ? {
           id: 'stop',
           leftSection: IconPlayerStop,
-          label: isStopping ? 'Stopping...' : 'Stop Server',
+          label: isStopping ? t('MOCK_SERVER.STOPPING', 'Stopping...') : t('MOCK_SERVER.STOP_SERVER', 'Stop Server'),
           disabled: isStopping,
           testId: `mock-server-sidebar-stop-${instance.uid}`,
           onClick: handleStop
@@ -135,7 +137,7 @@ const MockServerItem = React.memo(({
       : {
           id: 'start',
           leftSection: IconPlayerPlay,
-          label: isStarting ? 'Starting...' : 'Start Server',
+          label: isStarting ? t('MOCK_SERVER.STARTING', 'Starting...') : t('MOCK_SERVER.START_SERVER', 'Start Server'),
           disabled: isStarting,
           testId: `mock-server-sidebar-start-${instance.uid}`,
           onClick: handleStart
@@ -143,27 +145,27 @@ const MockServerItem = React.memo(({
     {
       id: 'rename',
       leftSection: IconPencil,
-      label: 'Rename',
+      label: t('COMMON.RENAME', 'Rename'),
       testId: `mock-server-sidebar-rename-${instance.uid}`,
       onClick: () => onRename(instance)
     },
     {
       id: 'clone',
       leftSection: IconCopy,
-      label: 'Clone',
+      label: t('COMMON.CLONE', 'Clone'),
       testId: `mock-server-sidebar-clone-${instance.uid}`,
       onClick: () => onClone(instance)
     },
     {
       id: 'settings',
       leftSection: IconSettings,
-      label: 'Settings',
+      label: t('MOCK_SERVER.SETTINGS', 'Settings'),
       onClick: () => onEditSettings(instance)
     },
     {
       id: 'delete',
       leftSection: IconTrash,
-      label: 'Delete',
+      label: t('COMMON.DELETE', 'Delete'),
       className: 'delete-item',
       onClick: () => onDelete(instance)
     }
@@ -203,7 +205,7 @@ const MockServerItem = React.memo(({
         >
           <ActionIcon
             style={{ width: 16, minWidth: 16 }}
-            label="Toggle mock responses"
+            label={t('MOCK_SERVER.TOGGLE_MOCK_RESPONSES', 'Toggle mock responses')}
             onClick={handleChevronClick}
           >
             <IconChevronRight
@@ -221,7 +223,7 @@ const MockServerItem = React.memo(({
         </div>
         <div className="pr-2">
           <MenuDropdown items={menuItems} placement="bottom-end">
-            <ActionIcon label="Mock server actions" className="mock-server-actions">
+            <ActionIcon label={t('MOCK_SERVER.MOCK_SERVER_ACTIONS', 'Mock server actions')} className="mock-server-actions">
               <IconDots size={18} aria-hidden="true" />
             </ActionIcon>
           </MenuDropdown>
@@ -242,7 +244,7 @@ const MockServerItem = React.memo(({
             ))}
           </div>
         ) : (
-          <div className="pl-9 empty-mock-server-message">No mock responses yet</div>
+          <div className="pl-9 empty-mock-server-message">{t('MOCK_SERVER.NO_MOCK_RESPONSES_YET', 'No mock responses yet')}</div>
         )
       ) : null}
     </>
@@ -252,6 +254,7 @@ const MockServerItem = React.memo(({
 MockServerItem.displayName = 'MockServerItem';
 
 const MockServers = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [editingInstance, setEditingInstance] = useState(null);
   const [renamingInstance, setRenamingInstance] = useState(null);
@@ -323,8 +326,8 @@ const MockServers = () => {
     return (
       <StyledWrapper>
         <div className="text-xs text-center placeholder py-4">
-          <div>No mock servers yet.</div>
-          <div className="mt-2">Use the + button to create one.</div>
+          <div>{t('MOCK_SERVER.NO_SERVERS_YET', 'No mock servers yet.')}</div>
+          <div className="mt-2">{t('MOCK_SERVER.USE_PLUS_TO_CREATE', 'Use the + button to create one.')}</div>
         </div>
       </StyledWrapper>
     );

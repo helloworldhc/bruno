@@ -8,8 +8,10 @@ import SingleLineEditor from 'components/SingleLineEditor';
 import { updateCollectionAuth } from 'providers/ReduxStore/slices/collections';
 import { saveCollectionSettings } from 'providers/ReduxStore/slices/collections/actions';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const BearerAuth = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
 
@@ -33,7 +35,7 @@ const BearerAuth = ({ collection }) => {
 
   return (
     <StyledWrapper className="mt-2 w-full">
-      <label className="block mb-1">Token</label>
+      <label className="block mb-1">{t('AUTH.TOKEN', 'Token')}</label>
       <div className="single-line-editor-wrapper flex items-center">
         <SingleLineEditor
           value={bearerToken}

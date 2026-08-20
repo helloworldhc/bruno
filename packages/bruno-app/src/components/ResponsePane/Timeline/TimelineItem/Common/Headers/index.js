@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { IconChevronDown, IconChevronRight } from '@tabler/icons';
+import { useTranslation } from 'react-i18next';
 
 const toEntries = (headers) => {
   if (!headers) return [];
@@ -10,6 +11,7 @@ const toEntries = (headers) => {
 };
 
 const Headers = ({ headers, variant }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(true);
   const entries = toEntries(headers);
   const count = entries.length;
@@ -26,12 +28,12 @@ const Headers = ({ headers, variant }) => {
         <span className="tl-block-chev">
           {isOpen ? <IconChevronDown size={12} strokeWidth={2} /> : <IconChevronRight size={12} strokeWidth={2} />}
         </span>
-        Headers
+        {t('COMMON.HEADERS', 'Headers')}
         <span className="tl-block-count">({count})</span>
       </button>
       {isOpen && (
         count === 0
-          ? <div className="tl-empty">No Headers</div>
+          ? <div className="tl-empty">{t('RESPONSE.NO_HEADERS', 'No Headers')}</div>
           : (
               <table className="tl-headers-table" data-testid={`tl-headers-table-${variant}`}>
                 <tbody>

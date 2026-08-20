@@ -37,7 +37,7 @@ const Cache = () => {
 
   const persist = (next) => {
     dispatch(savePreferences({ ...preferences, cache: next })).catch(() => {
-      toast.error('Failed to update cache preferences');
+      toast.error(t('PREFERENCES.CACHE_SAVE_ERROR', 'Failed to update cache preferences'));
     });
   };
 
@@ -67,13 +67,13 @@ const Cache = () => {
         setFileCacheSize(size);
         toast.success(t('PREFERENCES.CLEAR_FILE_CACHE', 'File cache cleared'));
       })
-      .catch(() => toast.error('Failed to clear file cache'));
+      .catch(() => toast.error(t('PREFERENCES.CLEAR_FILE_CACHE_ERROR', 'Failed to clear file cache')));
   };
 
   const handleClearSslSession = () => {
     dispatch(clearHttpHttpsAgentCache())
       .then(() => toast.success(t('PREFERENCES.CLEAR_SSL_CACHE', 'SSL session cache cleared')))
-      .catch(() => toast.error('Failed to clear SSL session cache'));
+      .catch(() => toast.error(t('PREFERENCES.CLEAR_SSL_CACHE_ERROR', 'Failed to clear SSL session cache')));
   };
 
   return (

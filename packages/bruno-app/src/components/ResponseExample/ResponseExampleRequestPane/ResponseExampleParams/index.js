@@ -9,6 +9,7 @@ import SingleLineEditor from 'components/SingleLineEditor';
 import BulkEditor from 'components/BulkEditor';
 import InfoTip from 'components/InfoTip';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const ResponseExampleParams = ({ editMode, item, collection, exampleUid }) => {
   const dispatch = useDispatch();

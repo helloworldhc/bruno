@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import get from 'lodash/get';
 import jsyaml from 'js-yaml';
 import { useTheme } from 'providers/Theme';
@@ -44,6 +45,7 @@ const MIN_RIGHT_PANE_WIDTH = 450;
  *  - onLeftPaneWidthChange (fn)      Persist the new width (called on mouseup / double-click / resize-clamp)
  */
 const SpecViewer = ({ content, readOnly, onSave, leftPaneWidth, onLeftPaneWidthChange }) => {
+  const { t } = useTranslation();
   const { displayedTheme, theme } = useTheme();
   const preferences = useSelector((state) => state.app.preferences);
 
@@ -170,7 +172,7 @@ const SpecViewer = ({ content, readOnly, onSave, leftPaneWidth, onLeftPaneWidthC
               >
                 <div className="flex items-center justify-center gap-2 opacity-70">
                   <IconLoader2 size={20} className="animate-spin" />
-                  <span>Generating preview…</span>
+                  <span>{t('API_SPEC.GENERATING_PREVIEW', 'Generating preview…')}</span>
                 </div>
               </div>
             )}

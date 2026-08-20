@@ -12,12 +12,14 @@ import Timeline from '../Timeline';
 import ClearTimeline from '../ClearTimeline';
 import ResponseClear from '../ResponseClear';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 import ResponseTrailers from './ResponseTrailers';
 import GrpcQueryResult from './GrpcQueryResult';
 import ResponseLayoutToggle from '../ResponseLayoutToggle';
 import ResponsiveTabs from 'ui/ResponsiveTabs';
 
 const GrpcResponsePane = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);
@@ -108,7 +110,7 @@ const GrpcResponsePane = ({ item, collection }) => {
   }
 
   if (!activeTabUid) {
-    return <div>Something went wrong</div>;
+    return <div>{t('COMMON.SOMETHING_WENT_WRONG', 'Something went wrong')}</div>;
   }
 
   const focusedTab = find(tabs, (t) => t.uid === activeTabUid);

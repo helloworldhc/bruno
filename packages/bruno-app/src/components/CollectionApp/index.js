@@ -34,6 +34,7 @@ import {
   projectResponse,
   useAppWebview
 } from '../AppView/webview-bridge';
+import { useTranslation } from 'react-i18next';
 
 /*
  * Standalone collection-/folder-level app — a file (.bru/.yml) of type 'app'
@@ -169,6 +170,7 @@ const listRequestSummaries = (collection) =>
     }));
 
 const CollectionApp = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { displayedTheme, theme, themeVariantLight, themeVariantDark } = useTheme();
   const preferences = useSelector((state) => state.app.preferences);
@@ -343,7 +345,7 @@ const CollectionApp = ({ item, collection }) => {
   return (
     <StyledWrapper data-testid="collection-app">
       <div className="app-toolbar">
-        <span>App - {item.name}</span>
+        <span>{t('COLLECTION_APP.APP_NAME', 'App - {{name}}', { name: item.name })}</span>
         <div className="flex items-center gap-2">
           {view === 'code' && (
             <AIAssist
@@ -361,7 +363,7 @@ const CollectionApp = ({ item, collection }) => {
               className={classnames('view-btn', { active: view === 'code' })}
               onClick={() => setView('code')}
             >
-              Code
+              {t('COMMON.CODE', 'Code')}
             </button>
             <button
               type="button"
@@ -369,7 +371,7 @@ const CollectionApp = ({ item, collection }) => {
               className={classnames('view-btn', { active: view === 'preview' })}
               onClick={() => setView('preview')}
             >
-              Preview
+              {t('COMMON.PREVIEW', 'Preview')}
             </button>
           </div>
         </div>
@@ -401,8 +403,8 @@ const CollectionApp = ({ item, collection }) => {
       ) : (
         <div className="app-pane" data-testid="collection-app-preview">
           <EmptyAppState
-            title="No app yet"
-            hint="Switch to Code and write some HTML/JS"
+            title={t('APP_VIEW.NO_APP_YET', 'No app yet')}
+            hint={t('COLLECTION_APP.EMPTY_HINT', 'Switch to Code and write some HTML/JS')}
           />
         </div>
       )}

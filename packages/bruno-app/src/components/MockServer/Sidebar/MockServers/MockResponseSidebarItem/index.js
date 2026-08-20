@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import classnames from 'classnames';
 import { IconCopy, IconDots, IconPencil, IconServer2, IconTrash } from '@tabler/icons';
 import toast from 'react-hot-toast';
@@ -18,6 +19,7 @@ const MockResponseSidebarItem = ({
   collectionUid,
   location
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const activeTabUid = useSelector((state) => state.tabs?.activeTabUid);
   const existingResponses = useSelector((state) => state.mockServer.mockResponses[instance.uid] || []);
@@ -63,9 +65,9 @@ const MockResponseSidebarItem = ({
       }));
 
       setShowRenameModal(false);
-      toast.success('Mock response renamed');
+      toast.success(t('MOCK_SERVER.RESPONSE_RENAMED', 'Mock response renamed'));
     } catch (err) {
-      toast.error(err.message || 'Failed to rename mock response');
+      toast.error(err.message || t('MOCK_SERVER.RENAME_RESPONSE_ERROR', 'Failed to rename mock response'));
     } finally {
       setIsRenaming(false);
     }
@@ -85,9 +87,9 @@ const MockResponseSidebarItem = ({
       })).unwrap();
 
       openResponseTab(result.response || clonedResponse);
-      toast.success('Mock response cloned');
+      toast.success(t('MOCK_SERVER.RESPONSE_CLONED', 'Mock response cloned'));
     } catch (err) {
-      toast.error(err.message || 'Failed to clone mock response');
+      toast.error(err.message || t('MOCK_SERVER.CLONE_RESPONSE_ERROR', 'Failed to clone mock response'));
     } finally {
       setIsCloning(false);
     }
@@ -104,9 +106,9 @@ const MockResponseSidebarItem = ({
       dispatch(closeTabs({ tabUids: [response.uid] }));
       dispatch(removeMockResponseEditor({ responseUid: response.uid }));
       setShowDeleteModal(false);
-      toast.success('Mock response deleted');
+      toast.success(t('MOCK_SERVER.RESPONSE_DELETED', 'Mock response deleted'));
     } catch (err) {
-      toast.error(err.message || 'Failed to delete mock response');
+      toast.error(err.message || t('MOCK_SERVER.DELETE_RESPONSE_ERROR', 'Failed to delete mock response'));
     } finally {
       setIsDeleting(false);
     }
@@ -116,14 +118,14 @@ const MockResponseSidebarItem = ({
     {
       id: 'rename',
       leftSection: IconPencil,
-      label: 'Rename',
+      label: t('COMMON.RENAME', 'Rename'),
       testId: `mock-response-sidebar-rename-${response.uid}`,
       onClick: () => setShowRenameModal(true)
     },
     {
       id: 'clone',
       leftSection: IconCopy,
-      label: isCloning ? 'Cloning...' : 'Clone',
+      label: isCloning ? t('MOCK_SERVER.CLONING', 'Cloning...') : t('COMMON.CLONE', 'Clone'),
       disabled: isCloning,
       testId: `mock-response-sidebar-clone-${response.uid}`,
       onClick: handleClone
@@ -131,7 +133,7 @@ const MockResponseSidebarItem = ({
     {
       id: 'delete',
       leftSection: IconTrash,
-      label: 'Delete',
+      label: t('COMMON.DELETE', 'Delete'),
       className: 'delete-item',
       testId: `mock-response-sidebar-delete-${response.uid}`,
       onClick: () => setShowDeleteModal(true)
@@ -156,8 +158,8 @@ const MockResponseSidebarItem = ({
 
       {showDeleteModal ? (
         <MockConfirmModal
-          title="Delete Mock Response"
-          confirmText={isDeleting ? 'Deleting...' : 'Delete'}
+          title={t('MOCK_SERVER.DELETE_MOCK_RESPONSE', 'Delete Mock Response')}
+          confirmText={isDeleting ? t('MOCK_SERVER.DELETING', 'Deleting...') : t('COMMON.DELETE', 'Delete')}
           confirmDisabled={isDeleting}
           confirmButtonColor="danger"
           dataTestId="delete-mock-response-modal"
@@ -168,7 +170,7 @@ const MockResponseSidebarItem = ({
           }}
           onConfirm={handleDeleteConfirm}
         >
-          Are you sure you want to delete the mock response
+          {t('MOCK_SERVER.CONFIRM_DELETE_RESPONSE', 'Are you sure you want to delete the mock response')}
           {' '}
           <span className="font-medium">{response?.name}</span>
           ?
@@ -191,7 +193,7 @@ const MockResponseSidebarItem = ({
           <span className="truncate">{response.name}</span>
         </button>
         <MenuDropdown items={menuItems} placement="bottom-end">
-          <ActionIcon label="Mock response actions" className="mock-server-actions flex-shrink-0">
+          <ActionIcon label={t('MOCK_SERVER.MOCK_RESPONSE_ACTIONS', 'Mock response actions')} className="mock-server-actions flex-shrink-0">
             <IconDots size={18} aria-hidden="true" />
           </ActionIcon>
         </MenuDropdown>

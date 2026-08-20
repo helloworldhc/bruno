@@ -699,7 +699,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                     <button
                       type="button"
                       data-testid="view-mode-request"
-                      aria-label="Request view"
+                      aria-label={t('COLLECTION.SWITCH_TO_REQUEST_MODE', 'Request view')}
                       className={`mode-btn ${!appEnabled && !collection.fileMode ? 'active' : ''}`}
                       onClick={() => {
                         if (collection.fileMode) handleFileModeClick();
@@ -713,7 +713,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                     <button
                       type="button"
                       data-testid="view-mode-app"
-                      aria-label="App view"
+                      aria-label={t('COLLECTION.SWITCH_TO_APP_MODE', 'App view')}
                       className={`mode-btn ${appEnabled && !collection.fileMode ? 'active' : ''}`}
                       onClick={() => {
                         if (collection.fileMode) handleFileModeClick();
@@ -727,7 +727,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                     <button
                       type="button"
                       data-testid="view-mode-file"
-                      aria-label="File view"
+                      aria-label={t('COLLECTION.SWITCH_TO_FILE_MODE', 'File view')}
                       className={`mode-btn ${collection.fileMode ? 'active' : ''}`}
                       onClick={() => {
                         if (appEnabled) handleToggleAppMode(false);
@@ -743,7 +743,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                 <ToolHint text={t('AI.ASSISTANT', 'AI Assistant')} toolhintId="AiAssistantToolhintId" place="bottom">
                   <ActionIcon
                     onClick={() => dispatch(toggleAiSidebar())}
-                    aria-label="AI Assistant"
+                    aria-label={t('AI.ASSISTANT', 'AI Assistant')}
                     size="sm"
                     data-testid="ai-assistant"
                     className={isAiSidebarOpen ? 'active' : ''}
@@ -770,7 +770,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                     type="button"
                     className="pill-dismiss"
                     onClick={dismissMigratePill}
-                    aria-label="Dismiss"
+                    aria-label={t('COMMON.DISMISS', 'Dismiss')}
                     data-testid="migrate-yml-pill-dismiss"
                   >
                     <IconX size={12} strokeWidth={2} />
@@ -784,7 +784,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
                   toolhintId="OpenApiSyncToolhintId"
                   place="bottom"
                 >
-                  <ActionIcon onClick={viewOpenApiSync} aria-label="OpenAPI" size="sm" className="relative">
+                  <ActionIcon onClick={viewOpenApiSync} aria-label={t('OPENAPI.TITLE', 'OpenAPI')} size="sm" className="relative">
                     <OpenAPISyncIcon size={15} />
                     {(hasOpenApiUpdates || hasOpenApiError) && (
                       <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: hasOpenApiError ? theme.status.danger.text : theme.status.warning.text }} />
@@ -794,7 +794,7 @@ const CollectionHeader = ({ collection, isScratchCollection }) => {
               )}
               {/* Runner - always visible */}
               <ToolHint text={t('RUNNER.TITLE', 'Runner')} toolhintId="RunnerToolhintId" place="bottom">
-                <ActionIcon onClick={handleRun} aria-label="Runner" size="sm" data-testid="runner">
+                <ActionIcon onClick={handleRun} aria-label={t('RUNNER.TITLE', 'Runner')} size="sm" data-testid="runner">
                   <IconRun size={16} strokeWidth={1.5} />
                 </ActionIcon>
               </ToolHint>

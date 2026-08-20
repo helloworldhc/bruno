@@ -8,9 +8,11 @@ import SingleLineEditor from 'components/SingleLineEditor';
 import { updateCollectionAuth } from 'providers/ReduxStore/slices/collections';
 import { saveCollectionSettings } from 'providers/ReduxStore/slices/collections/actions';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 import { humanizeRequestAPIKeyPlacement } from 'utils/collections';
 
 const ApiKeyAuth = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const dropdownTippyRef = useRef();
@@ -57,7 +59,7 @@ const ApiKeyAuth = ({ collection }) => {
 
   return (
     <StyledWrapper className="mt-2 w-full">
-      <label className="block mb-1">Key</label>
+      <label className="block mb-1">{t('AUTH.KEY', 'Key')}</label>
       <div className="single-line-editor-wrapper mb-3">
         <SingleLineEditor
           value={apikeyAuth.key || ''}
@@ -69,7 +71,7 @@ const ApiKeyAuth = ({ collection }) => {
         />
       </div>
 
-      <label className="block mb-1">Value</label>
+      <label className="block mb-1">{t('AUTH.VALUE', 'Value')}</label>
       <div className="single-line-editor-wrapper mb-3">
         <SingleLineEditor
           value={apikeyAuth.value || ''}
@@ -81,7 +83,7 @@ const ApiKeyAuth = ({ collection }) => {
         />
       </div>
 
-      <label className="block mb-1">Add To</label>
+      <label className="block mb-1">{t('AUTH.ADD_TO', 'Add To')}</label>
       <div className="inline-flex items-center cursor-pointer auth-placement-selector w-fit">
         <Dropdown onCreate={onDropdownCreate} icon={<Icon />} placement="bottom-end">
           <div
@@ -90,18 +92,14 @@ const ApiKeyAuth = ({ collection }) => {
               dropdownTippyRef.current.hide();
               handleAuthChange('placement', 'header');
             }}
-          >
-            Header
-          </div>
+          >{t('AUTH.HEADER', 'Header')}</div>
           <div
             className="dropdown-item"
             onClick={() => {
               dropdownTippyRef.current.hide();
               handleAuthChange('placement', 'queryparams');
             }}
-          >
-            Query Params
-          </div>
+          >{t('AUTH.QUERY_PARAM', 'Query Params')}</div>
         </Dropdown>
       </div>
     </StyledWrapper>

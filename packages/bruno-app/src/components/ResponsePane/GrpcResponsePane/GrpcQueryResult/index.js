@@ -6,8 +6,10 @@ import { useTheme } from 'providers/Theme/index';
 import StyledWrapper from './StyledWrapper';
 import GrpcError from '../GrpcError';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons';
+import { useTranslation } from 'react-i18next';
 
 const GrpcQueryResult = ({ item, collection }) => {
+  const { t } = useTranslation();
   const { displayedTheme } = useTheme();
   const preferences = useSelector((state) => state.app.preferences);
   const [showErrorMessage, setShowErrorMessage] = useState(true);
@@ -40,7 +42,7 @@ const GrpcQueryResult = ({ item, collection }) => {
   if (!hasResponses && !hasError) {
     return (
       <StyledWrapper className="w-full h-full relative flex flex-col">
-        <div className="empty-state">No messages received</div>
+        <div className="empty-state">{t('GRPC.NO_MESSAGES_RECEIVED', 'No messages received')}</div>
       </StyledWrapper>
     );
   }
@@ -79,8 +81,8 @@ const GrpcQueryResult = ({ item, collection }) => {
                       onClick={() => setExpandedIndex(isExpanded ? -1 : index)}
                     >
                       <span className="message-label">
-                        Response {originalIndex + 1}
-                        {index === 0 && <span className="latest-badge">Latest</span>}
+                        {t('GRPC.RESPONSE_LABEL', 'Response {{number}}', { number: originalIndex + 1 })}
+                        {index === 0 && <span className="latest-badge">{t('GRPC.LATEST_BADGE', 'Latest')}</span>}
                       </span>
                       <button className="toggle-btn">
                         {isExpanded ? (

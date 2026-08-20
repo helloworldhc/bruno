@@ -8,6 +8,7 @@ import { normalizePath } from 'utils/common/path';
 import { addTab, updateRequestPaneTab, updateScriptPaneTab, setFocusErrorLine } from 'providers/ReduxStore/slices/tabs';
 import { updateSettingsSelectedTab, updatedFolderSettingsSelectedTab } from 'providers/ReduxStore/slices/collections';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Determines the source of a script error (request, folder, or collection)
@@ -81,6 +82,7 @@ const getErrorSourceInfo = (filePath, item, collection, getTreePath) => {
 };
 
 const ScriptErrorCard = ({ title, message, errorContext, item, collection, scriptPhase, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [showStack, setShowStack] = useState(false);
 
@@ -159,7 +161,7 @@ const ScriptErrorCard = ({ title, message, errorContext, item, collection, scrip
         <div className="script-error-header">
           <div className="error-title" data-testid="script-error-title">{title}</div>
           {onClose && (
-            <button className="close-button flex-shrink-0 cursor-pointer" data-testid="script-error-close" onClick={onClose} aria-label="Close error">
+            <button className="close-button flex-shrink-0 cursor-pointer" data-testid="script-error-close" onClick={onClose} aria-label={t('SCRIPT_ERROR.CLOSE_ERROR', 'Close error')}>
               <IconX size={16} strokeWidth={1.5} />
             </button>
           )}
@@ -175,7 +177,7 @@ const ScriptErrorCard = ({ title, message, errorContext, item, collection, scrip
                 tabIndex={canNavigate ? 0 : undefined}
                 onClick={handleNavigate}
                 onKeyDown={handleNavigateKeyDown}
-                title={canNavigate ? `Open ${displayFilePath}` : undefined}
+                title={canNavigate ? t('SCRIPT_ERROR.OPEN_FILE', 'Open {{filePath}}', { filePath: displayFilePath }) : undefined}
               >
                 <span>{displayFilePath}</span>
                 {canNavigate && <IconExternalLink size={12} className="flex-shrink-0" />}
@@ -194,10 +196,10 @@ const ScriptErrorCard = ({ title, message, errorContext, item, collection, scrip
               data-testid="script-error-stack-toggle"
               onClick={() => setShowStack(!showStack)}
               aria-expanded={showStack}
-              aria-label={`${showStack ? 'Hide' : 'Show'} stack trace`}
+              aria-label={showStack ? t('SCRIPT_ERROR.HIDE_STACK_TRACE', 'Hide stack trace') : t('SCRIPT_ERROR.SHOW_STACK_TRACE', 'Show stack trace')}
             >
               {showStack ? <IconChevronDown size={14} /> : <IconChevronRight size={14} />}
-              <span>{showStack ? 'Hide' : 'Show'} stack trace</span>
+              <span>{showStack ? t('SCRIPT_ERROR.HIDE_STACK_TRACE', 'Hide stack trace') : t('SCRIPT_ERROR.SHOW_STACK_TRACE', 'Show stack trace')}</span>
             </button>
             {showStack && (
               <pre className="script-error-stack" data-testid="script-error-stack">{errorContext.stack}</pre>
@@ -210,6 +212,7 @@ const ScriptErrorCard = ({ title, message, errorContext, item, collection, scrip
 };
 
 const ScriptError = ({ item, collection, onClose }) => {
+  const { t } = useTranslation();
   const preRequestError = item?.preRequestScriptErrorMessage;
   const postResponseError = item?.postResponseScriptErrorMessage;
   const testScriptError = item?.testScriptErrorMessage;
@@ -225,9 +228,9 @@ const ScriptError = ({ item, collection, onClose }) => {
   // If no error context available for any error, fall back to ErrorBanner
   if (!hasAnyContext) {
     const errors = [];
-    if (preRequestError) errors.push({ title: 'Pre-Request Script Error', message: preRequestError });
-    if (postResponseError) errors.push({ title: 'Post-Response Script Error', message: postResponseError });
-    if (testScriptError) errors.push({ title: 'Test Script Error', message: testScriptError });
+    if (preRequestError) errors.push({ title: t('SCRIPT_ERROR.PRE_REQUEST', 'Pre-Request Script Error'), message: preRequestError });
+    if (postResponseError) errors.push({ title: t('SCRIPT_ERROR.POST_RESPONSE', 'Post-Response Script Error'), message: postResponseError });
+    if (testScriptError) errors.push({ title: t('SCRIPT_ERROR.TEST_SCRIPT', 'Test Script Error'), message: testScriptError });
     return <ErrorBanner errors={errors} onClose={onClose} className="mb-2" />;
   }
 
@@ -235,7 +238,7 @@ const ScriptError = ({ item, collection, onClose }) => {
     <div className="mb-2 flex flex-col gap-2">
       {preRequestError && (
         <ScriptErrorCard
-          title="Pre-Request Script Error"
+          title={t('SCRIPT_ERROR.PRE_REQUEST', 'Pre-Request Script Error')}
           message={preRequestError}
           errorContext={preRequestContext}
           item={item}
@@ -246,7 +249,7 @@ const ScriptError = ({ item, collection, onClose }) => {
       )}
       {postResponseError && (
         <ScriptErrorCard
-          title="Post-Response Script Error"
+          title={t('SCRIPT_ERROR.POST_RESPONSE', 'Post-Response Script Error')}
           message={postResponseError}
           errorContext={postResponseContext}
           item={item}
@@ -257,7 +260,7 @@ const ScriptError = ({ item, collection, onClose }) => {
       )}
       {testScriptError && (
         <ScriptErrorCard
-          title="Test Script Error"
+          title={t('SCRIPT_ERROR.TEST_SCRIPT', 'Test Script Error')}
           message={testScriptError}
           errorContext={testContext}
           item={item}

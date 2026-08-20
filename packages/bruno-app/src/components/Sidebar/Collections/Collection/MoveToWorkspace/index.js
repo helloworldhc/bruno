@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import Modal from 'components/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { moveCollectionToWorkspace } from 'providers/ReduxStore/slices/collections/actions';
@@ -10,6 +11,7 @@ import ConfirmMoveDrafts from './ConfirmMoveDrafts';
 import StyledWrapper from './StyledWrapper';
 
 const MoveToWorkspace = ({ onClose, collectionUid }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const collection = useSelector((state) => findCollectionByUid(state.collections.collections, collectionUid));
   const activeWorkspace = useSelector((state) =>
@@ -26,7 +28,7 @@ const MoveToWorkspace = ({ onClose, collectionUid }) => {
 
   const onConfirm = () => {
     if (!collection) {
-      toast.error('Collection not found');
+      toast.error(t('MOVE_TO_WORKSPACE.COLLECTION_NOT_FOUND', 'Collection not found'));
       onClose();
       return;
     }
@@ -36,17 +38,17 @@ const MoveToWorkspace = ({ onClose, collectionUid }) => {
     setIsMoving(true);
     dispatch(moveCollectionToWorkspace(collection.uid))
       .then(() => {
-        toast.success('Collection moved into workspace');
+        toast.success(t('MOVE_TO_WORKSPACE.COLLECTION_MOVED', 'Collection moved into workspace'));
         onClose();
       })
       .catch((err) => {
-        toast.error(err?.message || 'An error occurred while moving the collection');
+        toast.error(err?.message || t('MOVE_TO_WORKSPACE.MOVE_ERROR', 'An error occurred while moving the collection'));
         setIsMoving(false);
       });
   };
 
   if (!collection) {
-    return <div>Collection not found</div>;
+    return <div>{t('MOVE_TO_WORKSPACE.COLLECTION_NOT_FOUND', 'Collection not found')}</div>;
   }
 
   if (!activeWorkspace?.pathname) {
@@ -64,25 +66,25 @@ const MoveToWorkspace = ({ onClose, collectionUid }) => {
     <StyledWrapper>
       <Modal
         size="sm"
-        title="Move into Workspace"
-        confirmText={isMoving ? 'Moving...' : 'Move'}
+        title={t('MOVE_TO_WORKSPACE.TITLE', 'Move into Workspace')}
+        confirmText={isMoving ? t('MOVE_TO_WORKSPACE.MOVING', 'Moving...') : t('MOVE_TO_WORKSPACE.MOVE', 'Move')}
         confirmDisabled={isMoving}
         handleConfirm={onConfirm}
         handleCancel={onClose}
       >
         <p className="mb-4">
-          This will move the following collection's files into {activeWorkspace?.name} workspace.
+          {t('MOVE_TO_WORKSPACE.MOVE_DESCRIPTION', 'This will move the following collection\'s files into {{name}} workspace.', { name: activeWorkspace?.name })}
         </p>
         <div className="collection-info-card">
           <div className="collection-name">{collection.name}</div>
           <div className="collection-path">{collection.pathname}</div>
         </div>
         <div className="mt-3 collection-info-card">
-          <div className="collection-label">Destination</div>
+          <div className="collection-label">{t('MOVE_TO_WORKSPACE.DESTINATION', 'Destination')}</div>
           <div className="collection-path">{targetLocation}</div>
         </div>
         <p className="mt-4 text-muted text-sm">
-          The collection reloads from its new location, so any open request tabs will close.
+          {t('MOVE_TO_WORKSPACE.RELOAD_HINT', 'The collection reloads from its new location, so any open request tabs will close.')}
         </p>
       </Modal>
     </StyledWrapper>

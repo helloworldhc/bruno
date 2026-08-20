@@ -1,6 +1,7 @@
 import React from 'react';
 import { IconChevronRight, IconDots } from '@tabler/icons';
 import Dropdown from 'components/Dropdown';
+import { useTranslation } from 'react-i18next';
 
 const FolderBreadcrumbs = ({
   collectionName,
@@ -9,6 +10,7 @@ const FolderBreadcrumbs = ({
   onNavigateToRoot,
   onNavigateToBreadcrumb
 }) => {
+  const { t } = useTranslation();
   const collapsed = breadcrumbs.length > 1 ? breadcrumbs.slice(0, -1) : [];
   const last = breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1] : null;
 

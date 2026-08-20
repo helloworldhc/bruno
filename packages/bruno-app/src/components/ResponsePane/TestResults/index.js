@@ -10,18 +10,21 @@ import {
 } from '@tabler/icons';
 import { useTranslation } from 'react-i18next';
 
-const ResultIcon = ({ status }) => (
-  <span
-    data-testid={status === 'pass' ? 'test-result-icon-pass' : 'test-result-icon-fail'}
-    className={`inline-flex items-center ${status === 'pass' ? 'test-success' : 'test-failure'}`}
-  >
-    {status === 'pass' ? (
-      <IconCircleCheck size={14} className="mr-1" aria-label="Test passed" />
-    ) : (
-      <IconCircleX size={14} className="mr-1" aria-label="Test failed" />
-    )}
-  </span>
-);
+const ResultIcon = ({ status }) => {
+  const { t } = useTranslation();
+  return (
+    <span
+      data-testid={status === 'pass' ? 'test-result-icon-pass' : 'test-result-icon-fail'}
+      className={`inline-flex items-center ${status === 'pass' ? 'test-success' : 'test-failure'}`}
+    >
+      {status === 'pass' ? (
+        <IconCircleCheck size={14} className="mr-1" aria-label={t('TEST_RESULTS.PASSED', 'Test passed')} />
+      ) : (
+        <IconCircleX size={14} className="mr-1" aria-label={t('TEST_RESULTS.FAILED', 'Test failed')} />
+      )}
+    </span>
+  );
+};
 
 const ErrorMessage = ({ error }) => error && (
   <>

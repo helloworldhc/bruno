@@ -524,7 +524,7 @@ export default function RunnerResults({ collection }) {
                   onClick={() => setSelectedItem(null)}
                   className="p-1 rounded hover-bg-surface transition-colors cursor-pointer flex items-center justify-center"
                   title={t('COMMON.CLOSE', 'Close')}
-                  aria-label="Close response view"
+                  aria-label={t('RUNNER.CLOSE_RESPONSE_VIEW', 'Close response view')}
                 >
                   <IconX size={16} strokeWidth={1.5} />
                 </button>

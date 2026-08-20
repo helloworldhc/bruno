@@ -5,8 +5,10 @@ import CodeEditor from 'components/CodeEditor';
 import { updateRequestGraphqlVariables } from 'providers/ReduxStore/slices/collections';
 import { sendRequest, saveRequest } from 'providers/ReduxStore/slices/collections/actions';
 import { useTheme } from 'providers/Theme';
+import { useTranslation } from 'react-i18next';
 
 const GraphQLVariables = ({ variables, item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const { displayedTheme } = useTheme();

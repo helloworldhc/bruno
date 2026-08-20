@@ -16,8 +16,10 @@ import { IconAlertTriangle } from '@tabler/icons';
 import Modal from 'components/Modal';
 import Button from 'ui/Button';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [] }) => {
+  const { t } = useTranslation();
   const MAX_UNSAVED_ITEMS_TO_SHOW = 5;
   const collections = useSelector((state) => state.collections.collections);
   const tabs = useSelector((state) => state.tabs.tabs);
@@ -233,9 +235,9 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
   return (
     <Modal
       size="md"
-      title="Unsaved changes"
-      confirmText="Save and Close"
-      cancelText="Close without saving"
+      title={t('COMMON.UNSAVED_CHANGES', 'Unsaved changes')}
+      confirmText={t('COMMON.SAVE_AND_CLOSE', 'Save and Close')}
+      cancelText={t('COMMON.CLOSE_WITHOUT_SAVING', 'Close without saving')}
       handleCancel={onClose}
       disableEscapeKey={true}
       disableCloseOnOutsideClick={true}
@@ -244,11 +246,13 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
     >
       <div className="flex items-center">
         <IconAlertTriangle size={32} strokeWidth={1.5} className="text-yellow-600" />
-        <h1 className="ml-2 text-lg font-medium">Hold on..</h1>
+        <h1 className="ml-2 text-lg font-medium">{t('COMMON.HOLD_ON', 'Hold on..')}</h1>
       </div>
       <p className="mt-4">
-        Do you want to save the changes you made to the following{' '}
-        <span className="font-medium">{totalDraftsCount}</span> {pluralizeWord('item', totalDraftsCount)}?
+        {t('COMMON.UNSAVED_DRAFTS_CONFIRM', 'Do you want to save the changes you made to the following {{count}} {{item}}?', {
+          count: totalDraftsCount,
+          item: pluralizeWord('item', totalDraftsCount)
+        })}
       </p>
 
       <ul className="mt-4">
@@ -256,19 +260,19 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
           let prefix;
           switch (item.type) {
             case 'collection':
-              prefix = 'Collection: ';
+              prefix = `${t('COMMON.COLLECTION', 'Collection')}: `;
               break;
             case 'folder':
-              prefix = 'Folder: ';
+              prefix = `${t('COMMON.FOLDER', 'Folder')}: `;
               break;
             case 'collection-environment':
-              prefix = 'Collection Environment: ';
+              prefix = `${t('ENVIRONMENT.COLLECTION_ENVIRONMENT', 'Collection Environment')}: `;
               break;
             case 'global-environment':
-              prefix = 'Global Environment: ';
+              prefix = `${t('ENVIRONMENT.GLOBAL_ENVIRONMENT', 'Global Environment')}: `;
               break;
             default:
-              prefix = 'Request: ';
+              prefix = `${t('COMMON.REQUEST', 'Request')}: `;
           }
           return (
             <li key={`${item.type}-${item.collectionUid || item.uid}-${index}`} className="mt-1 text-xs">
@@ -281,23 +285,25 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
 
       {totalDraftsCount > MAX_UNSAVED_ITEMS_TO_SHOW && (
         <p className="mt-1 text-xs">
-          ...{totalDraftsCount - MAX_UNSAVED_ITEMS_TO_SHOW} additional{' '}
-          {pluralizeWord('item', totalDraftsCount - MAX_UNSAVED_ITEMS_TO_SHOW)} not shown
+          {t('COMMON.ADDITIONAL_ITEMS_NOT_SHOWN', '...{{count}} additional {{item}} not shown', {
+            count: totalDraftsCount - MAX_UNSAVED_ITEMS_TO_SHOW,
+            item: pluralizeWord('item', totalDraftsCount - MAX_UNSAVED_ITEMS_TO_SHOW)
+          })}
         </p>
       )}
 
       <div className="flex justify-between mt-6">
         <div>
           <Button color="danger" onClick={closeWithoutSave}>
-            Don't Save
+            {t('COMMON.DONT_SAVE', "Don't Save")}
           </Button>
         </div>
         <div className="flex gap-2">
           <Button color="secondary" variant="ghost" onClick={onClose}>
-            Cancel
+            {t('COMMON.CANCEL', 'Cancel')}
           </Button>
           <Button onClick={closeWithSave}>
-            {totalDraftsCount > 1 ? 'Save All' : 'Save'}
+            {totalDraftsCount > 1 ? t('COMMON.SAVE_ALL', 'Save All') : t('COMMON.SAVE', 'Save')}
           </Button>
         </div>
       </div>

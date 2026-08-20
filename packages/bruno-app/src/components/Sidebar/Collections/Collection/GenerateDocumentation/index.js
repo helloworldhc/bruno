@@ -17,14 +17,25 @@ import { transformCollectionToSaveToExportAsFile, findCollectionByUid, areItemsL
 import { brunoToOpenCollection } from '@usebruno/converters';
 import { sanitizeName } from 'utils/common/regex';
 import { escapeHtml } from 'utils/response';
+import { useTranslation } from 'react-i18next';
 
 const CDN_BASE_URL = 'https://cdn.usebruno.com';
 
-const FEATURES = [
-  'Standalone HTML file - no server required',
-  'Interactive API playground',
-  'Host on any static file server'
-];
+const CollectionNotFound = ({ onClose }) => {
+  const { t } = useTranslation();
+  return (
+    <Portal>
+      <Modal size="md" title={t('GENERATE_DOCS.TITLE', 'Generate Documentation')} confirmText={t('COMMON.CLOSE', 'Close')} handleConfirm={onClose} hideCancel>
+        <StyledWrapper className="w-[500px]">
+          <div className="flex items-center gap-2 text-warning">
+            <IconAlertTriangle size={16} className="shrink-0" />
+            <span>{t('GENERATE_DOCS.COLLECTION_NOT_FOUND', 'Collection not found. It may have been deleted or is no longer available.')}</span>
+          </div>
+        </StyledWrapper>
+      </Modal>
+    </Portal>
+  );
+};
 
 const buildHtmlDocument = (collectionName, escapedYamlContent) => `<!DOCTYPE html>
 <html lang="en">
@@ -52,24 +63,18 @@ const buildHtmlDocument = (collectionName, escapedYamlContent) => `<!DOCTYPE htm
 </body>
 </html>`;
 
-const CollectionNotFound = ({ onClose }) => (
-  <Portal>
-    <Modal size="md" title="Generate Documentation" confirmText="Close" handleConfirm={onClose} hideCancel>
-      <StyledWrapper className="w-[500px]">
-        <div className="flex items-center gap-2 text-warning">
-          <IconAlertTriangle size={16} className="shrink-0" />
-          <span>Collection not found. It may have been deleted or is no longer available.</span>
-        </div>
-      </StyledWrapper>
-    </Modal>
-  </Portal>
-);
-
 const GenerateDocumentation = ({ onClose, collectionUid }) => {
+  const { t } = useTranslation();
   const { version } = useApp();
   const collection = useSelector((state) =>
     findCollectionByUid(state.collections.collections, collectionUid)
   );
+
+  const features = useMemo(() => [
+    t('GENERATE_DOCS.FEATURE_1', 'Standalone HTML file - no server required'),
+    t('GENERATE_DOCS.FEATURE_2', 'Interactive API playground'),
+    t('GENERATE_DOCS.FEATURE_3', 'Host on any static file server')
+  ], [t]);
 
   const isLoading = useMemo(
     () => (collection ? areItemsLoading(collection) : false),
@@ -164,13 +169,13 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
       const fileName = `${sanitizeName(collection.name)}-documentation.html`;
       FileSaver.saveAs(new Blob([htmlContent], { type: 'text/html' }), fileName);
 
-      toast.success('Documentation generated successfully');
+      toast.success(t('GENERATE_DOCS.GENERATE_SUCCESS', 'Documentation generated successfully'));
       onClose();
     } catch (error) {
       console.error('Error generating documentation:', error);
-      toast.error('Failed to generate documentation');
+      toast.error(t('GENERATE_DOCS.GENERATE_ERROR', 'Failed to generate documentation'));
     }
-  }, [collection, version, onClose, currentVersion, selectedEnvUids]);
+  }, [collection, version, onClose, currentVersion, selectedEnvUids, t]);
 
   if (!collection) {
     return <CollectionNotFound onClose={onClose} />;
@@ -180,9 +185,9 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
     <Portal>
       <Modal
         size="md"
-        title="Generate Documentation"
-        confirmText={isLoading ? 'Loading...' : 'Generate'}
-        cancelText="Cancel"
+        title={t('GENERATE_DOCS.TITLE', 'Generate Documentation')}
+        confirmText={isLoading ? t('COMMON.LOADING', 'Loading...') : t('GENERATE_DOCS.GENERATE', 'Generate')}
+        cancelText={t('COMMON.CANCEL', 'Cancel')}
         handleConfirm={isLoading ? undefined : handleGenerate}
         handleCancel={onClose}
         confirmDisabled={isLoading}
@@ -191,20 +196,20 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
           {isLoading ? (
             <div className="flex items-center justify-center gap-3 py-8">
               <IconLoader2 size={20} className="animate-spin" />
-              <span>Loading collection...</span>
+              <span>{t('GENERATE_DOCS.LOADING_COLLECTION', 'Loading collection...')}</span>
             </div>
           ) : (
             <div className="content">
               <h3 className="title flex items-center gap-2 mt-2 font-medium">
                 <IconBook size={18} />
-                <span>Interactive API Documentation</span>
+                <span>{t('GENERATE_DOCS.INTERACTIVE_DOCS_TITLE', 'Interactive API Documentation')}</span>
               </h3>
               <p className="description mb-4">
-                Generate a standalone HTML file that can be hosted anywhere or shared with your team.
+                {t('GENERATE_DOCS.DESCRIPTION', 'Generate a standalone HTML file that can be hosted anywhere or shared with your team.')}
               </p>
 
               <ul className="features flex flex-col list-none gap-2 p-0 mb-4">
-                {FEATURES.map((feature) => (
+                {features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2.5">
                     <IconCheck size={16} className="check-icon flex-shrink-0" />
                     <span>{feature}</span>
@@ -219,7 +224,7 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
                     <div className="card-divider" />
                     <div className="env-section">
                       <EnvironmentSelectionList
-                        title="Environments to include"
+                        title={t('GENERATE_DOCS.ENVIRONMENTS_TO_INCLUDE', 'Environments to include')}
                         environments={environments}
                         selectedUids={selectedEnvUids}
                         onToggle={toggleEnv}
@@ -231,7 +236,7 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
               </div>
 
               <p className="note m-0">
-                The generated file loads Bruno's JavaScript and CSS files from a CDN, which requires an internet connection.
+                {t('GENERATE_DOCS.CDN_NOTE', "The generated file loads Bruno's JavaScript and CSS files from a CDN, which requires an internet connection.")}
               </p>
             </div>
           )}

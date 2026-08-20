@@ -2,8 +2,10 @@ import React, { useMemo, useCallback, memo } from 'react';
 import { useSelector } from 'react-redux';
 import { IconBox, IconLoader2 } from '@tabler/icons';
 import { areItemsLoading } from 'utils/collections';
+import { useTranslation } from 'react-i18next';
 
 const CollectionListItem = memo(({ collectionUid, collectionPath, collectionName, isSelected, onSelect }) => {
+  const { t } = useTranslation();
   const collection = useSelector((state) =>
     state.collections.collections.find((c) => c.uid === collectionUid || c.pathname === collectionPath)
   );

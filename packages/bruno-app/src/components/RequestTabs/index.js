@@ -12,8 +12,10 @@ import StyledWrapper from './StyledWrapper';
 import DraggableTab from './DraggableTab';
 import CreateTransientRequest from 'components/CreateTransientRequest';
 import ActionIcon from 'ui/ActionIcon/index';
+import { useTranslation } from 'react-i18next';
 
 const RequestTabs = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabsRef = useRef();
   const scrollContainerRef = useRef();
@@ -123,7 +125,7 @@ const RequestTabs = () => {
           )}
           <div className="flex items-center gap-2 pl-2" ref={collectionTabsRef}>
             <div className={classnames('scroll-chevrons', { hidden: !showChevrons })}>
-              <ActionIcon size="lg" onClick={leftSlide} aria-label="Left Chevron" style={{ marginBottom: '3px' }}>
+              <ActionIcon size="lg" onClick={leftSlide} aria-label={t('COMMON.SCROLL_LEFT', 'Scroll left')} style={{ marginBottom: '3px' }}>
                 <IconChevronLeft size={18} strokeWidth={1.5} />
               </ActionIcon>
             </div>
@@ -175,7 +177,7 @@ const RequestTabs = () => {
             )}
 
             <div className={classnames('scroll-chevrons', { hidden: !showChevrons })}>
-              <ActionIcon size="lg" onClick={rightSlide} aria-label="Right Chevron" style={{ marginBottom: '3px' }}>
+              <ActionIcon size="lg" onClick={rightSlide} aria-label={t('COMMON.SCROLL_RIGHT', 'Scroll right')} style={{ marginBottom: '3px' }}>
                 <IconChevronRight size={18} strokeWidth={1.5} />
               </ActionIcon>
             </div>

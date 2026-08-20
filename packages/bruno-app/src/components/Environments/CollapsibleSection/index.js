@@ -1,6 +1,7 @@
 import React from 'react';
 import { IconChevronRight } from '@tabler/icons';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const CollapsibleSection = ({
   title,
@@ -11,6 +12,7 @@ const CollapsibleSection = ({
   children,
   testId
 }) => {
+  const { t } = useTranslation();
   return (
     <StyledWrapper className={expanded ? 'expanded' : 'collapsed'}>
       <div className="section-header" onClick={onToggle} data-testid={testId}>

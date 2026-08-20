@@ -8,6 +8,7 @@ import escapeHTML from 'escape-html';
 import MD from 'markdown-it';
 
 import { GraphQLNonNull, GraphQLList } from 'graphql';
+import i18n from 'i18n';
 
 const md = new MD();
 
@@ -66,7 +67,8 @@ export default function onHasCompletion(_cm, data, onHintInformationRender) {
 
     if (ctx && deprecation && ctx.deprecationReason) {
       const reason = ctx.deprecationReason ? md.render(ctx.deprecationReason) : '';
-      deprecation.innerHTML = '<span className="deprecation-label">Deprecated</span>' + reason;
+      const deprecatedLabel = i18n.t('COMMON.DEPRECATED', 'Deprecated');
+      deprecation.innerHTML = `<span className="deprecation-label">${deprecatedLabel}</span>` + reason;
       deprecation.style.display = 'block';
     } else if (deprecation) {
       deprecation.style.display = 'none';

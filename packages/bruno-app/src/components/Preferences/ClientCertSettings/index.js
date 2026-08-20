@@ -47,7 +47,7 @@ const CertFileInput = ({ label, name, value, inputRef, onSelect, onClear, error,
           <span className="truncate max-w-[260px]" title={value}>
             {path.basename(value)}
           </span>
-          <ActionIcon type="button" label="Remove file" size="sm" colorOnHover={dangerColor} onClick={onClear}>
+          <ActionIcon type="button" label={t('PREFERENCES.REMOVE_FILE', 'Remove file')} size="sm" colorOnHover={dangerColor} onClick={onClear}>
             <IconX size={14} strokeWidth={1.5} />
           </ActionIcon>
         </div>
@@ -59,7 +59,7 @@ const CertFileInput = ({ label, name, value, inputRef, onSelect, onClear, error,
           onClick={() => inputRef.current?.click()}
           data-testid={`choose-file-${name}`}
         >
-          {chooseFileText}
+          {chooseFileText || t('PREFERENCES.CHOOSE_FILE', 'Choose file')}
         </Button>
       )}
       {touched && error ? <div className="text-red-500 text-xs">{error}</div> : null}
@@ -96,7 +96,7 @@ const ClientCertSettings = () => {
           }
         }
       })
-    ).catch(() => toast.error('Failed to save preferences'));
+    ).catch(() => toast.error(t('PREFERENCES.SAVE_ERROR', 'Failed to save preferences')));
   };
 
   const formik = useFormik({
@@ -261,8 +261,9 @@ const ClientCertSettings = () => {
                   title={clientCert.disabled ? 'Enable certificate' : 'Disable certificate'}
                 />
                 <ActionIcon
-                  label="Remove certificate"
-                  colorOnHover={theme.colors.text.danger}
+                  size="sm"
+                  label={t('PREFERENCES.REMOVE_CERTIFICATE', 'Remove certificate')}
+                  colorOnHover={theme.colors?.text?.danger}
                   onClick={() => handleRemove(index)}
                 >
                   <IconTrash size={16} strokeWidth={1.5} />
@@ -270,7 +271,7 @@ const ClientCertSettings = () => {
               </>
             )}
           >
-            <CertField label="Host" value={clientCert.domain} title={clientCert.domain} />
+            <CertField label={t('PREFERENCES.HOST', 'Host')} value={clientCert.domain} title={clientCert.domain} />
             {clientCert.type === 'pfx' ? (
               <CertField label={t('PREFERENCES.PFX_FILE', 'PFX File')} value={path.basename(clientCert.pfxFilePath || '')} title={clientCert.pfxFilePath} />
             ) : (

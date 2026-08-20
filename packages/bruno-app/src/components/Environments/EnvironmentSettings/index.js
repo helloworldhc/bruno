@@ -4,8 +4,10 @@ import { updateTabState } from 'providers/ReduxStore/slices/tabs';
 import EnvironmentList from './EnvironmentList';
 import StyledWrapper from './StyledWrapper';
 import ExportEnvironmentModal from 'components/Environments/Common/ExportEnvironmentModal';
+import { useTranslation } from 'react-i18next';
 
 const EnvironmentSettings = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [isModified, setIsModified] = useState(false);
   const environments = collection?.environments || [];

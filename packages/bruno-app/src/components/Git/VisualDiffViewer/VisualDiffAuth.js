@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import get from 'lodash/get';
+import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
 
 const AUTH_TYPE_LABELS = {
@@ -52,6 +53,7 @@ const AUTH_FIELD_LABELS = {
 };
 
 const VisualDiffAuth = ({ oldData, newData, showSide }) => {
+  const { t } = useTranslation();
   const oldAuth = get(oldData, 'request.auth', {});
   const newAuth = get(newData, 'request.auth', {});
 
@@ -137,7 +139,7 @@ const VisualDiffAuth = ({ oldData, newData, showSide }) => {
               <tr>
                 <th style={{ width: '30px' }}></th>
                 <th style={{ width: '40%' }}>Field</th>
-                <th>Value</th>
+                <th>{t('COMMON.VALUE', 'Value')}</th>
               </tr>
             </thead>
             <tbody>
@@ -149,7 +151,7 @@ const VisualDiffAuth = ({ oldData, newData, showSide }) => {
                     </span>
                   )}
                 </td>
-                <td className="key-cell">Auth Mode</td>
+                <td className="key-cell">{t('AUTH.AUTH_MODE', 'Auth Mode')}</td>
                 <td className="value-cell">{AUTH_TYPE_LABELS[currentMode] || currentMode}</td>
               </tr>
             </tbody>
@@ -171,7 +173,7 @@ const VisualDiffAuth = ({ oldData, newData, showSide }) => {
               <tr>
                 <th style={{ width: '30px' }}></th>
                 <th style={{ width: '40%' }}>Field</th>
-                <th>Value</th>
+                <th>{t('COMMON.VALUE', 'Value')}</th>
               </tr>
             </thead>
             <tbody>

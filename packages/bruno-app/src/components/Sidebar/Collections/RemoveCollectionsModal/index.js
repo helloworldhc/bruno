@@ -20,6 +20,7 @@ import {
 import { IconAlertTriangle } from '@tabler/icons';
 import StyledWrapper from './StyledWrapper';
 import Button from 'ui/Button';
+import { useTranslation, Trans } from 'react-i18next';
 
 const MAX_COLLECTIONS_WIDTH = 530;
 const CHARACTER_WIDTH = 8;
@@ -47,6 +48,7 @@ const getDisplayItems = (items, maxWidth = MAX_COLLECTIONS_WIDTH) => {
 };
 
 const RemoveCollectionsModal = ({ collectionUids, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const allCollections = useSelector((state) => state.collections.collections || []);
   const [showAllCollections, setShowAllCollections] = useState(false);
@@ -115,11 +117,11 @@ const RemoveCollectionsModal = ({ collectionUids, onClose }) => {
 
     Promise.all(removalPromises)
       .then(() => {
-        toast.success('Closed all collections');
+        toast.success(t('REMOVE_COLLECTIONS.CLOSED_ALL', 'Closed all collections'));
       })
       .catch((error) => {
         console.error('Error closing collections:', error);
-        toast.error('An error occurred while closing collections');
+        toast.error(t('REMOVE_COLLECTIONS.CLOSE_ALL_ERROR', 'An error occurred while closing collections'));
       })
       .finally(() => {
         onClose();
@@ -157,7 +159,7 @@ const RemoveCollectionsModal = ({ collectionUids, onClose }) => {
       handleCloseAllCollections();
     } catch (error) {
       console.error('Error saving drafts:', error);
-      toast.error('An error occurred while saving changes');
+      toast.error(t('REMOVE_COLLECTIONS.SAVE_ERROR', 'An error occurred while saving changes'));
       handleCancel();
     }
   };
@@ -182,7 +184,7 @@ const RemoveCollectionsModal = ({ collectionUids, onClose }) => {
       onClick={() => setShowAllCollections(!showAllCollections)}
     >
       <span className="text-link">
-        {showAllCollections ? 'Show less' : `Show ${hiddenCollectionsCount} more`}
+        {showAllCollections ? t('COMMON.SHOW_LESS', 'Show less') : t('REMOVE_COLLECTIONS.SHOW_MORE', 'Show {{count}} more', { count: hiddenCollectionsCount })}
       </span>
     </span>
   ) : null;
@@ -191,7 +193,7 @@ const RemoveCollectionsModal = ({ collectionUids, onClose }) => {
     <Portal>
       <Modal
         size="md"
-        title="Close all collections"
+        title={t('REMOVE_COLLECTIONS.MODAL_TITLE', 'Close all collections')}
         disableEscapeKey={hasUnsavedChanges}
         disableCloseOnOutsideClick={hasUnsavedChanges}
         handleCancel={handleCancel}
@@ -202,14 +204,15 @@ const RemoveCollectionsModal = ({ collectionUids, onClose }) => {
             <>
               <div className="flex items-center font-normal">
                 <IconAlertTriangle size={32} strokeWidth={1.5} className="text-yellow-600" />
-                <h1 className="ml-2 text-lg font-medium">Hold on..</h1>
+                <h1 className="ml-2 text-lg font-medium">{t('COMMON.HOLD_ON', 'Hold on..')}</h1>
               </div>
               <div className="font-normal mt-4">
-                Do you want to save changes you made to the following{' '}
-                {collectionsWithUnsavedChanges.length === 1 ? 'collection' : 'collections'}?
+                {collectionsWithUnsavedChanges.length === 1
+                  ? t('REMOVE_COLLECTIONS.UNSAVED_SINGLE', 'Do you want to save changes you made to the following collection?')
+                  : t('REMOVE_COLLECTIONS.UNSAVED_MULTIPLE', 'Do you want to save changes you made to the following collections?')}
               </div>
               <div className="mt-2 text-xs text-gray-500">
-                Collections will be removed from the current workspace but will still be available in the file system and can be re-opened later.
+                {t('REMOVE_COLLECTIONS.NOTICE', 'Collections will be removed from the current workspace but will still be available in the file system and can be re-opened later.')}
               </div>
 
               <div className="mt-4">
@@ -228,15 +231,15 @@ const RemoveCollectionsModal = ({ collectionUids, onClose }) => {
               <div className="flex justify-between mt-6">
                 <div>
                   <Button color="danger" onClick={handleDiscard}>
-                    Discard and Close
+                    {t('REMOVE_COLLECTIONS.DISCARD_AND_CLOSE', 'Discard and Close')}
                   </Button>
                 </div>
                 <div>
                   <Button className="mr-2" color="secondary" variant="ghost" onClick={handleCancel}>
-                    Cancel
+                    {t('COMMON.CANCEL', 'Cancel')}
                   </Button>
                   <Button onClick={handleSave}>
-                    Save and Close
+                    {t('REMOVE_COLLECTIONS.SAVE_AND_CLOSE', 'Save and Close')}
                   </Button>
                 </div>
               </div>
@@ -245,22 +248,27 @@ const RemoveCollectionsModal = ({ collectionUids, onClose }) => {
             <>
               <div className="mt-4">
                 {hasMultipleCollections ? (
-                  `Are you sure you want to close all ${collectionUids.length} collections in this workspace?`
+                  t('REMOVE_COLLECTIONS.CONFIRM_CLOSE_ALL', 'Are you sure you want to close all {{count}} collections in this workspace?', {
+                    count: collectionUids.length
+                  })
                 ) : (
-                  <>
-                    Are you sure you want to close the collection <strong>{singleCollectionName}</strong> from this workspace?
-                  </>
+                  <Trans
+                    i18nKey="REMOVE_COLLECTIONS.CONFIRM_CLOSE_SINGLE"
+                    defaults="Are you sure you want to close the collection <0>{{name}}</0> from this workspace?"
+                    values={{ name: singleCollectionName }}
+                    components={[<strong key="name" />]}
+                  />
                 )}
               </div>
               <div className="mt-4 text-xs text-gray-500">
-                Collections will be removed from the current workspace but will still be available in the file system and can be re-opened later.
+                {t('REMOVE_COLLECTIONS.NOTICE', 'Collections will be removed from the current workspace but will still be available in the file system and can be re-opened later.')}
               </div>
               <div className="flex justify-end mt-6">
                 <Button className="mr-2" color="secondary" variant="ghost" onClick={handleCancel} data-testid="modal-close-button">
-                  Cancel
+                  {t('COMMON.CANCEL', 'Cancel')}
                 </Button>
                 <Button color="warning" onClick={handleCloseAllCollections}>
-                  {hasMultipleCollections ? 'Close All' : 'Close'}
+                  {hasMultipleCollections ? t('REMOVE_COLLECTIONS.CLOSE_ALL', 'Close All') : t('COMMON.CLOSE', 'Close')}
                 </Button>
               </div>
             </>

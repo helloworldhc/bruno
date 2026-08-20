@@ -170,7 +170,7 @@ const CollectionsList = ({ workspace }) => {
   const handleRenameCollection = (collection) => {
     dropdownRefs.current[collection.uid]?.hide();
     if (collection.isLoaded === false) {
-      toast.error('Cannot rename collections that are not cloned yet');
+      toast.error(t('WORKSPACE.CANNOT_RENAME_UNCLONED', 'Cannot rename collections that are not cloned yet'));
       return;
     }
     setSelectedCollectionUid(collection.uid);
@@ -180,7 +180,7 @@ const CollectionsList = ({ workspace }) => {
   const handleShareCollection = (collection) => {
     dropdownRefs.current[collection.uid]?.hide();
     if (collection.isLoaded === false) {
-      toast.error('Please clone this collection first before sharing it');
+      toast.error(t('WORKSPACE.CLONE_BEFORE_SHARING', 'Please clone this collection first before sharing it'));
       return;
     }
 
@@ -200,12 +200,12 @@ const CollectionsList = ({ workspace }) => {
     dropdownRefs.current[collection.uid]?.hide();
     if (collection.failedToOpen || collection.notFoundLocally) {
       dispatch(removeCollectionFromWorkspaceAction(workspace.uid, collection.pathname))
-        .then(() => toast.success('Collection removed from workspace'))
-        .catch(() => toast.error('An error occurred while removing the collection'));
+        .then(() => toast.success(t('COMMON.SUCCESS', 'Collection removed from workspace')))
+        .catch(() => toast.error(t('COLLECTIONS.REMOVE_ERROR', 'An error occurred while removing the collection')));
       return;
     }
     if (collection.isLoaded === false) {
-      toast.error('Cannot remove collections that are not loaded');
+      toast.error(t('WORKSPACE.CANNOT_REMOVE_UNLOADED', 'Cannot remove collections that are not loaded'));
       return;
     }
     setSelectedCollectionUid(collection.uid);
@@ -215,7 +215,7 @@ const CollectionsList = ({ workspace }) => {
   const handleDeleteCollection = (collection) => {
     dropdownRefs.current[collection.uid]?.hide();
     if (collection.isLoaded === false) {
-      toast.error('Cannot delete collections that are not loaded');
+      toast.error(t('WORKSPACE.CANNOT_DELETE_UNLOADED', 'Cannot delete collections that are not loaded'));
       return;
     }
     setSelectedCollectionUid(collection.uid);
@@ -226,14 +226,14 @@ const CollectionsList = ({ workspace }) => {
     dropdownRefs.current[collection.uid]?.hide();
     dispatch(showInFolder(collection.pathname)).catch((error) => {
       console.error('Error opening the folder', error);
-      toast.error('Error opening the folder');
+      toast.error(t('COLLECTION.ERROR_OPENING_FOLDER', 'Error opening the folder'));
     });
   };
 
   const handleConnectGit = (collection) => {
     dropdownRefs.current[collection.uid]?.hide();
     if (collection.isLoaded === false) {
-      toast.error('Cannot connect a Git remote to a collection that is not present locally');
+      toast.error(t('WORKSPACE.CANNOT_CONNECT_GIT_LOCAL', 'Cannot connect a Git remote to a collection that is not present locally'));
       return;
     }
     setGitTarget({
@@ -259,9 +259,9 @@ const CollectionsList = ({ workspace }) => {
     if (!collection.gitRemoteUrl) return;
     try {
       await navigator.clipboard.writeText(collection.gitRemoteUrl);
-      toast.success('Git URL copied');
+      toast.success(t('WORKSPACE.GIT_URL_COPIED', 'Git URL copied'));
     } catch (e) {
-      toast.error('Failed to copy URL');
+      toast.error(t('COMMON.FAILED_TO_COPY', 'Failed to copy to clipboard'));
     }
   };
 
@@ -336,8 +336,8 @@ const CollectionsList = ({ workspace }) => {
         {workspaceCollections.length === 0 ? (
           <div className="empty-state">
             <IconBox size={32} strokeWidth={1.5} className="empty-icon" />
-            <h3 className="empty-title">No collections yet</h3>
-            <p className="empty-description">Create your first collection or open an existing one to get started.</p>
+            <h3 className="empty-title">{t('WORKSPACE.NO_COLLECTIONS_YET', 'No collections yet')}</h3>
+            <p className="empty-description">{t('WORKSPACE.NO_COLLECTIONS_DESC', 'Create your first collection or open an existing one to get started.')}</p>
           </div>
         ) : (
           workspaceCollections.map((collection, index) => (

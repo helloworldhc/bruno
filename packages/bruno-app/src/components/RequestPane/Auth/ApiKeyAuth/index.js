@@ -8,8 +8,10 @@ import SingleLineEditor from 'components/SingleLineEditor';
 import { sendRequest } from 'providers/ReduxStore/slices/collections/actions';
 import StyledWrapper from './StyledWrapper';
 import { humanizeRequestAPIKeyPlacement } from 'utils/collections';
+import { useTranslation } from 'react-i18next';
 
 const ApiKeyAuth = ({ item, collection, updateAuth, request, save }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const dropdownTippyRef = useRef();
@@ -62,7 +64,7 @@ const ApiKeyAuth = ({ item, collection, updateAuth, request, save }) => {
 
   return (
     <StyledWrapper className="w-full">
-      <label className="block mb-1">Key</label>
+      <label className="block mb-1">{t('AUTH.KEY', 'Key')}</label>
       <div className="single-line-editor-wrapper mb-3">
         <SingleLineEditor
           value={apikeyAuth.key || ''}
@@ -75,7 +77,7 @@ const ApiKeyAuth = ({ item, collection, updateAuth, request, save }) => {
         />
       </div>
 
-      <label className="block mb-1">Value</label>
+      <label className="block mb-1">{t('AUTH.VALUE', 'Value')}</label>
       <div className="single-line-editor-wrapper mb-3">
         <SingleLineEditor
           value={apikeyAuth.value || ''}
@@ -88,7 +90,7 @@ const ApiKeyAuth = ({ item, collection, updateAuth, request, save }) => {
         />
       </div>
 
-      <label className="block mb-1">Add To</label>
+      <label className="block mb-1">{t('AUTH.ADD_TO', 'Add To')}</label>
       <div data-testid="auth-placement-selector" className="inline-flex items-center cursor-pointer auth-placement-selector w-fit">
         <Dropdown onCreate={onDropdownCreate} icon={<Icon />} placement="bottom-end">
           <div
@@ -98,7 +100,7 @@ const ApiKeyAuth = ({ item, collection, updateAuth, request, save }) => {
               handleAuthChange('placement', 'header');
             }}
           >
-            Header
+            {t('AUTH.HEADER', 'Header')}
           </div>
           <div
             className="dropdown-item"
@@ -107,7 +109,7 @@ const ApiKeyAuth = ({ item, collection, updateAuth, request, save }) => {
               handleAuthChange('placement', 'queryparams');
             }}
           >
-            Query Param
+            {t('AUTH.QUERY_PARAM', 'Query Param')}
           </div>
         </Dropdown>
       </div>

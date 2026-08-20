@@ -42,7 +42,7 @@ const Auth = ({ item, collection }) => {
   const getAuthView = () => {
     switch (authMode) {
       case 'none': {
-        return <div className="mt-2">{t('REQUEST.NO_AUTH', 'No Auth')}</div>;
+        return <div className="mt-2">{t('REQUEST.AUTH_NONE', 'No Auth')}</div>;
       }
       case 'awsv4': {
         return <AwsV4Auth collection={collection} item={item} request={request} save={save} updateAuth={updateAuth} />;

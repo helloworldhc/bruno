@@ -16,10 +16,12 @@ import Button from 'ui/Button';
 import { headerNameRegex, headerValueRegex } from 'utils/common/regex';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useTrackScroll } from 'hooks/useTrackScroll';
+import { useTranslation } from 'react-i18next';
 
 const headerAutoCompleteList = StandardHTTPHeaders.map((e) => e.header);
 
 const Headers = ({ collection, folder }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const tabs = useSelector((state) => state.tabs.tabs);
@@ -58,17 +60,17 @@ const Headers = ({ collection, folder }) => {
     if (key === 'name') {
       if (!row.name || row.name.trim() === '') return null;
       if (!headerNameRegex.test(row.name)) {
-        return 'Header name cannot contain spaces or newlines';
+        return t('FOLDER_SETTINGS.HEADER_NAME_ERROR', 'Header name cannot contain spaces or newlines');
       }
     }
     if (key === 'value') {
       if (!row.value) return null;
       if (!headerValueRegex.test(row.value)) {
-        return 'Header value cannot contain newlines';
+        return t('FOLDER_SETTINGS.HEADER_VALUE_ERROR', 'Header value cannot contain newlines');
       }
     }
     return null;
-  }, []);
+  }, [t]);
 
   const descriptionColumn = createDescriptionColumn({
     theme: storedTheme,
@@ -77,12 +79,15 @@ const Headers = ({ collection, folder }) => {
     item: folder
   });
 
+  const nameLabel = t('COMMON.NAME', 'Name');
+  const valueLabel = t('COMMON.VALUE', 'Value');
+
   const columns = [
     {
       key: 'name',
-      name: 'Name',
+      name: nameLabel,
       isKeyField: true,
-      placeholder: 'Name',
+      placeholder: nameLabel,
       width: '20%',
       render: ({ value, onChange }) => (
         <SingleLineEditor
@@ -92,14 +97,14 @@ const Headers = ({ collection, folder }) => {
           onChange={(newValue) => onChange(newValue.replace(/[\r\n]/g, ''))}
           autocomplete={headerAutoCompleteList}
           collection={collection}
-          placeholder={!value ? 'Name' : ''}
+          placeholder={!value ? nameLabel : ''}
         />
       )
     },
     {
       key: 'value',
-      name: 'Value',
-      placeholder: 'Value',
+      name: valueLabel,
+      placeholder: valueLabel,
       render: ({ value, onChange }) => (
         <SingleLineEditor
           value={value || ''}
@@ -109,7 +114,7 @@ const Headers = ({ collection, folder }) => {
           collection={collection}
           item={folder}
           autocomplete={MimeTypes}
-          placeholder={!value ? 'Value' : ''}
+          placeholder={!value ? valueLabel : ''}
         />
       )
     },
@@ -126,7 +131,7 @@ const Headers = ({ collection, folder }) => {
     return (
       <StyledWrapper className="w-full">
         <div className="text-xs mb-4 text-muted">
-          Request headers that will be sent with every request inside this folder.
+          {t('FOLDER_SETTINGS.HEADERS_DESCRIPTION', 'Request headers that will be sent with every request inside this folder.')}
         </div>
         <BulkEditor
           params={headers}
@@ -141,7 +146,7 @@ const Headers = ({ collection, folder }) => {
   return (
     <StyledWrapper className="w-full" ref={wrapperRef}>
       <div className="text-xs mb-4 text-muted">
-        Request headers that will be sent with every request inside this folder.
+        {t('FOLDER_SETTINGS.HEADERS_DESCRIPTION', 'Request headers that will be sent with every request inside this folder.')}
       </div>
       <EditableTable
         tableId="folder-headers"
@@ -156,12 +161,12 @@ const Headers = ({ collection, folder }) => {
       />
       <div className="flex justify-end mt-2">
         <button className="text-link select-none" data-testid="bulk-edit-toggle" onClick={toggleBulkEditMode}>
-          Bulk Edit
+          {t('COMMON.BULK_EDIT', 'Bulk Edit')}
         </button>
       </div>
       <div className="mt-6">
         <Button type="submit" size="sm" onClick={handleSave}>
-          Save
+          {t('COMMON.SAVE', 'Save')}
         </Button>
       </div>
     </StyledWrapper>

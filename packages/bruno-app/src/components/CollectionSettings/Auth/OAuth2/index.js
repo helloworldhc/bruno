@@ -1,6 +1,7 @@
 import React from 'react';
 import get from 'lodash/get';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 import { saveCollectionSettings } from 'providers/ReduxStore/slices/collections/actions';
 import OAuth2AuthorizationCode from 'components/RequestPane/Auth/OAuth2/AuthorizationCode/index';
 import { updateCollectionAuth } from 'providers/ReduxStore/slices/collections/index';
@@ -40,6 +41,7 @@ const GrantTypeComponentMap = ({ collection }) => {
 };
 
 const OAuth2 = ({ collection }) => {
+  const { t } = useTranslation();
   let request = collection.draft?.root ? get(collection, 'draft.root.request', {}) : get(collection, 'root.request', {});
 
   return (

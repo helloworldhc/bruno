@@ -11,6 +11,7 @@ import trim from 'lodash/trim';
 import path, { normalizePath, isPathExternalToBasePath } from 'utils/common/path';
 import { insertTaskIntoQueue } from 'providers/ReduxStore/slices/app';
 import toast from 'react-hot-toast';
+import i18n from 'i18n';
 import IpcErrorModal from 'components/Errors/IpcErrorModal/index';
 import SaveFileErrorModal from 'components/Errors/SaveFileErrorModal/index';
 import {
@@ -190,7 +191,7 @@ export const saveRequest = (itemUid, collectionUid, silent = false) => (dispatch
       .then(() => ipcRenderer.invoke('renderer:save-request', item.pathname, itemToSave, collection.format))
       .then(() => {
         if (!silent) {
-          toast.success('Request saved successfully');
+          toast.success(i18n.t('COLLECTIONS.REQUEST_SAVED_SUCCESS', 'Request saved successfully'));
         }
         dispatch(
           _saveRequest({
@@ -250,11 +251,11 @@ export const saveFile = (content, itemUid, collectionUid, silent = false) => asy
   try {
     await ipcRenderer.invoke('renderer:save-file', item.pathname, content);
     if (!silent) {
-      toast.success('File saved successfully!');
+      toast.success(i18n.t('COLLECTIONS.FILE_SAVED_SUCCESS', 'File saved successfully!'));
     }
   } catch (err) {
     if (!silent) {
-      toast.error('Failed to save file!');
+      toast.error(i18n.t('COLLECTIONS.FILE_SAVED_ERROR', 'Failed to save file!'));
     }
     throw err;
   }
@@ -287,7 +288,7 @@ export const saveMultipleRequests = (items) => (dispatch, getState) => {
       .invoke('renderer:save-multiple-requests', itemsToSave)
       .then(resolve)
       .catch((err) => {
-        toast.error('Failed to save requests!');
+        toast.error(i18n.t('COLLECTIONS.REQUESTS_SAVED_ERROR', 'Failed to save requests!'));
         reject(err);
       });
   });
@@ -311,12 +312,12 @@ export const saveCollectionRoot = (collectionUid) => (dispatch, getState) => {
     ipcRenderer
       .invoke('renderer:save-collection-root', collectionCopy.pathname, collectionRootToSave, collectionCopy.brunoConfig)
       .then(() => {
-        toast.success('Collection Settings saved successfully');
+        toast.success(i18n.t('COLLECTIONS.SETTINGS_SAVED_SUCCESS', 'Collection Settings saved successfully'));
         dispatch(saveCollectionDraft({ collectionUid }));
       })
       .then(resolve)
       .catch((err) => {
-        toast.error('Failed to save collection settings!');
+        toast.error(i18n.t('COLLECTIONS.SETTINGS_SAVED_ERROR', 'Failed to save collection settings!'));
         reject(err);
       });
   });
@@ -346,11 +347,11 @@ export const saveCollectionVersion = (collectionUid, version) => (dispatch, getS
       .invoke('renderer:update-bruno-config', brunoConfigToSave, collection.pathname, collection.root)
       .then(() => {
         dispatch(_updateCollectionVersion({ collectionUid, version: updatedVersion }));
-        toast.success('Collection version updated');
+        toast.success(i18n.t('COLLECTIONS.VERSION_UPDATED', 'Collection version updated'));
       })
       .then(resolve)
       .catch((err) => {
-        toast.error('Failed to update collection version');
+        toast.error(i18n.t('COLLECTIONS.VERSION_UPDATE_ERROR', 'Failed to update collection version'));
         reject(err);
       });
   });
@@ -386,7 +387,7 @@ export const saveFolderRoot = (collectionUid, folderUid, silent = false) => (dis
       .invoke('renderer:save-folder-root', folderData)
       .then(() => {
         if (!silent) {
-          toast.success('Folder Settings saved successfully');
+          toast.success(i18n.t('FOLDER_SETTINGS.SETTINGS_SAVED_SUCCESS', 'Folder Settings saved successfully'));
         }
         // If there was a draft, save it to root and clear the draft
         if (folder.draft) {
@@ -395,7 +396,7 @@ export const saveFolderRoot = (collectionUid, folderUid, silent = false) => (dis
       })
       .then(resolve)
       .catch((err) => {
-        toast.error('Failed to save folder settings!');
+        toast.error(i18n.t('FOLDER_SETTINGS.SETTINGS_SAVED_ERROR', 'Failed to save folder settings!'));
         reject(err);
       });
   });
@@ -434,7 +435,7 @@ export const saveMultipleCollections = (collectionDrafts) => (dispatch, getState
     Promise.all(savePromises)
       .then(() => resolve())
       .catch((err) => {
-        toast.error('Failed to save collection settings!');
+        toast.error(i18n.t('COLLECTIONS.SETTINGS_SAVED_ERROR', 'Failed to save collection settings!'));
         reject(err);
       });
   });
@@ -476,7 +477,7 @@ export const saveMultipleFolders = (folderDrafts) => (dispatch, getState) => {
     Promise.all(savePromises)
       .then(resolve)
       .catch((err) => {
-        toast.error('Failed to save folder settings!');
+        toast.error(i18n.t('FOLDER_SETTINGS.SETTINGS_SAVED_ERROR', 'Failed to save folder settings!'));
         reject(err);
       });
   });
@@ -508,7 +509,7 @@ export const sendCollectionOauth2Request = (collectionUid, itemUid) => (dispatch
         if (response?.data?.error) {
           toast.error(response?.data?.error);
         } else {
-          toast.success('Request made successfully');
+          toast.success(i18n.t('COLLECTIONS.REQUEST_MADE_SUCCESS', 'Request made successfully'));
         }
         return response;
       })
@@ -859,7 +860,7 @@ export const newFolder = (folderName, directoryName, collectionUid, itemUid) => 
           .invoke('renderer:new-folder', { pathname: fullName, folderData, format: collection.format })
           .then(resolve)
           .catch((error) => {
-            toast.error('Failed to create a new folder!');
+            toast.error(i18n.t('NEW_FOLDER.CREATE_ERROR', 'Failed to create a new folder!'));
             reject(error);
           });
       } else {
@@ -892,7 +893,7 @@ export const newFolder = (folderName, directoryName, collectionUid, itemUid) => 
             .invoke('renderer:new-folder', { pathname: fullName, folderData, format: collection.format })
             .then(resolve)
             .catch((error) => {
-              toast.error('Failed to create a new folder!');
+              toast.error(i18n.t('NEW_FOLDER.CREATE_ERROR', 'Failed to create a new folder!'));
               reject(error);
             });
         } else {
@@ -926,7 +927,7 @@ export const renameItem
 
         const renameName = async () => {
           return ipcRenderer.invoke('renderer:rename-item-name', { itemPath: item.pathname, newName, collectionPathname: collection.pathname }).catch((err) => {
-            toast.error('Failed to rename the item name');
+            toast.error(i18n.t('COLLECTIONS.ITEM_RENAMED_ERROR', 'Failed to rename the item name'));
             console.error(err);
             throw new Error('Failed to rename the item name');
           });
@@ -960,7 +961,7 @@ export const renameItem
 
         renameOperation()
           .then(() => {
-            toast.success('Item renamed successfully');
+            toast.success(i18n.t('COLLECTIONS.ITEM_RENAMED_SUCCESS', 'Item renamed successfully'));
             resolve();
           })
           .catch((err) => reject(err));
@@ -1324,7 +1325,7 @@ export const handleCollectionItemDrop
           if (isPathOrDescendant(targetItemPathname, draggedItemPathname)) return;
 
           if (isCrossFormatMove && isItemAFolder(draggedItem)) {
-            toast.error('Moving folders between collections with different formats is not supported');
+            toast.error(i18n.t('COLLECTIONS.CROSS_FORMAT_FOLDER_MOVE_ERROR', 'Moving folders between collections with different formats is not supported'));
             return;
           }
 
@@ -2755,13 +2756,13 @@ export const saveCollectionSettings = (collectionUid, brunoConfig = null, silent
     Promise.all(savePromises)
       .then(() => {
         if (!silent) {
-          toast.success('Collection Settings saved successfully');
+          toast.success(i18n.t('COLLECTIONS.SETTINGS_SAVED_SUCCESS', 'Collection Settings saved successfully'));
         }
         dispatch(saveCollectionDraft({ collectionUid }));
       })
       .then(resolve)
       .catch((err) => {
-        toast.error('Failed to save collection settings!');
+        toast.error(i18n.t('COLLECTIONS.SETTINGS_SAVED_ERROR', 'Failed to save collection settings!'));
         reject(err);
       });
   });
@@ -2876,7 +2877,7 @@ export const openCollectionEvent = (uid, pathname, brunoConfig, options = {}) =>
 
     if (existingCollection && isAlreadyInWorkspace) {
       if (!options.silent) {
-        toast.success('Collection is already opened');
+        toast.success(i18n.t('COLLECTIONS.COLLECTION_ALREADY_OPENED', 'Collection is already opened'));
       }
       resolve();
       return;
@@ -2893,12 +2894,12 @@ export const openCollectionEvent = (uid, pathname, brunoConfig, options = {}) =>
           .invoke('renderer:add-collection-to-workspace', activeWorkspace.pathname, workspaceCollection)
           .then(() => {
             if (!options.silent) {
-              toast.success('Collection added to workspace');
+              toast.success(i18n.t('COLLECTIONS.COLLECTION_ADDED_TO_WORKSPACE', 'Collection added to workspace'));
             }
           })
           .catch((err) => {
             console.error('Failed to add collection to workspace', err);
-            toast.error('Failed to add collection to workspace');
+            toast.error(i18n.t('COLLECTIONS.COLLECTION_ADD_ERROR', 'Failed to add collection to workspace'));
           });
       }
 
@@ -2960,7 +2961,7 @@ export const openCollectionEvent = (uid, pathname, brunoConfig, options = {}) =>
                 .invoke('renderer:add-collection-to-workspace', currentWorkspace.pathname, workspaceCollection)
                 .catch((err) => {
                   console.error('Failed to add collection to workspace', err);
-                  toast.error('Failed to add collection to workspace');
+                  toast.error(i18n.t('COLLECTIONS.COLLECTION_ADD_ERROR', 'Failed to add collection to workspace'));
                 });
             }
           }
@@ -3682,19 +3683,19 @@ export const migrateCollectionToYml = (collectionUid) => async (dispatch, getSta
       collectionUid,
       type: 'collection-settings'
     }));
-    toast.success('Collection migrated to YML format successfully');
+    toast.success(i18n.t('MIGRATE.SUCCESS_TOAST', 'Collection migrated to YML format successfully'));
   } catch (err) {
     const wasCancelled = getState().collectionMigration.status === 'cancelling'
       || /migration cancelled/i.test(err?.message || '');
     if (wasCancelled) {
-      toast('Migration cancelled');
+      toast(i18n.t('MIGRATE.CANCELLED', 'Migration cancelled'));
     } else {
-      toast.error(`Migration failed: ${err?.message || 'Unknown error'}`);
+      toast.error(i18n.t('MIGRATE.FAILED', 'Migration failed: {{error}}', { error: err?.message || 'Unknown error' }));
     }
     // Main restored the disk and re-opened the original collection; hold the locked
     // modal open until it is back in the store so the sidebar never sits empty.
     await remountReopenedCollection().catch(() => {
-      toast.error('Collection could not be reopened automatically. Please reopen it manually.');
+      toast.error(i18n.t('MIGRATE.REOPEN_ERROR', 'Collection could not be reopened automatically. Please reopen it manually.'));
     });
     throw err;
   } finally {

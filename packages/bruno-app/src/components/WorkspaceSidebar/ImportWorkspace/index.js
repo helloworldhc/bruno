@@ -75,7 +75,7 @@ const ImportWorkspace = ({ onClose }) => {
 
     const filePath = window?.ipcRenderer?.getFilePath(file);
     if (!filePath) {
-      toast.error('Could not get file path');
+      toast.error(t('WORKSPACE.COULD_NOT_GET_FILE_PATH', 'Could not get file path'));
       return null;
     }
 

@@ -15,6 +15,7 @@ import { useTheme } from 'providers/Theme';
 import Button from 'ui/Button';
 import StyledWrapper from './StyledWrapper';
 import EmptyAppState from './EmptyAppState';
+import { useTranslation } from 'react-i18next';
 import { buildVariables } from './buildVariables';
 import {
   SENTINEL,
@@ -302,9 +303,9 @@ const AppView = ({ item, collection, code }) => {
   return (
     <StyledWrapper data-testid="app-view">
       <div className="app-view-toolbar">
-        <span>App mode - {item.name}</span>
+        <span>{t('APP.APP_MODE', 'App mode')} - {item.name}</span>
         <button type="button" className="app-exit-btn" data-testid="app-exit-button" onClick={disableApp}>
-          Exit to editor
+          {t('APP.EXIT_TO_EDITOR', 'Exit to editor')}
         </button>
       </div>
       {code && code.trim().length ? (
@@ -319,8 +320,8 @@ const AppView = ({ item, collection, code }) => {
         </div>
       ) : (
         <EmptyAppState
-          title="No app yet"
-          hint="Add HTML/JS in the App tab to render a custom UI for this request."
+          title={t('APP_VIEW.NO_APP_YET', 'No app yet')}
+          hint={t('APP_VIEW.HINT', 'Add HTML/JS in the App tab to render a custom UI for this request.')}
           actions={(
             <>
               <Button
@@ -330,7 +331,7 @@ const AppView = ({ item, collection, code }) => {
                 onClick={goToAppTab}
                 data-testid="empty-app-add-code"
               >
-                Add app code
+                {t('APP.ADD_APP_CODE', 'Add app code')}
               </Button>
               <Button
                 size="sm"
@@ -339,7 +340,7 @@ const AppView = ({ item, collection, code }) => {
                 onClick={openAppsDocs}
                 data-testid="empty-app-learn-more"
               >
-                Learn more
+                {t('COMMON.LEARN_MORE', 'Learn more')}
               </Button>
             </>
           )}

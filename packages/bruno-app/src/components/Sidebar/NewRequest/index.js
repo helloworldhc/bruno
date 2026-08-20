@@ -165,7 +165,7 @@ const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
           })
         )
           .then(() => {
-            toast.success('New request created!');
+            toast.success(t('COLLECTIONS.NEW_REQUEST_CREATED', 'New request created!'));
             onClose();
           })
           .catch((err) => toast.error(err ? err.message : 'An error occurred while adding the request'));
@@ -182,7 +182,7 @@ const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
           itemUid: item ? item.uid : null
         }))
           .then(() => {
-            toast.success('New request created!');
+            toast.success(t('COLLECTIONS.NEW_REQUEST_CREATED', 'New request created!'));
             onClose();
           })
           .catch((err) => toast.error(err ? err.message : 'An error occurred while adding the request'));
@@ -230,7 +230,7 @@ const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
           })
         )
           .then(() => {
-            toast.success('New request created!');
+            toast.success(t('COLLECTIONS.NEW_REQUEST_CREATED', 'New request created!'));
             onClose();
           })
           .catch((err) => toast.error(err ? err.message : 'An error occurred while adding the request'));
@@ -247,7 +247,7 @@ const NewRequest = ({ collectionUid, item, isEphemeral, onClose }) => {
           })
         )
           .then(() => {
-            toast.success('New request created!');
+            toast.success(t('COLLECTIONS.NEW_REQUEST_CREATED', 'New request created!'));
             onClose();
           })
           .catch((err) => toast.error(err ? err.message : 'An error occurred while adding the request'));

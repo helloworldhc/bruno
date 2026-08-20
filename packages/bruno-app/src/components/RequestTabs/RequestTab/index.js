@@ -269,8 +269,8 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
           window.dispatchEvent(new Event('dotenv-save'));
         } else {
           dispatch(saveEnvironment(variables, environmentUid, collection.uid))
-            .then(() => toast.success('Changes saved successfully'))
-            .catch(saveErrorHandler('Failed to save environment'));
+            .then(() => toast.success(t('COMMON.CHANGES_SAVED', 'Changes saved successfully')))
+            .catch(saveErrorHandler(t('ENVIRONMENTS.FAILED_SAVE', 'Failed to save environment')));
         }
       }
     } else if (tab.type === 'global-environment-settings' || tab.type === 'workspaceEnvironments') {
@@ -280,8 +280,8 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
           window.dispatchEvent(new Event('dotenv-save'));
         } else {
           dispatch(saveGlobalEnvironment({ variables, environmentUid }))
-            .then(() => toast.success('Changes saved successfully'))
-            .catch(saveErrorHandler('Failed to save global environment'));
+            .then(() => toast.success(t('COMMON.CHANGES_SAVED', 'Changes saved successfully')))
+            .catch(saveErrorHandler(t('ENVIRONMENTS.FAILED_SAVE_GLOBAL', 'Failed to save global environment')));
         }
       }
     } else if (tab.type === 'folder-settings') {
@@ -441,9 +441,9 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
                     dispatch(clearEnvironmentsDraft({ collectionUid: collection.uid }));
                     dispatch(closeTabs({ tabUids: [tab.uid] }));
                     setShowConfirmEnvironmentClose(false);
-                    toast.success('Environment saved');
+                    toast.success(t('ENVIRONMENTS.SAVED', 'Environment saved'));
                   })
-                  .catch(saveErrorHandler('Failed to save environment'));
+                  .catch(saveErrorHandler(t('ENVIRONMENTS.FAILED_SAVE', 'Failed to save environment')));
               }
             }}
           />
@@ -489,9 +489,9 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
                     dispatch(clearGlobalEnvironmentDraft());
                     dispatch(closeTabs({ tabUids: [tab.uid] }));
                     setShowConfirmGlobalEnvironmentClose(false);
-                    toast.success('Global environment saved');
+                    toast.success(t('ENVIRONMENTS.GLOBAL_SAVED', 'Global environment saved'));
                   })
-                  .catch(saveErrorHandler('Failed to save global environment'));
+                  .catch(saveErrorHandler(t('ENVIRONMENTS.FAILED_SAVE_GLOBAL', 'Failed to save global environment')));
               }
             }}
           />
@@ -631,7 +631,7 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
         }}
       >
         {item.type === 'app' ? (
-          <span className="tab-method flex items-center" aria-label="App">
+          <span className="tab-method flex items-center" aria-label={t('COMMON.APP', 'App')}>
             <IconAppWindow size={14} strokeWidth={1.5} />
           </span>
         ) : (

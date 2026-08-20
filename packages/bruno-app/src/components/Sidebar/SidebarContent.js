@@ -1,4 +1,5 @@
 import { useSidebarAccordion } from './SidebarAccordionContext';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Sections configuration
@@ -19,6 +20,7 @@ import { useSidebarAccordion } from './SidebarAccordionContext';
  */
 
 const SidebarContent = ({ sections }) => {
+  const { t } = useTranslation();
   const { isExpanded, getExpandedCount } = useSidebarAccordion();
 
   const expandedCount = getExpandedCount();

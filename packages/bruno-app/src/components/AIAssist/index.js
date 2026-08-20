@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import get from 'lodash/get';
 import Tippy from '@tippyjs/react';
 import { IconX, IconArrowBackUp, IconPlayerStop } from '@tabler/icons';
@@ -45,24 +46,10 @@ const SUGGESTIONS = {
   ]
 };
 
-const TITLES = {
-  'tests': 'Generate Tests',
-  'pre-request': 'Generate Pre-Request Script',
-  'post-response': 'Generate Post-Response Script',
-  'docs': 'Generate Documentation',
-  'app-request': 'Generate App',
-  'app-collection': 'Generate App'
-};
-
-const PREVIEW_LABELS = {
-  'docs': 'Preview · replaces current documentation',
-  'app-request': 'Preview · replaces current app',
-  'app-collection': 'Preview · replaces current app'
-};
-
 const isValidType = (t) => SUGGESTIONS[t] !== undefined;
 
 const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, variables, onApply }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +57,21 @@ const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, vari
   const [generated, setGenerated] = useState(null);
   const streamIdRef = useRef(null);
   const tippyRef = useRef(null);
+
+  const titles = {
+    'tests': t('AI_ASSIST.GENERATE_TESTS', 'Generate Tests'),
+    'pre-request': t('AI_ASSIST.GENERATE_PRE_REQUEST', 'Generate Pre-Request Script'),
+    'post-response': t('AI_ASSIST.GENERATE_POST_RESPONSE', 'Generate Post-Response Script'),
+    'docs': t('AI_ASSIST.GENERATE_DOCS', 'Generate Documentation'),
+    'app-request': t('AI_ASSIST.GENERATE_APP', 'Generate App'),
+    'app-collection': t('AI_ASSIST.GENERATE_APP', 'Generate App')
+  };
+
+  const previewLabels = {
+    'docs': t('AI_ASSIST.PREVIEW_REPLACES_DOCS', 'Preview · replaces current documentation'),
+    'app-request': t('AI_ASSIST.PREVIEW_REPLACES_APP', 'Preview · replaces current app'),
+    'app-collection': t('AI_ASSIST.PREVIEW_REPLACES_APP', 'Preview · replaces current app')
+  };
 
   // Focus the prompt textarea when coming back from preview
   useEffect(() => {
@@ -95,8 +97,8 @@ const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, vari
   const isAiEnabled = get(preferences, 'ai.enabled', false);
 
   const suggestions = useMemo(() => SUGGESTIONS[scriptType] || [], [scriptType]);
-  const title = TITLES[scriptType] || 'Generate with AI';
-  const previewLabel = PREVIEW_LABELS[scriptType] || 'Preview · replaces current script';
+  const title = titles[scriptType] || t('AI_ASSIST.GENERATE_WITH_AI', 'Generate with AI');
+  const previewLabel = previewLabels[scriptType] || t('AI_ASSIST.PREVIEW_REPLACES_SCRIPT', 'Preview · replaces current script');
 
   const close = useCallback(() => {
     tippyRef.current?.hide();
@@ -132,16 +134,16 @@ const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, vari
         if (result?.content) {
           setGenerated(result.content);
         } else {
-          setError('No content was generated. Try rephrasing your prompt.');
+          setError(t('AI_ASSIST.NO_CONTENT', 'No content was generated. Try rephrasing your prompt.'));
         }
       } catch (err) {
-        setError(err?.message || 'Failed to generate script');
+        setError(err?.message || t('AI_ASSIST.FAILED_GENERATE', 'Failed to generate script'));
       } finally {
         streamIdRef.current = null;
         setIsLoading(false);
       }
     },
-    [prompt, isLoading, scriptType, currentScript, requestContext, docsContext, variables]
+    [prompt, isLoading, scriptType, currentScript, requestContext, docsContext, variables, t]
   );
 
   const handleStop = useCallback(() => {
@@ -192,7 +194,7 @@ const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, vari
                 <IconSparkles size={12} strokeWidth={1.75} />
                 {title}
               </span>
-              <button className="popup-close" onClick={close} type="button" aria-label="Close">
+              <button className="popup-close" onClick={close} type="button" aria-label={t('COMMON.CLOSE', 'Close')}>
                 <IconX size={14} />
               </button>
             </div>
@@ -210,7 +212,7 @@ const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, vari
                         handleGenerate();
                       }
                     }}
-                    placeholder="Describe what you want to generate..."
+                    placeholder={t('AI_ASSIST.PLACEHOLDER', 'Describe what you want to generate...')}
                     rows={3}
                     disabled={isLoading}
                   />
@@ -238,10 +240,10 @@ const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, vari
                   {isLoading ? (
                     <span className="popup-loading">
                       <span className="loading-spinner" />
-                      Generating...
+                      {t('AI_ASSIST.GENERATING', 'Generating...')}
                     </span>
                   ) : (
-                    <span className="popup-hint">Enter to generate · Shift+Enter for newline</span>
+                    <span className="popup-hint">{t('AI_ASSIST.HINT', 'Enter to generate · Shift+Enter for newline')}</span>
                   )}
                   {isLoading ? (
                     <Button
@@ -251,9 +253,9 @@ const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, vari
                       rounded="sm"
                       icon={<IconPlayerStop size={12} />}
                       onClick={handleStop}
-                      title="Stop generating"
+                      title={t('AI_ASSIST.STOP_GENERATING', 'Stop generating')}
                     >
-                      Stop
+                      {t('AI_ASSIST.STOP', 'Stop')}
                     </Button>
                   ) : (
                     <button
@@ -262,7 +264,7 @@ const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, vari
                       onClick={() => handleGenerate()}
                       disabled={!prompt.trim()}
                     >
-                      Generate
+                      {t('AI_ASSIST.GENERATE', 'Generate')}
                     </button>
                   )}
                 </div>
@@ -281,11 +283,11 @@ const AIAssist = ({ scriptType, currentScript, requestContext, docsContext, vari
                 <div className="popup-footer">
                   <button className="btn-secondary" type="button" onClick={handleBackToPrompt}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <IconArrowBackUp size={12} /> Back
+                      <IconArrowBackUp size={12} /> {t('COMMON.BACK', 'Back')}
                     </span>
                   </button>
                   <button className="btn-generate" type="button" onClick={handleApply}>
-                    Apply
+                    {t('COMMON.APPLY', 'Apply')}
                   </button>
                 </div>
               </>

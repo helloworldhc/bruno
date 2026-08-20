@@ -3,13 +3,15 @@ import Modal from 'components/Modal/index';
 import { IconFiles } from '@tabler/icons';
 import { useSelector } from 'react-redux';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const SelectCollection = ({ onClose, onSelect, title }) => {
+  const { t } = useTranslation();
   const { collections } = useSelector((state) => state.collections);
 
   return (
     <StyledWrapper>
-      <Modal size="sm" title={title || 'Select Collection'} hideFooter={true} handleCancel={onClose}>
+      <Modal size="sm" title={title || t('SIDEBAR.SELECT_COLLECTION', 'Select Collection')} hideFooter={true} handleCancel={onClose}>
         <ul className="mb-2">
           {collections && collections.length ? (
             collections.map((c) => (
@@ -18,7 +20,7 @@ const SelectCollection = ({ onClose, onSelect, title }) => {
               </div>
             ))
           ) : (
-            <div>No collections found</div>
+            <div>{t('SIDEBAR.NO_COLLECTIONS_FOUND', 'No collections found')}</div>
           )}
         </ul>
       </Modal>

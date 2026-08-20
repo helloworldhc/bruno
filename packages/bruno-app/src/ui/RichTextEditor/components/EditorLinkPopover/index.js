@@ -8,6 +8,7 @@ import EditorLinkEditPopover from '../EditorLinkEditPopover';
 import StyledWrapper from './StyledWrapper';
 import Portal from 'ui/Portal';
 import { createPopper } from '@popperjs/core';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Resolves link text + doc range from the TipTap document for a given anchor element.
@@ -30,6 +31,7 @@ function resolveLinkText(editor, anchorEl) {
 }
 
 const EditorLinkPopover = ({ editor, onSubmit, onUnlink, containerEl }) => {
+  const { t } = useTranslation();
   // --- Hover View Popover ---
   const [hoverOpen, setHoverOpen] = useState(false);
   const [hoverLink, setHoverLink] = useState({ text: '', url: '' });
@@ -325,7 +327,7 @@ const EditorLinkPopover = ({ editor, onSubmit, onUnlink, containerEl }) => {
                   className="action-icon-btn"
                   onClick={() => {
                     navigator.clipboard.writeText(hoverLink.url).then(() => {
-                      toast.success('Link copied to clipboard');
+                      toast.success(t('COMMON.LINK_COPIED', 'Link copied to clipboard'));
                     });
                     setHoverOpen(false);
                   }}

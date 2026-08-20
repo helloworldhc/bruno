@@ -1,5 +1,6 @@
 import React from 'react';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const GrpcResponseHeaders = ({ metadata }) => {
   // Ensure headers is an array
@@ -10,8 +11,8 @@ const GrpcResponseHeaders = ({ metadata }) => {
       <table>
         <thead>
           <tr>
-            <td>Name</td>
-            <td>Value</td>
+            <td>{t('COMMON.NAME', 'Name')}</td>
+            <td>{t('COMMON.VALUE', 'Value')}</td>
           </tr>
         </thead>
         <tbody>

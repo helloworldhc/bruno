@@ -8,6 +8,7 @@ import ModeSwitch from 'components/ModeSwitch';
 import { useEditor } from '@tiptap/react';
 import { useTrackScroll } from 'hooks/useTrackScroll';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 // Distinct from any real `docs` value (including `null`, which a fresh
 // collection's docs field legitimately holds) so the "no edit emitted yet"
@@ -27,6 +28,7 @@ const DocsEditor = ({
   onScroll,
   testId
 }) => {
+  const { t } = useTranslation();
   const { displayedTheme } = useTheme();
   const preferences = useSelector((state) => state.app.preferences);
   const [isMarkdownMode, setIsMarkdownMode] = useState(false);

@@ -6,6 +6,7 @@ import CodeEditor from 'components/CodeEditor';
 import ResponseExampleFormUrlEncodedParams from '../ResponseExampleFormUrlEncodedParams';
 import ResponseExampleMultipartFormParams from '../ResponseExampleMultipartFormParams';
 import ResponseExampleFileBody from '../ResponseExampleFileBody';
+import { useTranslation } from 'react-i18next';
 
 const ResponseExampleBodyRenderer = ({
   bodyMode,
@@ -17,6 +18,7 @@ const ResponseExampleBodyRenderer = ({
   onBodyEdit,
   onSave
 }) => {
+  const { t } = useTranslation();
   const { displayedTheme } = useTheme();
   const preferences = useSelector((state) => state.app.preferences);
 
@@ -52,7 +54,7 @@ const ResponseExampleBodyRenderer = ({
       case 'none':
         return (
           <div className="no-body-text">
-            No Body
+            {t('REQUEST.NO_BODY', 'No Body')}
           </div>
         );
 
@@ -92,7 +94,7 @@ const ResponseExampleBodyRenderer = ({
       default:
         return (
           <div className="no-body-text">
-            No Body
+            {t('REQUEST.NO_BODY', 'No Body')}
           </div>
         );
     }

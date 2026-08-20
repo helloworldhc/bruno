@@ -247,8 +247,8 @@ const ModifyCookieModal = ({ onClose, domain, cookie }) => {
                 value={cookieString}
                 onChange={(e) => setCookieString(e.target.value)}
                 className="block textbox w-full h-24"
-                placeholder="key=value; key2=value2"
-              />
+                placeholder={t('COOKIES.RAW_COOKIE_PLACEHOLDER', 'key=value; key2=value2')}
+                autoComplete="off"/>
             </div>
           ) : (
             <div className="space-y-4">

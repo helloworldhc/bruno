@@ -7,14 +7,16 @@ import { sanitizeName } from 'utils/common/regex';
 import toast from 'react-hot-toast';
 import { IconApi, IconBrandGraphql, IconPlugConnected, IconCode, IconPlus } from '@tabler/icons';
 import ActionIcon from 'ui/ActionIcon';
+import { useTranslation } from 'react-i18next';
 
 const CreateUntitledRequest = ({ collectionUid, itemUid = null, onRequestCreated, placement = 'bottom' }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const collections = useSelector((state) => state.collections.collections);
   const collection = collections?.find((c) => c.uid === collectionUid);
 
   const handleCreateHttpRequest = useCallback(async () => {
-    const uniqueName = await generateUniqueRequestName(collection, 'Untitled', itemUid);
+    const uniqueName = await generateUniqueRequestName(collection, t('COMMON.UNTITLED', 'Untitled'), itemUid);
     const filename = sanitizeName(uniqueName);
 
     dispatch(
@@ -29,14 +31,14 @@ const CreateUntitledRequest = ({ collectionUid, itemUid = null, onRequestCreated
       })
     )
       .then(() => {
-        toast.success('New request created!');
+        toast.success(t('REQUEST.NEW_REQUEST_CREATED', 'New request created!'));
         onRequestCreated?.();
       })
-      .catch((err) => toast.error(err ? err.message : 'An error occurred while adding the request'));
-  }, [dispatch, collection, itemUid, onRequestCreated]);
+      .catch((err) => toast.error(err ? err.message : t('REQUEST.ADD_REQUEST_ERROR', 'An error occurred while adding the request')));
+  }, [dispatch, collection, itemUid, onRequestCreated, t]);
 
   const handleCreateGraphQLRequest = useCallback(async () => {
-    const uniqueName = await generateUniqueRequestName(collection, 'Untitled', itemUid);
+    const uniqueName = await generateUniqueRequestName(collection, t('COMMON.UNTITLED', 'Untitled'), itemUid);
     const filename = sanitizeName(uniqueName);
 
     dispatch(
@@ -58,14 +60,14 @@ const CreateUntitledRequest = ({ collectionUid, itemUid = null, onRequestCreated
       })
     )
       .then(() => {
-        toast.success('New request created!');
+        toast.success(t('REQUEST.NEW_REQUEST_CREATED', 'New request created!'));
         onRequestCreated?.();
       })
-      .catch((err) => toast.error(err ? err.message : 'An error occurred while adding the request'));
-  }, [dispatch, collection, itemUid, onRequestCreated]);
+      .catch((err) => toast.error(err ? err.message : t('REQUEST.ADD_REQUEST_ERROR', 'An error occurred while adding the request')));
+  }, [dispatch, collection, itemUid, onRequestCreated, t]);
 
   const handleCreateWebSocketRequest = useCallback(async () => {
-    const uniqueName = await generateUniqueRequestName(collection, 'Untitled', itemUid);
+    const uniqueName = await generateUniqueRequestName(collection, t('COMMON.UNTITLED', 'Untitled'), itemUid);
     const filename = sanitizeName(uniqueName);
 
     dispatch(
@@ -79,14 +81,14 @@ const CreateUntitledRequest = ({ collectionUid, itemUid = null, onRequestCreated
       })
     )
       .then(() => {
-        toast.success('New request created!');
+        toast.success(t('REQUEST.NEW_REQUEST_CREATED', 'New request created!'));
         onRequestCreated?.();
       })
-      .catch((err) => toast.error(err ? err.message : 'An error occurred while adding the request'));
-  }, [dispatch, collection, itemUid, onRequestCreated]);
+      .catch((err) => toast.error(err ? err.message : t('REQUEST.ADD_REQUEST_ERROR', 'An error occurred while adding the request')));
+  }, [dispatch, collection, itemUid, onRequestCreated, t]);
 
   const handleCreateGrpcRequest = useCallback(async () => {
-    const uniqueName = await generateUniqueRequestName(collection, 'Untitled', itemUid);
+    const uniqueName = await generateUniqueRequestName(collection, t('COMMON.UNTITLED', 'Untitled'), itemUid);
     const filename = sanitizeName(uniqueName);
 
     dispatch(
@@ -99,11 +101,11 @@ const CreateUntitledRequest = ({ collectionUid, itemUid = null, onRequestCreated
       })
     )
       .then(() => {
-        toast.success('New request created!');
+        toast.success(t('REQUEST.NEW_REQUEST_CREATED', 'New request created!'));
         onRequestCreated?.();
       })
-      .catch((err) => toast.error(err ? err.message : 'An error occurred while adding the request'));
-  }, [dispatch, collection, itemUid, onRequestCreated]);
+      .catch((err) => toast.error(err ? err.message : t('REQUEST.ADD_REQUEST_ERROR', 'An error occurred while adding the request')));
+  }, [dispatch, collection, itemUid, onRequestCreated, t]);
 
   const menuItems = useMemo(() => [
     {

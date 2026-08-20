@@ -16,6 +16,7 @@ import ToolHint from 'components/ToolHint';
 import { interpolateUrl } from 'utils/url';
 import useDebounce from 'hooks/useDebounce';
 import get from 'lodash/get';
+import { useTranslation } from 'react-i18next';
 
 const CONNECTION_STATUS = {
   CONNECTING: 'connecting',
@@ -42,6 +43,7 @@ const useWsConnectionStatus = (requestId) => {
 
 const WsQueryUrl = ({ item, collection, handleRun }) => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { theme, displayedTheme } = useTheme();
   // TODO: reaper, better state for connecting
   const saveShortcut = isMacOS() ? '⌘S' : 'Ctrl+S';
@@ -77,11 +79,11 @@ const WsQueryUrl = ({ item, collection, handleRun }) => {
       if (!result?.success) {
         throw new Error(result?.error || 'Failed to close WebSocket connection');
       }
-      notify && toast.success('WebSocket connection closed');
+      notify && toast.success(t('WS.CONNECTION_CLOSED', 'WebSocket connection closed'));
       setConnectionStatus(CONNECTION_STATUS.DISCONNECTED);
     } catch (err) {
       console.error('Failed to close WebSocket connection:', err);
-      notify && toast.error('Failed to close WebSocket connection');
+      notify && toast.error(t('WS.CONNECTION_CLOSE_FAILED', 'Failed to close WebSocket connection'));
       const statusResult = await getWsConnectionStatus(item.uid);
       setConnectionStatus(statusResult?.status ?? CONNECTION_STATUS.DISCONNECTED);
     }
@@ -91,7 +93,7 @@ const WsQueryUrl = ({ item, collection, handleRun }) => {
     e?.stopPropagation();
     if (UNINTERACTIVE_STATES.includes(connectionStatus)) return;
     if (!url) {
-      toast.error('Please enter a valid WebSocket URL');
+      toast.error(t('WS.INVALID_URL', 'Please enter a valid WebSocket URL'));
       return;
     }
     handleRun(e);
@@ -131,7 +133,7 @@ const WsQueryUrl = ({ item, collection, handleRun }) => {
             value={url}
             onSave={(finalValue) => onSave(finalValue)}
             onChange={handleUrlChange}
-            placeholder="ws://localhost:8080 or wss://example.com"
+            placeholder={t('WS.URL_PLACEHOLDER', 'ws://localhost:8080 or wss://example.com')}
             className="w-full"
             theme={displayedTheme}
             onRun={handleWsRun}
@@ -139,7 +141,7 @@ const WsQueryUrl = ({ item, collection, handleRun }) => {
             item={item}
           />
           <div className="flex items-center h-full cursor-pointer gap-3 mx-3">
-            <ToolHint text={`Save (${saveShortcut})`} toolhintId="ws-save-request" place="top" positionStrategy="fixed">
+            <ToolHint text={t('QUERY_URL.SAVE_SHORTCUT', 'Save ({{shortcut}})', { shortcut: saveShortcut })} toolhintId="ws-save-request" place="top" positionStrategy="fixed">
               <div
                 className="flex items-center"
                 data-testid="save-request-button"
@@ -160,7 +162,7 @@ const WsQueryUrl = ({ item, collection, handleRun }) => {
 
             {(connectionStatus === CONNECTION_STATUS.CONNECTED || connectionStatus === CONNECTION_STATUS.DISCONNECTING) && (
               <div className="connection-controls relative flex items-center h-full">
-                <ToolHint text={connectionStatus === CONNECTION_STATUS.DISCONNECTING ? 'Disconnecting...' : 'Close Connection'} toolhintId="ws-close-connection" place="top" positionStrategy="fixed">
+                <ToolHint text={connectionStatus === CONNECTION_STATUS.DISCONNECTING ? t('WS.DISCONNECTING', 'Disconnecting...') : t('WS.CLOSE_CONNECTION', 'Close Connection')} toolhintId="ws-close-connection" place="top" positionStrategy="fixed">
                   <div className="flex items-center" onClick={(e) => connectionStatus === CONNECTION_STATUS.CONNECTED ? handleDisconnect(e, true) : null} data-testid="ws-disconnect-button">
                     <IconPlugConnectedX
                       color={theme.colors.text.danger}
@@ -177,7 +179,7 @@ const WsQueryUrl = ({ item, collection, handleRun }) => {
 
             {(connectionStatus === CONNECTION_STATUS.CONNECTING || connectionStatus === CONNECTION_STATUS.DISCONNECTED) && (
               <div className="connection-controls relative flex items-center h-full">
-                <ToolHint text="Connect" toolhintId="ws-connect" place="top" positionStrategy="fixed">
+                <ToolHint text={t('WS.CONNECT', 'Connect')} toolhintId="ws-connect" place="top" positionStrategy="fixed">
                   <div className="flex items-center" onClick={handleConnect} data-testid="ws-connect-button">
                     <IconPlugConnected
                       className={classnames('cursor-pointer', {

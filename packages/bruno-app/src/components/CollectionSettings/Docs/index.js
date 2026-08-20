@@ -9,8 +9,10 @@ import Button from 'ui/Button/index';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useDocsEditingState } from 'components/Documentation/useDocsEditingState';
 import DocsEditor from 'components/Documentation/DocsEditor';
+import { useTranslation } from 'react-i18next';
 
 const Docs = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { isEditing, setEditing } = useDocsEditingState();
   const savedDocs = get(collection, 'root.docs', '');
@@ -53,16 +55,16 @@ const Docs = ({ collection }) => {
       <div className="flex flex-row w-full justify-between items-center mb-4">
         <div className="text-lg font-medium flex items-center gap-2">
           <IconFileText size={20} strokeWidth={1.5} />
-          Documentation
+          {t('COLLECTION_SETTINGS.DOCUMENTATION', 'Documentation')}
         </div>
         <div className="flex flex-row gap-2 items-center justify-center">
           {isEditing ? (
             <>
               <Button type="button" color="secondary" onClick={handleDiscardChanges}>
-                Cancel
+                {t('COMMON.CANCEL', 'Cancel')}
               </Button>
               <Button type="button" onClick={onSave}>
-                Save
+                {t('COMMON.SAVE', 'Save')}
               </Button>
             </>
           ) : null}

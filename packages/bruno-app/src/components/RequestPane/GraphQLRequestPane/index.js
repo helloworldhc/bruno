@@ -288,28 +288,30 @@ const GraphQLRequestPane = ({ item, collection, onSchemaLoad, toggleDocs, handle
   const queryMenuItems = useMemo(() => [
     {
       id: 'docs',
-      label: 'Docs',
+      label: t('GRAPHQL.DOCS', 'Docs'),
       leftSection: IconBook,
       onClick: toggleDocs
     },
     {
       id: 'schema-introspection',
-      label: schema && schemaSource === 'introspection' ? 'Refresh from Introspection' : 'Load from Introspection',
+      label: schema && schemaSource === 'introspection'
+        ? t('GRAPHQL.REFRESH_FROM_INTROSPECTION', 'Refresh from Introspection')
+        : t('GRAPHQL.LOAD_FROM_INTROSPECTION', 'Load from Introspection'),
       leftSection: schema && schemaSource === 'introspection' ? IconRefresh : IconDownload,
       onClick: () => loadSchema('introspection'),
       disabled: isSchemaLoading
     },
     {
       id: 'schema-file',
-      label: 'Load from File',
+      label: t('GRAPHQL.LOAD_FROM_FILE', 'Load from File'),
       leftSection: IconFile,
       onClick: () => loadSchema('file'),
       disabled: isSchemaLoading
     }
-  ], [toggleDocs, schema, schemaSource, loadSchema, isSchemaLoading]);
+  ], [toggleDocs, schema, schemaSource, loadSchema, isSchemaLoading, t]);
 
   if (!activeTabUid || !focusedTab?.uid || !requestPaneTab) {
-    return <div className="pb-4 px-4">An error occurred!</div>;
+    return <div className="pb-4 px-4">{t('COMMON.ERROR_OCCURRED', 'An error occurred!')}</div>;
   }
 
   let rightContent = null;
@@ -324,17 +326,17 @@ const GraphQLRequestPane = ({ item, collection, onSchemaLoad, toggleDocs, handle
     case 'query':
       rightContent = (
         <div ref={schemaActionsRef} className="flex items-center gap-2">
-          <ActionIcon label="Prettify" onClick={handlePrettify}>
+          <ActionIcon label={t('COMMON.PRETTIFY', 'Prettify')} onClick={handlePrettify}>
             <IconWand size={14} strokeWidth={1.5} />
           </ActionIcon>
           <ActionIcon
-            label={showQueryBuilder ? 'Hide Query Builder' : 'Show Query Builder'}
+            label={showQueryBuilder ? t('QUERY_BUILDER.HIDE', 'Hide Query Builder') : t('QUERY_BUILDER.SHOW', 'Show Query Builder')}
             onClick={toggleQueryBuilder}
           >
             <IconSidebarToggle collapsed={!showQueryBuilder} size={16} strokeWidth={1.5} />
           </ActionIcon>
           <MenuDropdown items={queryMenuItems} placement="bottom-end">
-            <ActionIcon label="More actions">
+            <ActionIcon label={t('COMMON.MORE_ACTIONS', 'More actions')}>
               <IconDots size={16} strokeWidth={1.5} />
             </ActionIcon>
           </MenuDropdown>

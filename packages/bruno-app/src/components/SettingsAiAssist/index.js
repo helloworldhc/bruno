@@ -19,6 +19,7 @@ import {
   updateFolderDocs
 } from 'providers/ReduxStore/slices/collections';
 import { getActiveScriptTab } from 'utils/tabs';
+import { useTranslation } from 'react-i18next';
 
 const getCollectionValue = (collection, path) =>
   (collection.draft?.root ? get(collection, `draft.root.${path}`, '') : get(collection, `root.${path}`, ''));
@@ -33,6 +34,7 @@ const resolveTarget = (activeTab) => {
 };
 
 const SettingsAiAssist = ({ collection, folder = null, activeTab }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);

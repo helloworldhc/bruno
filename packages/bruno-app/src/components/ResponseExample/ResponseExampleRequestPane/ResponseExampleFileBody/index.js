@@ -12,8 +12,10 @@ import StyledWrapper from './StyledWrapper';
 import FilePickerEditor from 'components/FilePickerEditor/index';
 import SingleLineEditor from 'components/SingleLineEditor/index';
 import RadioButton from 'components/RadioButton';
+import { useTranslation } from 'react-i18next';
 
 const ResponseExampleFileBody = ({ item, collection, exampleUid, editMode = false }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const tabs = useSelector((state) => state.tabs.tabs);
@@ -129,9 +131,9 @@ const ResponseExampleFileBody = ({ item, collection, exampleUid, editMode = fals
   const columns = [
     {
       key: 'filePath',
-      name: 'File',
+      name: t('COMMON.FILE', 'File'),
       isKeyField: true,
-      placeholder: 'File',
+      placeholder: t('COMMON.FILE', 'File'),
       width: '30%',
       readOnly: !editMode,
       render: ({ row, value, onChange }) => (
@@ -147,7 +149,7 @@ const ResponseExampleFileBody = ({ item, collection, exampleUid, editMode = fals
     },
     {
       key: 'contentType',
-      name: 'Content-Type',
+      name: t('REQUEST.CONTENT_TYPE', 'Content-Type'),
       placeholder: 'Auto',
       width: '20%',
       readOnly: !editMode,
@@ -167,7 +169,7 @@ const ResponseExampleFileBody = ({ item, collection, exampleUid, editMode = fals
     },
     {
       key: 'selected',
-      name: 'Selected',
+      name: t('REQUEST.SELECTED', 'Selected'),
       width: '15%',
       readOnly: !editMode,
       render: ({ row, rowIndex }) => (

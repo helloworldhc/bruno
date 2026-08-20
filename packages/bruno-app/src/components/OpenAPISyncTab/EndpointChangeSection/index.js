@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconChevronRight } from '@tabler/icons';
 import { toggleSectionExpanded } from 'providers/ReduxStore/slices/openapi-sync';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Collapsible section container for endpoint lists.
@@ -33,6 +34,7 @@ const EndpointChangeSection = ({
   collectionUid,
   sectionKey
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const reduxExpanded = useSelector((state) => {
     if (!collectionUid || !sectionKey) return undefined;

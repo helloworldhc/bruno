@@ -7,8 +7,10 @@ import StyledWrapper from './StyledWrapper';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useDocsEditingState } from 'components/Documentation/useDocsEditingState';
 import DocsEditor from 'components/Documentation/DocsEditor';
+import { useTranslation } from 'react-i18next';
 
 const Documentation = ({ collection, folder }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { isEditing, setEditing } = useDocsEditingState();
   const docs = folder.draft ? get(folder, 'draft.docs', '') : get(folder, 'root.docs', '');
@@ -56,7 +58,7 @@ const Documentation = ({ collection, folder }) => {
       {isEditing && (
         <div className="mt-6 flex-shrink-0">
           <Button type="submit" size="sm" onClick={onSave}>
-            Save
+            {t('COMMON.SAVE', 'Save')}
           </Button>
         </div>
       )}

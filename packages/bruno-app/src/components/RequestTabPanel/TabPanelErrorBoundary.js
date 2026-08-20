@@ -6,6 +6,7 @@ import { closeTabs } from 'providers/ReduxStore/slices/collections/actions';
 import { NON_CLOSABLE_TAB_TYPES } from 'providers/ReduxStore/slices/tabs';
 import Button from 'ui/Button';
 import { useTheme } from 'providers/Theme';
+import { useTranslation } from 'react-i18next';
 
 class TabPanelErrorBoundaryInner extends React.Component {
   constructor(props) {
@@ -22,7 +23,7 @@ class TabPanelErrorBoundaryInner extends React.Component {
   }
 
   render() {
-    const { theme } = this.props;
+    const { theme, t = (k, f) => f } = this.props;
 
     if (this.state.hasError) {
       const { isClosable, onClose } = this.props;
@@ -31,15 +32,14 @@ class TabPanelErrorBoundaryInner extends React.Component {
       return (
         <div className="h-full flex flex-col items-center justify-center gap-3 px-6 text-center">
           <IconAlertTriangle size={36} strokeWidth={1.5} style={{ color: theme?.status?.warning?.text }} />
-          <h2 className="text-lg font-medium">Something went wrong</h2>
+          <h2 className="text-lg font-medium">{t('COMMON.SOMETHING_WENT_WRONG', 'Something went wrong')}</h2>
           {isClosable ? (
             <p className="text-sm opacity-70 max-w-md">
-              This tab encountered an unexpected error. Close it and try reopening the request. If the
-              error repeats, the request file may be corrupt.
+              {t('REQUEST_TAB.ERROR_CLOSABLE_DESC', 'This tab encountered an unexpected error. Close it and try reopening the request. If the error repeats, the request file may be corrupt.')}
             </p>
           ) : (
             <p className="text-sm opacity-70 max-w-md">
-              This panel encountered an unexpected error. Restart Bruno to recover.
+              {t('REQUEST_TAB_PANEL.ERROR_DESC', 'This panel encountered an unexpected error. Restart Bruno to recover.')}
             </p>
           )}
           {errorMessage && (
@@ -47,7 +47,7 @@ class TabPanelErrorBoundaryInner extends React.Component {
           )}
           {isClosable && (
             <Button size="md" data-testid="tab-panel-error-boundary-close-tab" color="primary" onClick={onClose}>
-              Close Tab
+              {t('REQUEST_TAB.CLOSE_TAB', 'Close Tab')}
             </Button>
           )}
         </div>
@@ -59,6 +59,7 @@ class TabPanelErrorBoundaryInner extends React.Component {
 }
 
 const TabPanelErrorBoundary = ({ tabUid, children }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const focusedTab = find(tabs, (t) => t.uid === tabUid);
@@ -70,7 +71,7 @@ const TabPanelErrorBoundary = ({ tabUid, children }) => {
   };
 
   return (
-    <TabPanelErrorBoundaryInner isClosable={isClosable} onClose={handleClose} theme={theme}>
+    <TabPanelErrorBoundaryInner isClosable={isClosable} onClose={handleClose} theme={theme} t={t}>
       {children}
     </TabPanelErrorBoundaryInner>
   );

@@ -3,8 +3,10 @@ import { useDispatch } from 'react-redux';
 import { updateResponseExampleStatusCode, updateResponseExampleStatusText } from 'providers/ReduxStore/slices/collections';
 import statusCodePhraseMap from 'components/ResponsePane/StatusCode/get-status-code-phrase';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const ResponseExampleStatusInput = ({ item, collection, exampleUid, status, statusText }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const currentCode = status !== null && status !== '' ? String(status) : '';
 
@@ -75,7 +77,7 @@ const ResponseExampleStatusInput = ({ item, collection, exampleUid, status, stat
         data-testid="response-status-input"
       >
         {!currentCode ? (
-          <option value="">Select status</option>
+          <option value="">{t('RESPONSE_EXAMPLE.SELECT_STATUS', 'Select status')}</option>
         ) : null}
         {options.map((option) => (
           <option key={option.code} value={option.code}>

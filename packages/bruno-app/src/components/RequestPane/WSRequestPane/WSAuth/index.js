@@ -5,6 +5,7 @@ import BearerAuth from '../../Auth/BearerAuth';
 import BasicAuth from '../../Auth/BasicAuth';
 import ApiKeyAuth from '../../Auth/ApiKeyAuth';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 import { humanizeRequestAuthMode } from 'utils/collections';
 import { getEffectiveAuthSource } from 'utils/auth';
 import { updateRequestAuthMode, updateAuth } from 'providers/ReduxStore/slices/collections';
@@ -13,6 +14,7 @@ import { saveRequest } from 'providers/ReduxStore/slices/collections/actions';
 import { AUTH_MODES_WS } from 'utils/common/constants';
 
 const WSAuth = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const authMode = item.draft ? get(item, 'draft.request.auth.mode') : get(item, 'request.auth.mode');
 
@@ -43,7 +45,7 @@ const WSAuth = ({ item, collection }) => {
   const getAuthView = () => {
     switch (authMode) {
       case 'none': {
-        return <div>No Auth</div>;
+        return <div>{t('REQUEST.AUTH_NONE', 'No Auth')}</div>;
       }
       case 'basic': {
         return <BasicAuth collection={collection} item={item} updateAuth={updateAuth} request={request} save={save} />;

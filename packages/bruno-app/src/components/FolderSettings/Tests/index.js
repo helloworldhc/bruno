@@ -9,8 +9,10 @@ import StyledWrapper from './StyledWrapper';
 import Button from 'ui/Button';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useFocusErrorLine } from 'hooks/useFocusErrorLine';
+import { useTranslation } from 'react-i18next';
 
 const Tests = ({ collection, folder }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const testsEditorRef = useRef(null);
   const tests = folder.draft ? get(folder, 'draft.request.tests', '') : get(folder, 'root.request.tests', '');
@@ -39,7 +41,7 @@ const Tests = ({ collection, folder }) => {
 
   return (
     <StyledWrapper className="w-full flex flex-col h-full">
-      <div className="text-xs mb-4 text-muted">These tests will run any time a request in this collection is sent.</div>
+      <div className="text-xs mb-4 text-muted">{t('FOLDER_SETTINGS.TESTS_DESCRIPTION', 'These tests will run any time a request in this folder is sent.')}</div>
       <div className="relative h-full">
         <CodeEditor
           ref={testsEditorRef}
@@ -60,7 +62,7 @@ const Tests = ({ collection, folder }) => {
 
       <div className="mt-6">
         <Button type="submit" size="sm" onClick={handleSave}>
-          Save
+          {t('COMMON.SAVE', 'Save')}
         </Button>
       </div>
     </StyledWrapper>

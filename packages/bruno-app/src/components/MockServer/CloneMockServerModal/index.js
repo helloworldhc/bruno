@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
@@ -28,6 +29,7 @@ const CloneMockServerModal = ({
   activeWorkspace,
   onClose
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const inputRef = useRef();
   const activeWorkspaceUid = useSelector((state) => state.workspaces.activeWorkspaceUid);
@@ -70,7 +72,7 @@ const CloneMockServerModal = ({
     }),
     onSubmit: async (values, { setFieldError }) => {
       if (!workspacePath) {
-        toast.error('Workspace path is required to clone mock responses');
+        toast.error(t('MOCK_SERVER.WORKSPACE_PATH_REQUIRED_CLONE', 'Workspace path is required to clone mock responses'));
         return;
       }
 
@@ -115,10 +117,10 @@ const CloneMockServerModal = ({
         });
 
         dispatch(openMockServerDashboard(savedInstance, tabCollectionUid));
-        toast.success('Mock server cloned');
+        toast.success(t('MOCK_SERVER.CLONED', 'Mock server cloned'));
         onClose();
       } catch (err) {
-        toast.error(err.message || 'Failed to clone mock server');
+        toast.error(err.message || t('MOCK_SERVER.CLONE_ERROR', 'Failed to clone mock server'));
       }
     }
   });
@@ -148,8 +150,8 @@ const CloneMockServerModal = ({
     <Portal>
       <Modal
         size="md"
-        title="Clone Mock Server"
-        confirmText="Clone"
+        title={t('MOCK_SERVER.CLONE_MOCK_SERVER', 'Clone Mock Server')}
+        confirmText={t('COMMON.CLONE', 'Clone')}
         handleConfirm={() => formik.handleSubmit()}
         handleCancel={onClose}
         dataTestId="mock-server-clone-modal"
@@ -157,7 +159,7 @@ const CloneMockServerModal = ({
         <form className="bruno-form" onSubmit={(event) => event.preventDefault()}>
           <div>
             <label htmlFor="mock-server-clone-name" className="block font-medium">
-              Name
+              {t('MOCK_SERVER.NAME', 'Name')}
             </label>
             <input
               id="mock-server-clone-name"
@@ -181,7 +183,7 @@ const CloneMockServerModal = ({
 
           <div className="mt-4">
             <label htmlFor="mock-server-clone-port" className="block font-medium">
-              Port
+              {t('MOCK_SERVER.PORT', 'Port')}
             </label>
             <input
               id="mock-server-clone-port"
@@ -203,7 +205,7 @@ const CloneMockServerModal = ({
           </div>
 
           <p className="text-xs opacity-70 mt-4">
-            Clones mock responses and server settings. The clone starts stopped.
+            {t('MOCK_SERVER.CLONE_HELP', 'Clones mock responses and server settings. The clone starts stopped.')}
           </p>
         </form>
       </Modal>

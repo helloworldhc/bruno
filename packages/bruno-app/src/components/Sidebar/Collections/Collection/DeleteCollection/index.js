@@ -19,18 +19,18 @@ const DeleteCollection = ({ onClose, collectionUid, workspaceUid }) => {
 
   const onConfirm = async () => {
     if (!collection || !workspace) {
-      toast.error('Collection or workspace not found');
+      toast.error(t('COLLECTIONS.NOT_FOUND', 'Collection or workspace not found'));
       onClose();
       return;
     }
 
     try {
       await dispatch(removeCollectionFromWorkspaceAction(workspace.uid, collection.pathname, { deleteFiles: true }));
-      toast.success(`Deleted "${collection.name}" collection`);
+      toast.success(t('DELETE_COLLECTION.SUCCESS', 'Deleted "{{name}}" collection', { name: collection.name }));
       onClose();
     } catch (error) {
       console.error('Error deleting collection:', error);
-      toast.error(error.message || 'An error occurred while deleting the collection');
+      toast.error(error.message || t('COLLECTIONS.DELETE_ERROR', 'An error occurred while deleting the collection'));
     }
   };
 
@@ -69,7 +69,7 @@ const DeleteCollection = ({ onClose, collectionUid, workspaceUid }) => {
             type="text"
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
-            placeholder="delete"
+            placeholder={t('DELETE_COLLECTION.KEYWORD', 'delete')}
             autoComplete="off"
             autoFocus
           />

@@ -5,8 +5,10 @@ import { useTheme } from 'providers/Theme';
 import CodeEditor from 'components/CodeEditor';
 import { getCodeMirrorModeBasedOnContentType } from 'utils/common/codemirror';
 import StyledWrapper from 'components/ResponseExample/ResponseExampleResponsePane/ResponseExampleResponseContent/StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const MockResponseTryResult = ({ collection, item, tryResult }) => {
+  const { t } = useTranslation();
   const { displayedTheme } = useTheme();
   const preferences = useSelector((state) => state.app.preferences);
   const contentType = tryResult?.headers?.['content-type'] || tryResult?.headers?.['Content-Type'] || '';

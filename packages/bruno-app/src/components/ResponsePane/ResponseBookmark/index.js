@@ -12,20 +12,22 @@ import { getInitialExampleName } from 'utils/collections/index';
 import classnames from 'classnames';
 import StyledWrapper from './StyledWrapper';
 import ActionIcon from 'ui/ActionIcon/index';
+import { useTranslation } from 'react-i18next';
 
-const getTitleText = ({ isResponseTooLarge, isStreamingResponse }) => {
+const getTitleText = ({ isResponseTooLarge, isStreamingResponse, t }) => {
   if (isStreamingResponse) {
-    return 'Response Examples aren\'t supported in streaming responses yet.';
+    return t ? t('RESPONSE.BOOKMARK_STREAMING_UNSUPPORTED', "Response Examples aren't supported in streaming responses yet.") : "Response Examples aren't supported in streaming responses yet.";
   }
 
   if (isResponseTooLarge) {
-    return 'Response size exceeds 5MB limit. Cannot save as example.';
+    return t ? t('RESPONSE.BOOKMARK_TOO_LARGE', 'Response size exceeds 5MB limit. Cannot save as example.') : 'Response size exceeds 5MB limit. Cannot save as example.';
   }
 
-  return 'Save current response as example';
+  return t ? t('RESPONSE.BOOKMARK_TOOLTIP', 'Save current response as example') : 'Save current response as example';
 };
 
 const ResponseBookmark = forwardRef(({ item, collection, responseSize, children }, ref) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [showSaveResponseExampleModal, setShowSaveResponseExampleModal] = useState(false);
   const response = item.response || {};
@@ -47,14 +49,14 @@ const ResponseBookmark = forwardRef(({ item, collection, responseSize, children 
 
   const handleSaveClick = (e) => {
     if (!response || response.error) {
-      toast.error('No valid response to save as example');
+      toast.error(t('RESPONSE.BOOKMARK_NO_VALID_RESPONSE', 'No valid response to save as example'));
       e.preventDefault();
       e.stopPropagation();
       return;
     }
 
     if (isResponseTooLarge) {
-      toast.error('Response size exceeds 5MB limit. Cannot save as example.');
+      toast.error(t('RESPONSE.BOOKMARK_TOO_LARGE', 'Response size exceeds 5MB limit. Cannot save as example.'));
       e.preventDefault();
       e.stopPropagation();
       return;
@@ -124,18 +126,22 @@ const ResponseBookmark = forwardRef(({ item, collection, responseSize, children 
     }));
 
     setShowSaveResponseExampleModal(false);
-    toast.success(`Example "${name}" created successfully`);
+    toast.success(t('RESPONSE.EXAMPLE_CREATED', 'Example "{{name}}" created successfully', { name }));
   };
 
-  const disabledMessage = getTitleText({
-    isResponseTooLarge,
-    isStreamingResponse
-  });
+  const disabledMessage = useMemo(() => {
+    return getTitleText({
+      isResponseTooLarge,
+      isStreamingResponse,
+      t
+    });
+  }, [isResponseTooLarge, isStreamingResponse, t]);
 
   return (
     <>
       <div
         ref={elementRef}
+        aria-disabled={isDisabled}
         onClick={handleSaveClick}
         title={
           !children ? disabledMessage : (isDisabled ? disabledMessage : null)
@@ -158,7 +164,7 @@ const ResponseBookmark = forwardRef(({ item, collection, responseSize, children 
         isOpen={showSaveResponseExampleModal}
         onClose={() => setShowSaveResponseExampleModal(false)}
         onSave={saveAsExample}
-        title="Save Response as Example"
+        title={t('RESPONSE.SAVE_AS_EXAMPLE', 'Save Response as Example')}
         initialName={getInitialExampleName(item)}
       />
     </>

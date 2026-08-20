@@ -36,9 +36,9 @@ const Font = () => {
         }
       })
     ).catch(() => {
-      toast.error('Failed to save preferences');
+      toast.error(t('PREFERENCES.SAVE_ERROR', 'Failed to save preferences'));
     });
-  }, [dispatch, preferences]);
+  }, [dispatch, preferences, t]);
 
   const handleSaveRef = useRef(handleSave);
   handleSaveRef.current = handleSave;

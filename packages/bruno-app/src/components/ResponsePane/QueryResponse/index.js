@@ -4,6 +4,7 @@ import { useInitialResponseFormat, useResponsePreviewFormatOptions } from '../Qu
 import QueryResultTypeSelector from '../QueryResult/QueryResultTypeSelector/index';
 import StyledWrapper from './StyledWrapper';
 import classnames from 'classnames';
+import { useTranslation } from 'react-i18next';
 
 const QueryResponse = ({
   item,
@@ -16,6 +17,7 @@ const QueryResponse = ({
   hideResultTypeSelector,
   docKey
 }) => {
+  const { t } = useTranslation();
   const { initialFormat, initialTab } = useInitialResponseFormat(dataBuffer, headers);
   const previewFormatOptions = useResponsePreviewFormatOptions(dataBuffer, headers);
   const [selectedFormat, setSelectedFormat] = useState('raw');

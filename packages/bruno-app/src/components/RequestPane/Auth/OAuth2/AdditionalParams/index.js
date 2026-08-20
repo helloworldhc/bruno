@@ -8,8 +8,10 @@ import SingleLineEditor from 'components/SingleLineEditor/index';
 import MultiLineEditor from 'components/MultiLineEditor/index';
 import StyledWrapper from './StyledWrapper';
 import Table from 'components/Table/index';
+import { useTranslation } from 'react-i18next';
 
 const AdditionalParams = ({ item = {}, request, updateAuth, collection, handleSave }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
 
@@ -101,30 +103,24 @@ const AdditionalParams = ({ item = {}, request, updateAuth, collection, handleSa
   };
 
   const handleAddNewAdditionalParam = () => {
-    // Prevent adding multiple empty rows
+    // If there's already an empty row, don't add another one
     if (hasEmptyRow()) {
       return;
     }
 
-    const paramType = activeTab;
     const localAdditionalParameters = cloneDeep(additionalParameters);
 
-    if (!localAdditionalParameters[paramType]) {
-      localAdditionalParameters[paramType] = [];
+    if (!localAdditionalParameters[activeTab]) {
+      localAdditionalParameters[activeTab] = [];
     }
 
-    localAdditionalParameters[paramType] = [
-      ...localAdditionalParameters[paramType],
-      {
-        name: '',
-        value: '',
-        sendIn: 'headers',
-        enabled: true
-      }
-    ];
+    localAdditionalParameters[activeTab].push({
+      name: '',
+      value: '',
+      sendIn: 'headers',
+      enabled: true
+    });
 
-    // Don't filter here to allow the empty row to display in UI
-    // But don't permanently store it in state until it has values
     dispatch(
       updateAuth({
         mode: 'oauth2',
@@ -171,20 +167,20 @@ const AdditionalParams = ({ item = {}, request, updateAuth, collection, handleSa
           <IconAdjustmentsHorizontal size={14} className="oauth2-icon" />
         </div>
         <span className="oauth2-section-label">
-          Additional Parameters
+          {t('AUTH.ADDITIONAL_PARAMETERS', 'Additional Parameters')}
         </span>
       </div>
 
       <div className="tabs flex w-full gap-2 my-2">
-        {availableTabs.includes('authorization') && renderTab('authorization', 'Authorization')}
-        {availableTabs.includes('token') && renderTab('token', 'Token')}
-        {availableTabs.includes('refresh') && renderTab('refresh', 'Refresh')}
+        {availableTabs.includes('authorization') && renderTab('authorization', t('AUTH.TAB_AUTHORIZATION', 'Authorization'))}
+        {availableTabs.includes('token') && renderTab('token', t('AUTH.TAB_TOKEN', 'Token'))}
+        {availableTabs.includes('refresh') && renderTab('refresh', t('AUTH.TAB_REFRESH', 'Refresh'))}
       </div>
       <Table
         headers={[
-          { name: 'Key', accessor: 'name', width: '30%' },
-          { name: 'Value', accessor: 'value', width: '30%' },
-          { name: 'Send In', accessor: 'sendIn', width: '150px' },
+          { name: t('AUTH.KEY', 'Key'), accessor: 'name', width: '30%' },
+          { name: t('AUTH.VALUE', 'Value'), accessor: 'value', width: '30%' },
+          { name: t('AUTH.SEND_IN', 'Send In'), accessor: 'sendIn', width: '150px' },
           { name: '', accessor: '', width: '15%' }
         ]}
       >
@@ -281,7 +277,7 @@ const AdditionalParams = ({ item = {}, request, updateAuth, collection, handleSa
         onClick={addButtonDisabled ? null : handleAddNewAdditionalParam}
       >
         <IconPlus size={16} strokeWidth={1.5} style={{ marginLeft: '2px' }} />
-        <span className="ml-1 text-gray-500">Add Parameter</span>
+        <span className="ml-1 text-gray-500">{t('AUTH.ADD_PARAMETER', 'Add Parameter')}</span>
       </div>
     </StyledWrapper>
   );

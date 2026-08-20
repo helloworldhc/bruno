@@ -369,7 +369,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
       toast.success(t('CREATE_COLLECTION.COLLECTION_CREATED', 'Collection created!'));
       handleCancelNewCollection();
     } catch (err) {
-      toast.error(err?.message || 'An error occurred while creating the collection');
+      toast.error(err?.message || t('CREATE_COLLECTION.CREATE_ERROR', 'An error occurred while creating the collection'));
     }
   };
 

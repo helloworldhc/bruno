@@ -9,6 +9,7 @@ import { createPortal } from 'react-dom';
 import QuestionCircle from 'components/Icons/QuestionCircle';
 import InfoCircle from 'components/Icons/InfoCircle';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const GAP = 8;
 
@@ -47,6 +48,7 @@ const iconMap = {
 };
 
 const Help = ({ children, width = 200, placement = 'right', icon = 'question', iconComponent: IconComponent, size = 14 }) => {
+  const { t } = useTranslation();
   const [showTooltip, setShowTooltip] = useState(false);
   const [position, setPosition] = useState(null);
   const iconRef = useRef(null);

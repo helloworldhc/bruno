@@ -4,6 +4,7 @@ import { savePreferences } from 'providers/ReduxStore/slices/app';
 import StyledWrapper from './StyledWrapper';
 import { IconLayoutColumns, IconLayoutRows } from '@tabler/icons';
 import ActionIcon from 'ui/ActionIcon/index';
+import { useTranslation } from 'react-i18next';
 
 export const IconDockToBottom = () => {
   return (
@@ -72,6 +73,7 @@ export const useResponseLayoutToggle = () => {
 };
 
 const ResponseLayoutToggle = forwardRef(({ children }, ref) => {
+  const { t } = useTranslation();
   const { orientation, toggleOrientation } = useResponseLayoutToggle();
   const elementRef = useRef(null);
 
@@ -80,7 +82,11 @@ const ResponseLayoutToggle = forwardRef(({ children }, ref) => {
     isDisabled: false
   }), []);
 
-  const title = !children ? (orientation === 'horizontal' ? 'Switch to vertical layout' : 'Switch to horizontal layout') : null;
+  const title = !children
+    ? (orientation === 'horizontal'
+      ? t('RESPONSE.SWITCH_TO_VERTICAL', 'Switch to vertical layout')
+      : t('RESPONSE.SWITCH_TO_HORIZONTAL', 'Switch to horizontal layout'))
+    : null;
 
   return (
     <div

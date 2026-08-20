@@ -7,8 +7,10 @@ import { sendRequest, saveRequest } from 'providers/ReduxStore/slices/collection
 import { useTheme } from 'providers/Theme';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useFocusErrorLine } from 'hooks/useFocusErrorLine';
+import { useTranslation } from 'react-i18next';
 
 const Tests = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const testsEditorRef = useRef(null);
   const tests = item.draft ? get(item, 'draft.request.tests') : get(item, 'request.tests');

@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { escapeHtml } from 'utils/response/index';
+import { useTranslation } from 'react-i18next';
 
 const HtmlPreview = React.memo(({ data, baseUrl }) => {
+  const { t } = useTranslation();
   const webviewContainerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
 

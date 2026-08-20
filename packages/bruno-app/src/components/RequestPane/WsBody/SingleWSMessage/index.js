@@ -12,6 +12,7 @@ import { findCollectionByUid, findEnvironmentInCollection } from 'utils/collecti
 import toast from 'react-hot-toast';
 import WSRequestBodyMode from '../BodyMode/index';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const codemirrorMode = {
   text: 'application/text',
@@ -43,6 +44,7 @@ export const SingleWSMessage = ({
   paneHeight
 }) => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { displayedTheme } = useTheme();
   const preferences = useSelector((state) => state.app.preferences);
   const body = item.draft ? get(item, 'draft.request.body') : get(item, 'request.body');
@@ -169,10 +171,10 @@ export const SingleWSMessage = ({
 
       const result = await queueWsMessage(item, col, environment, col?.runtimeVariables, index);
       if (!result.success) {
-        toast.error(result.error || 'Failed to send message');
+        toast.error(result.error || t('WS.SEND_FAILED', 'Failed to send message'));
       }
     } catch (err) {
-      toast.error(err.message || 'Failed to send message');
+      toast.error(err.message || t('WS.SEND_FAILED', 'Failed to send message'));
     }
   }, [collections]);
 
@@ -239,13 +241,13 @@ export const SingleWSMessage = ({
         </div>
         <div className="accordion-actions" onClick={(e) => e.stopPropagation()}>
           <div className="hover-actions">
-            <ToolHint text="Send" toolhintId={`send-msg-${index}`} place="bottom">
+            <ToolHint text={t('WS.SEND', 'Send')} toolhintId={`send-msg-${index}`} place="bottom">
               <button onClick={onSendMessage} className="hover-action-btn" data-testid={`ws-send-msg-${index}`}>
                 <IconSend size={14} strokeWidth={1.5} />
               </button>
             </ToolHint>
             {(body.ws || []).length > 1 && (
-              <ToolHint text="Delete" toolhintId={`delete-msg-${index}`} place="bottom">
+              <ToolHint text={t('COMMON.DELETE', 'Delete')} toolhintId={`delete-msg-${index}`} place="bottom">
                 <button onClick={onDeleteMessage} className="hover-action-btn delete" data-testid={`ws-delete-msg-${index}`}>
                   <IconTrash size={14} strokeWidth={1.5} />
                 </button>

@@ -53,7 +53,7 @@ const WelcomeModal = ({ onDismiss, onImportCollection, onCreateCollection, onOpe
         }
       };
       return dispatch(savePreferences(updatedPreferences)).catch(() => {
-        toast.error('Failed to save preferences');
+        toast.error(t('PREFERENCES.SAVE_ERROR', 'Failed to save preferences'));
       });
     }
     return Promise.resolve();

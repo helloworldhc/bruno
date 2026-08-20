@@ -4,8 +4,10 @@ import { useDispatch } from 'react-redux';
 import OAuth1 from 'components/RequestPane/Auth/OAuth1';
 import { updateCollectionAuth } from 'providers/ReduxStore/slices/collections';
 import { saveCollectionSettings } from 'providers/ReduxStore/slices/collections/actions';
+import { useTranslation } from 'react-i18next';
 
 const CollectionOAuth1 = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const request = collection.draft?.root
     ? get(collection, 'draft.root.request', {})

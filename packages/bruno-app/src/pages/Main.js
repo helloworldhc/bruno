@@ -23,9 +23,11 @@ import '@fontsource/inter/700.css';
 import '@fontsource/inter/800.css';
 import '@fontsource/inter/900.css';
 import { setupPolyfills } from 'utils/common/setupPolyfills';
+import { useTranslation } from 'react-i18next';
 setupPolyfills();
 
 function Main({ children }) {
+  const { t } = useTranslation();
   if (!window.ipcRenderer) {
     return (
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mx-10 my-10 rounded relative" role="alert">

@@ -11,11 +11,13 @@ import ApiSpecsSection from './Sections/ApiSpecsSection/index';
 import MockServersSection from './Sections/MockServersSection/index';
 import useKeybinding from 'hooks/useKeybinding';
 import { useBetaFeature, BETA_FEATURES } from 'utils/beta-features';
+import { useTranslation } from 'react-i18next';
 
 const MIN_LEFT_SIDEBAR_WIDTH = 220;
 const MAX_LEFT_SIDEBAR_WIDTH = 600;
 
 const Sidebar = () => {
+  const { t } = useTranslation();
   const isMockServerEnabled = useBetaFeature(BETA_FEATURES.MOCK_SERVER);
   const sidebarSections = useMemo(() => {
     const sections = [

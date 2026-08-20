@@ -273,7 +273,7 @@ const ThemeDropdown = ({ children }) => {
         ref={menuRef}
         className={`theme-menu ${isSystemMode ? 'two-columns' : ''}`}
         role="dialog"
-        aria-label="Theme selector"
+        aria-label={t('THEMES.THEME_SELECTOR', 'Theme selector')}
       >
         <div className="mode-section">
           <div className="mode-label" id="mode-label">{t('THEMES.APPEARANCE', 'Appearance')}</div>

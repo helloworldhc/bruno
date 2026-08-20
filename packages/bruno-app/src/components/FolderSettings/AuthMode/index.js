@@ -7,8 +7,10 @@ import { useDispatch } from 'react-redux';
 import { updateFolderAuthMode } from 'providers/ReduxStore/slices/collections';
 import { humanizeRequestAuthMode } from 'utils/collections';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const AuthMode = ({ collection, folder }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const authMode = folder.draft ? get(folder, 'draft.request.auth.mode') : get(folder, 'root.request.auth.mode');
 
@@ -25,27 +27,27 @@ const AuthMode = ({ collection, folder }) => {
   const menuItems = useMemo(() => [
     {
       id: 'awsv4',
-      label: 'AWS Sig v4',
+      label: t('REQUEST.AUTH_AWS_SIGV4', 'AWS Sig v4'),
       onClick: () => onModeChange('awsv4')
     },
     {
       id: 'basic',
-      label: 'Basic Auth',
+      label: t('REQUEST.AUTH_BASIC', 'Basic Auth'),
       onClick: () => onModeChange('basic')
     },
     {
       id: 'bearer',
-      label: 'Bearer Token',
+      label: t('REQUEST.AUTH_BEARER', 'Bearer Token'),
       onClick: () => onModeChange('bearer')
     },
     {
       id: 'digest',
-      label: 'Digest Auth',
+      label: t('REQUEST.AUTH_DIGEST', 'Digest Auth'),
       onClick: () => onModeChange('digest')
     },
     {
       id: 'ntlm',
-      label: 'NTLM Auth',
+      label: t('REQUEST.AUTH_NTLM', 'NTLM Auth'),
       onClick: () => onModeChange('ntlm')
     },
     {
@@ -55,17 +57,17 @@ const AuthMode = ({ collection, folder }) => {
     },
     {
       id: 'oauth2',
-      label: 'OAuth 2.0',
+      label: t('REQUEST.AUTH_OAUTH2', 'OAuth 2.0'),
       onClick: () => onModeChange('oauth2')
     },
     {
       id: 'wsse',
-      label: 'WSSE Auth',
+      label: t('REQUEST.AUTH_WSSE', 'WSSE Auth'),
       onClick: () => onModeChange('wsse')
     },
     {
       id: 'apikey',
-      label: 'API Key',
+      label: t('REQUEST.AUTH_API_KEY', 'API Key'),
       onClick: () => onModeChange('apikey')
     },
     {
@@ -76,20 +78,20 @@ const AuthMode = ({ collection, folder }) => {
           <StatusBadge status="info" size="xs">Beta</StatusBadge>
         </span>
       ),
-      ariaLabel: 'Akamai EdgeGrid (Beta)',
+      ariaLabel: t('AUTH.AKAMAI_EDGEGRID_BETA', 'Akamai EdgeGrid (Beta)'),
       onClick: () => onModeChange('akamai-edgegrid')
     },
     {
       id: 'inherit',
-      label: 'Inherit',
+      label: t('COMMON.INHERIT', 'Inherit'),
       onClick: () => onModeChange('inherit')
     },
     {
       id: 'none',
-      label: 'No Auth',
+      label: t('REQUEST.AUTH_NONE', 'No Auth'),
       onClick: () => onModeChange('none')
     }
-  ], [onModeChange]);
+  ], [onModeChange, t]);
 
   return (
     <StyledWrapper>

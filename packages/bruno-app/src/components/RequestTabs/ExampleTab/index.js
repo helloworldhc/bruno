@@ -10,8 +10,10 @@ import RequestTabNotFound from '../RequestTab/RequestTabNotFound';
 import RequestTabLoading from '../RequestTab/RequestTabLoading';
 import StyledWrapper from '../RequestTab/StyledWrapper';
 import GradientCloseButton from '../RequestTab/GradientCloseButton';
+import { useTranslation } from 'react-i18next';
 
 const ExampleTab = ({ tab, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [showConfirmClose, setShowConfirmClose] = useState(false);
 

@@ -268,8 +268,8 @@ const CreateCollection = ({ onClose, defaultLocation: propDefaultLocation, initi
                     value={formik.values.format}
                     onChange={formik.handleChange}
                   >
-                    <option value="yml">OpenCollection (YAML)</option>
-                    <option value="bru">BRU Format (.bru)</option>
+                    <option value="yml">{t('CREATE_COLLECTION.FORMAT_YAML', 'OpenCollection (YAML)')}</option>
+                    <option value="bru">{t('CREATE_COLLECTION.FORMAT_BRU', 'BRU Format (.bru)')}</option>
                   </select>
                   {formik.touched.format && formik.errors.format ? (
                     <div className="text-red-500">{formik.errors.format}</div>

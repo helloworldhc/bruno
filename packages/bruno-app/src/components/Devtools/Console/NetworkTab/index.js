@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import {
   IconNetwork,
   IconArrowUp,
@@ -14,13 +15,13 @@ import StyledWrapper from './StyledWrapper';
 import { sortRequests } from './utils';
 
 const COLUMNS = [
-  { key: 'method', label: 'Method', width: 80, align: 'left' },
-  { key: 'status', label: 'Status', width: 70, align: 'left' },
-  { key: 'domain', label: 'Domain', width: 180, align: 'left' },
-  { key: 'path', label: 'Path', width: 300, align: 'left' },
-  { key: 'time', label: 'Time', width: 110, align: 'left' },
-  { key: 'duration', label: 'Duration', width: 100, align: 'right' },
-  { key: 'size', label: 'Size', width: 80, align: 'right' }
+  { key: 'method', labelKey: 'DEVTOOLS.NETWORK.COL_METHOD', label: 'Method', width: 80, align: 'left' },
+  { key: 'status', labelKey: 'DEVTOOLS.NETWORK.COL_STATUS', label: 'Status', width: 70, align: 'left' },
+  { key: 'domain', labelKey: 'DEVTOOLS.NETWORK.COL_DOMAIN', label: 'Domain', width: 180, align: 'left' },
+  { key: 'path', labelKey: 'DEVTOOLS.NETWORK.COL_PATH', label: 'Path', width: 300, align: 'left' },
+  { key: 'time', labelKey: 'DEVTOOLS.NETWORK.COL_TIME', label: 'Time', width: 110, align: 'left' },
+  { key: 'duration', labelKey: 'DEVTOOLS.NETWORK.COL_DURATION', label: 'Duration', width: 100, align: 'right' },
+  { key: 'size', labelKey: 'DEVTOOLS.NETWORK.COL_SIZE', label: 'Size', width: 80, align: 'right' }
 ];
 
 const MethodBadge = ({ method }) => {
@@ -133,6 +134,7 @@ const RequestRow = ({ request, isSelected, onClick, gridTemplateColumns }) => {
 };
 
 const NetworkTab = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [sortConfig, setSortConfig] = usePersistedState({ key: 'devtools-network-sort', default: { key: null, direction: null } });
   const [savedColWidths, setSavedColWidths] = usePersistedState({ key: 'devtools-network-col-widths', default: null });
@@ -199,27 +201,30 @@ const NetworkTab = () => {
         {filteredRequests.length === 0 ? (
           <div className="network-empty">
             <IconNetwork size={48} strokeWidth={1} />
-            <p>No network requests</p>
-            <span>Requests will appear here as you make API calls</span>
+            <p>{t('DEVTOOLS.NETWORK.NO_REQUESTS', 'No network requests')}</p>
+            <span>{t('DEVTOOLS.NETWORK.NO_REQUESTS_DESC', 'Requests will appear here as you make API calls')}</span>
           </div>
         ) : (
           <div className={`requests-container${resizingIdx !== null ? ' is-resizing' : ''}`}>
             <div className="requests-header" style={{ gridTemplateColumns }}>
-              {COLUMNS.map((col) => (
-                <div
-                  key={col.key}
-                  className={`header-cell${col.align === 'right' ? ' text-right' : ''}`}
-                  onClick={() => handleHeaderClick(col.key)}
-                  data-testid={`network-header-${col.key}`}
-                >
-                  <span title={col.label}>{col.label}</span>
-                  {sortConfig.key === col.key && (
-                    sortConfig.direction === 'asc'
-                      ? <IconArrowUp size={14} strokeWidth={2} data-testid="sort-icon-asc" />
-                      : <IconArrowDown size={14} strokeWidth={2} data-testid="sort-icon-desc" />
-                  )}
-                </div>
-              ))}
+              {COLUMNS.map((col) => {
+                const label = t(col.labelKey, col.label);
+                return (
+                  <div
+                    key={col.key}
+                    className={`header-cell${col.align === 'right' ? ' text-right' : ''}`}
+                    onClick={() => handleHeaderClick(col.key)}
+                    data-testid={`network-header-${col.key}`}
+                  >
+                    <span title={label}>{label}</span>
+                    {sortConfig.key === col.key && (
+                      sortConfig.direction === 'asc'
+                        ? <IconArrowUp size={14} strokeWidth={2} data-testid="sort-icon-asc" />
+                        : <IconArrowDown size={14} strokeWidth={2} data-testid="sort-icon-desc" />
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div ref={containerRef} className="requests-list">

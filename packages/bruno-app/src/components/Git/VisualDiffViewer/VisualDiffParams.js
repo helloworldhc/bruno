@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
 import get from 'lodash/get';
+import { useTranslation } from 'react-i18next';
 
 const VisualDiffParams = ({ oldData, newData, showSide }) => {
+  const { t } = useTranslation();
   const oldParams = get(oldData, 'request.params', []);
   const newParams = get(newData, 'request.params', []);
 
@@ -46,8 +48,8 @@ const VisualDiffParams = ({ oldData, newData, showSide }) => {
             <tr>
               <th style={{ width: '30px' }}></th>
               <th className="checkbox-cell"></th>
-              <th style={{ width: '40%' }}>Key</th>
-              <th>Value</th>
+              <th style={{ width: '40%' }}>{t('COMMON.KEY', 'Key')}</th>
+              <th>{t('COMMON.VALUE', 'Value')}</th>
             </tr>
           </thead>
           <tbody>

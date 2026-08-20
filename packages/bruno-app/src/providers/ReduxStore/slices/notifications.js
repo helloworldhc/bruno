@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast';
+import i18n from 'i18n';
 import { createSlice } from '@reduxjs/toolkit';
 import { getAppInstallDate } from 'utils/common/platform';
 import semver from 'semver';
@@ -10,7 +11,7 @@ const getReadNotificationIds = () => {
     let readNotificationIds = readNotificationIdsString ? JSON.parse(readNotificationIdsString) : [];
     return readNotificationIds;
   } catch (err) {
-    toast.error('An error occurred while fetching read notifications');
+    toast.error(i18n.t('NOTIFICATIONS.FETCH_ERROR', 'An error occurred while fetching read notifications'));
     return [];
   }
 };
@@ -19,7 +20,7 @@ const setReadNotificationsIds = (val) => {
   try {
     window.localStorage.setItem('bruno.notifications.read', JSON.stringify(val));
   } catch (err) {
-    toast.error('An error occurred while setting read notifications');
+    toast.error(i18n.t('NOTIFICATIONS.SET_ERROR', 'An error occurred while setting read notifications'));
   }
 };
 

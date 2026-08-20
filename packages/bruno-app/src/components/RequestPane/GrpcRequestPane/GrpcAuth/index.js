@@ -8,6 +8,7 @@ import ApiKeyAuth from '../../Auth/ApiKeyAuth';
 import OAuth2 from '../../Auth/OAuth2/index';
 import WsseAuth from '../../Auth/WsseAuth';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 import { humanizeRequestAuthMode } from 'utils/collections';
 import { getEffectiveAuthSource } from 'utils/auth';
 import { updateRequestAuthMode, updateAuth } from 'providers/ReduxStore/slices/collections';
@@ -16,6 +17,7 @@ import { saveRequest } from 'providers/ReduxStore/slices/collections/actions';
 import { AUTH_MODES_GRPC } from 'utils/common/constants';
 
 const GrpcAuth = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const authMode = item.draft ? get(item, 'draft.request.auth.mode') : get(item, 'request.auth.mode');
 
@@ -48,7 +50,7 @@ const GrpcAuth = ({ item, collection }) => {
   const getAuthView = () => {
     switch (authMode) {
       case 'none': {
-        return <div>No Auth</div>;
+        return <div>{t('REQUEST.AUTH_NONE', 'No Auth')}</div>;
       }
       case 'basic': {
         return <BasicAuth collection={collection} item={item} updateAuth={updateAuth} request={request} save={save} />;
@@ -71,7 +73,7 @@ const GrpcAuth = ({ item, collection }) => {
           return (
             <>
               <div className="flex flex-row w-full gap-2">
-                <div>Auth inherited from {inheritedSource.name}: </div>
+                <div>{t('REQUEST.AUTH_INHERITED_FROM', 'Auth inherited from {{name}}:', { name: inheritedSource.name })} </div>
                 <div className="inherit-mode-text">{humanizeRequestAuthMode(inheritedSource.auth?.mode)}</div>
               </div>
             </>
@@ -80,7 +82,7 @@ const GrpcAuth = ({ item, collection }) => {
           return (
             <>
               <div className="flex flex-row w-full gap-2">
-                <div>Inherited auth not supported by gRPC. Using no auth instead.</div>
+                <div>{t('GRPC.INHERITED_AUTH_UNSUPPORTED', 'Inherited auth not supported by gRPC. Using no auth instead.')}</div>
               </div>
             </>
           );

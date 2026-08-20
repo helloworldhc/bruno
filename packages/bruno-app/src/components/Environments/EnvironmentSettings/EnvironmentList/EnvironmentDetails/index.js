@@ -90,13 +90,13 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
 
     dispatch(renameEnvironment(newName, environment.uid, collection.uid))
       .then(() => {
-        toast.success('Environment renamed!');
+        toast.success(t('ENVIRONMENTS.RENAMED', 'Environment renamed!'));
         setIsRenaming(false);
         setNewName('');
         setNameError('');
       })
       .catch(() => {
-        toast.error('An error occurred while renaming the environment');
+        toast.error(t('ENVIRONMENTS.RENAME_ERROR', 'An error occurred while renaming the environment'));
       });
   };
 
@@ -190,7 +190,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
                   className="inline-action-btn save"
                   onClick={handleSaveRename}
                   onMouseDown={(e) => e.preventDefault()}
-                  title="Save"
+                  title={t('COMMON.SAVE', 'Save')}
                 >
                   <IconCheck size={14} strokeWidth={2} />
                 </button>
@@ -198,7 +198,7 @@ const EnvironmentDetails = ({ environment, setIsModified, collection, searchQuer
                   className="inline-action-btn cancel"
                   onClick={handleCancelRename}
                   onMouseDown={(e) => e.preventDefault()}
-                  title="Cancel"
+                  title={t('COMMON.CANCEL', 'Cancel')}
                 >
                   <IconX size={14} strokeWidth={2} />
                 </button>

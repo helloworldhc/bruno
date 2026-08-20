@@ -12,6 +12,7 @@ import ResponseExampleStatusInput from './ResponseExampleStatusInput';
 import MockResponseTryResult from 'components/MockServer/MockResponse/MockResponseTryResult';
 import StyledWrapper from './StyledWrapper';
 import HeightBoundContainer from 'ui/HeightBoundContainer';
+import { useTranslation } from 'react-i18next';
 
 const ResponseExampleResponsePane = ({
   item,
@@ -22,6 +23,7 @@ const ResponseExampleResponsePane = ({
   expectedResponseLabel = 'Response',
   tryResult = null
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);
@@ -83,16 +85,16 @@ const ResponseExampleResponsePane = ({
   const tabConfig = [
     {
       name: 'response',
-      label: expectedResponseLabel
+      label: expectedResponseLabel || t('RESPONSE.RESPONSE', 'Response')
     },
     {
       name: 'headers',
-      label: 'Headers',
+      label: t('RESPONSE.HEADERS', 'Headers'),
       count: (exampleData?.response?.headers || []).length
     },
     ...(tryResult ? [{
       name: 'try-result',
-      label: 'Try Result'
+      label: t('MOCK_SERVER.TRY_RESULT', 'Try Result')
     }] : [])
   ];
 

@@ -17,6 +17,7 @@ import { toastError } from 'utils/common/error';
 import toast from 'react-hot-toast';
 import { getAbsoluteFilePath } from 'utils/common/path';
 import { prettifyJsonString } from 'utils/common/index';
+import { useTranslation } from 'react-i18next';
 
 const MessageToolbar = ({
   index,
@@ -28,24 +29,25 @@ const MessageToolbar = ({
   onDeleteMessage,
   showDelete
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="message-toolbar">
-      <span className="message-label">Message {index + 1}</span>
+      <span className="message-label">{t('GRPC.MESSAGE_LABEL', 'Message {{number}}', { number: index + 1 })}</span>
       <div className="toolbar-actions mr-2">
-        <ToolHint text="Format JSON" toolhintId={`prettify-msg-${index}`}>
+        <ToolHint text={t('GRPC.FORMAT_JSON', 'Format JSON')} toolhintId={`prettify-msg-${index}`}>
           <button onClick={onPrettify} className="toolbar-btn">
             <IconWand size={16} strokeWidth={1.5} />
           </button>
         </ToolHint>
 
-        <ToolHint text="Generate sample" toolhintId={`regenerate-msg-${index}`}>
+        <ToolHint text={t('GRPC.GENERATE_SAMPLE', 'Generate sample')} toolhintId={`regenerate-msg-${index}`}>
           <button onClick={onRegenerateMessage} className="toolbar-btn" data-testid={`grpc-regenerate-message-${index}`}>
             <IconRefresh size={16} strokeWidth={1.5} />
           </button>
         </ToolHint>
 
         {canClientStream && (
-          <ToolHint text={isConnectionActive ? 'Send message' : 'Connection not active'} toolhintId={`send-msg-${index}`}>
+          <ToolHint text={isConnectionActive ? t('GRPC.SEND_MESSAGE', 'Send message') : t('GRPC.CONNECTION_NOT_ACTIVE', 'Connection not active')} toolhintId={`send-msg-${index}`}>
             <button
               onClick={onSend}
               disabled={!isConnectionActive}
@@ -58,7 +60,7 @@ const MessageToolbar = ({
         )}
 
         {showDelete && (
-          <ToolHint text="Delete message" toolhintId={`delete-msg-${index}`}>
+          <ToolHint text={t('GRPC.DELETE_MESSAGE', 'Delete message')} toolhintId={`delete-msg-${index}`}>
             <button onClick={onDeleteMessage} className="toolbar-btn delete">
               <IconTrash size={16} strokeWidth={1.5} />
             </button>
@@ -70,6 +72,7 @@ const MessageToolbar = ({
 };
 
 const SingleGrpcMessage = ({ message, item, collection, index, methodType, handleRun, canClientSendMultipleMessages, isLast }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const editorRef = useRef(null);
   const { displayedTheme } = useTheme();
@@ -111,7 +114,7 @@ const SingleGrpcMessage = ({ message, item, collection, index, methodType, handl
     try {
       const methodPath = item.draft?.request?.method || item.request?.method;
       if (!methodPath) {
-        toastError(new Error('Method path not found in request'));
+        toastError(new Error(t('GRPC.METHOD_NOT_FOUND', 'Method path not found in request')));
         return;
       }
 
@@ -148,9 +151,9 @@ const SingleGrpcMessage = ({ message, item, collection, index, methodType, handl
           itemUid: item.uid,
           collectionUid: collection.uid
         }));
-        toast.success('Sample message generated');
+        toast.success(t('GRPC.SAMPLE_MESSAGE_GENERATED', 'Sample message generated'));
       } else {
-        toastError(new Error(result.error || 'Failed to generate sample message'));
+        toastError(new Error(result.error || t('GRPC.FAILED_GENERATE_SAMPLE', 'Failed to generate sample message')));
       }
     } catch (error) {
       console.error('Error generating sample message:', error);
@@ -182,7 +185,7 @@ const SingleGrpcMessage = ({ message, item, collection, index, methodType, handl
         collectionUid: collection.uid
       }));
     } catch (e) {
-      toastError(new Error('Unable to prettify. Invalid JSON format.'));
+      toastError(new Error(t('GRPC.UNABLE_TO_PRETTIFY', 'Unable to prettify. Invalid JSON format.')));
     }
   };
 
@@ -222,6 +225,7 @@ const SingleGrpcMessage = ({ message, item, collection, index, methodType, handl
 };
 
 const GrpcBody = ({ item, collection, handleRun }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const messagesContainerRef = useRef(null);
   const body = item.draft ? get(item, 'draft.request.body') : get(item, 'request.body');
@@ -252,7 +256,7 @@ const GrpcBody = ({ item, collection, handleRun }) => {
     return (
       <StyledWrapper>
         <div className="empty-state">
-          <p>No gRPC messages available</p>
+          <p>{t('GRPC.NO_MESSAGES_AVAILABLE', 'No gRPC messages available')}</p>
           <Button
             onClick={addNewMessage}
             variant="filled"
@@ -260,7 +264,7 @@ const GrpcBody = ({ item, collection, handleRun }) => {
             size="sm"
             icon={<IconPlus size={14} strokeWidth={1.5} />}
           >
-            Add Message
+            {t('GRPC.ADD_MESSAGE', 'Add Message')}
           </Button>
         </div>
       </StyledWrapper>
@@ -302,7 +306,7 @@ const GrpcBody = ({ item, collection, handleRun }) => {
             icon={<IconPlus size={14} strokeWidth={1.5} />}
             data-testid="grpc-add-message-button"
           >
-            Add Message
+            {t('GRPC.ADD_MESSAGE', 'Add Message')}
           </Button>
         </div>
       )}

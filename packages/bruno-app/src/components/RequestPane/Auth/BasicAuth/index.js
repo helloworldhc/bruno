@@ -8,8 +8,10 @@ import SingleLineEditor from 'components/SingleLineEditor';
 import { updateAuth } from 'providers/ReduxStore/slices/collections';
 import { sendRequest, saveRequest } from 'providers/ReduxStore/slices/collections/actions';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const BasicAuth = ({ item, collection, updateAuth, request, save }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
 
@@ -53,7 +55,7 @@ const BasicAuth = ({ item, collection, updateAuth, request, save }) => {
 
   return (
     <StyledWrapper className="w-full">
-      <label className="block mb-1">Username</label>
+      <label className="block mb-1">{t('AUTH.USERNAME', 'Username')}</label>
       <div className="single-line-editor-wrapper mb-3">
         <SingleLineEditor
           value={basicAuth.username || ''}
@@ -67,7 +69,7 @@ const BasicAuth = ({ item, collection, updateAuth, request, save }) => {
         />
       </div>
 
-      <label className="block mb-1">Password</label>
+      <label className="block mb-1">{t('AUTH.PASSWORD', 'Password')}</label>
       <div className="single-line-editor-wrapper flex items-center">
         <SingleLineEditor
           value={basicAuth.password || ''}

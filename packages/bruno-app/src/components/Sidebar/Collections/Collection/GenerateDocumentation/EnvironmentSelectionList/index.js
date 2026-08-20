@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, memo } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import ColorBadge from 'components/ColorBadge';
+import { useTranslation } from 'react-i18next';
 
 // Show at most 6 environments at a glance; the list virtualises and scrolls beyond
 // that, so it stays performant even for collections with hundreds of environments
@@ -24,9 +25,11 @@ const EnvironmentSelectionList = ({
   selectedUids = [],
   onToggle,
   onToggleAll,
-  title = 'Environments',
+  title,
   disabled = false
 }) => {
+  const { t } = useTranslation();
+  const displayTitle = title || t('ENVIRONMENTS.TITLE', 'Environments');
   // O(1) membership checks regardless of how many environments are rendered.
   const selectedSet = useMemo(() => new Set(selectedUids), [selectedUids]);
 
@@ -77,9 +80,12 @@ const EnvironmentSelectionList = ({
     <>
       <div className="env-section-header">
         <div className="env-section-heading">
-          <h4 className="env-section-title" data-testid="env-section-title">{title}</h4>
+          <h4 className="env-section-title" data-testid="env-section-title">{displayTitle}</h4>
           <span className="env-section-count" data-testid="env-selected-count">
-            ({selectedCount}/{environments.length} selected)
+            {t('ENVIRONMENT_SELECTION_LIST.SELECTED_COUNT', `(${selectedCount}/${environments.length} selected)`, {
+              selectedCount,
+              total: environments.length
+            })}
           </span>
         </div>
         <label className="env-select-all">
@@ -92,13 +98,13 @@ const EnvironmentSelectionList = ({
             onChange={handleToggleAll}
             data-testid="env-select-all"
           />
-          <span className="env-select-all-label" data-testid="env-select-all-label">Select All</span>
+          <span className="env-select-all-label" data-testid="env-select-all-label">{t('COMMON.SELECT_ALL', 'Select All')}</span>
         </label>
       </div>
       <Virtuoso
         className="env-list"
         role="group"
-        aria-label={title}
+        aria-label={displayTitle}
         style={{ height: visibleRows * ENV_ROW_HEIGHT }}
         data={environments}
         computeItemKey={computeItemKey}

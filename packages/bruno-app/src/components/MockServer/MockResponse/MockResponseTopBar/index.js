@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import IconEdit from 'components/Icons/IconEdit';
 import { IconDeviceFloppy } from '@tabler/icons';
 import StyledWrapper from 'components/ResponseExample/ResponseExampleTopBar/StyledWrapper';
@@ -23,6 +24,7 @@ const MockResponseTopBar = ({
   onDelete,
   copiedFrom
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const example = useMemo(() => {
@@ -69,7 +71,7 @@ const MockResponseTopBar = ({
                     value={example?.name || ''}
                     onChange={handleNameChange}
                     className="example-input example-input-name"
-                    placeholder="Mock response name"
+                    placeholder={t('MOCK_SERVER.MOCK_RESPONSE_NAME_PLACEHOLDER', 'Mock response name')}
                     autoFocus
                     data-testid="mock-response-name-input"
                   />
@@ -82,7 +84,7 @@ const MockResponseTopBar = ({
                     value={example?.description || ''}
                     onChange={handleDescriptionChange}
                     className="example-input example-input-description"
-                    placeholder="Description"
+                    placeholder={t('MOCK_SERVER.DESCRIPTION', 'Description')}
                     rows={3}
                     data-testid="mock-response-description-input"
                   />
@@ -92,7 +94,7 @@ const MockResponseTopBar = ({
                 </div>
                 {copiedFrom?.exampleName ? (
                   <div className="text-xs opacity-60">
-                    Copied from example: {copiedFrom.exampleName}
+                    {t('MOCK_SERVER.COPIED_FROM_EXAMPLE', { name: copiedFrom.exampleName, defaultValue: `Copied from example: ${copiedFrom.exampleName}` })}
                   </div>
                 ) : null}
               </div>
@@ -105,7 +107,7 @@ const MockResponseTopBar = ({
                 onClick={onCancel}
                 data-testid="mock-response-cancel-btn"
               >
-                Cancel
+                {t('COMMON.CANCEL', 'Cancel')}
               </Button>
               <Button
                 color="primary"
@@ -115,7 +117,7 @@ const MockResponseTopBar = ({
                 disabled={Boolean(nameError || descriptionError)}
                 data-testid="mock-response-save-btn"
               >
-                Save
+                {t('COMMON.SAVE', 'Save')}
               </Button>
             </div>
           </div>
@@ -139,14 +141,14 @@ const MockResponseTopBar = ({
                 className="response-example-description-container max-w-full"
                 textClassName="response-example-description leading-relaxed max-w-full"
                 buttonClassName="text-blue-600 hover:text-blue-800 font-medium"
-                viewMoreText="View More"
-                viewLessText="View Less"
+                viewMoreText={t('COMMON.VIEW_MORE', 'View More')}
+                viewLessText={t('COMMON.VIEW_LESS', 'View Less')}
                 dataTestId="mock-response-description"
               />
             ) : null}
             {copiedFrom?.exampleName ? (
               <div className="text-xs opacity-60 mt-1">
-                Copied from example: {copiedFrom.exampleName}
+                {t('MOCK_SERVER.COPIED_FROM_EXAMPLE', { name: copiedFrom.exampleName, defaultValue: `Copied from example: ${copiedFrom.exampleName}` })}
               </div>
             ) : null}
           </div>
@@ -159,7 +161,7 @@ const MockResponseTopBar = ({
               onClick={onEditToggle}
               data-testid="mock-response-edit-btn"
             >
-              Edit
+              {t('COMMON.EDIT', 'Edit')}
             </Button>
             <Button
               variant="outline"
@@ -168,7 +170,7 @@ const MockResponseTopBar = ({
               onClick={onDelete}
               data-testid="mock-response-delete-btn"
             >
-              Delete
+              {t('COMMON.DELETE', 'Delete')}
             </Button>
           </div>
         </div>

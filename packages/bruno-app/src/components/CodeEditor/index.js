@@ -31,6 +31,7 @@ import {
   writePersistedEditorState
 } from './state-persistence';
 import { usePersistenceScope } from 'hooks/usePersistedState/PersistedScopeProvider';
+import i18n from 'i18n';
 
 const CodeMirror = require('codemirror');
 window.jsonlint = jsonlint;
@@ -466,7 +467,7 @@ class CodeEditor extends React.Component {
     return (
       <StyledWrapper
         className={`h-full w-full flex flex-col relative graphiql-container ${this.props.readOnly ? 'read-only' : ''} ${this.state.searchBarVisible ? 'search-bar-visible' : ''}`}
-        aria-label="Code Editor"
+        aria-label={i18n.t('QUERY_EDITOR.LABEL', 'Code Editor')}
         data-testid={this.props.testId}
         font={this.props.font}
         fontSize={this.props.fontSize}

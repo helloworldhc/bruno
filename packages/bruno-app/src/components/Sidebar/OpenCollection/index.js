@@ -79,18 +79,18 @@ const OpenCollectionModal = ({ onClose }) => {
 
         if (items.length === 0) {
           if (failedScans.length) {
-            toast.error(`Failed to scan ${failedScans.length} folder${failedScans.length === 1 ? '' : 's'} for collections`);
+            toast.error(t('COLLECTION.FAILED_SCAN_FOLDERS', 'Failed to scan {{count}} folder(s) for collections', { count: failedScans.length }));
           } else if (skippedItems.length) {
-            toast.error(`No Bruno collections found. ${skippedItems.length} skipped, config could not be read`);
+            toast.error(t('COLLECTION.NO_COLLECTIONS_SKIPPED', 'No Bruno collections found. {{count}} skipped, config could not be read', { count: skippedItems.length }));
           } else {
-            toast.error('No Bruno collections found. Couldn\'t find a bruno.json or opencollection.yml');
+            toast.error(t('COLLECTION.NO_COLLECTIONS_FOUND_HELP', "No Bruno collections found. Couldn't find a bruno.json or opencollection.yml"));
           }
           onClose();
           return;
         }
 
         if (failedScans.length) {
-          toast.error(`Failed to scan ${failedScans.length} folder${failedScans.length === 1 ? '' : 's'} for collections`);
+          toast.error(t('COLLECTION.FAILED_SCAN_FOLDERS', 'Failed to scan {{count}} folder(s) for collections', { count: failedScans.length }));
         }
 
         // If all selected folders are collections, open them directly
@@ -106,7 +106,7 @@ const OpenCollectionModal = ({ onClose }) => {
             const result = await dispatch(openMultipleCollections(items.map((item) => item.pathname), { silent: true }));
             notifyOpenResult(result);
           } catch {
-            toast.error('An error occurred while opening the collections');
+            toast.error(t('COLLECTION.OPEN_MULTIPLE_ERROR', 'An error occurred while opening the collections'));
           }
           onClose();
           return;
@@ -118,7 +118,7 @@ const OpenCollectionModal = ({ onClose }) => {
         setShowSelection(true);
       } catch (err) {
         console.error(err);
-        toast.error('An error occurred while scanning for collections');
+        toast.error(t('COLLECTION.SCAN_ERROR', 'An error occurred while scanning for collections'));
         onClose();
       }
     })();
@@ -151,7 +151,7 @@ const OpenCollectionModal = ({ onClose }) => {
         onClose();
       }
     } catch {
-      toast.error('An error occurred while opening the collections');
+      toast.error(t('COLLECTION.OPEN_MULTIPLE_ERROR', 'An error occurred while opening the collections'));
     }
   };
 

@@ -1,6 +1,8 @@
 import { debounce } from 'lodash';
 import { useTheme } from 'providers/Theme/index';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from 'i18n';
 import { formatResponse, getContentType } from 'utils/common';
 import { getDefaultResponseFormat, detectContentTypeFromBase64 } from 'utils/response';
 import LargeResponseWarning from '../LargeResponseWarning';
@@ -10,18 +12,18 @@ import StyledWrapper from './StyledWrapper';
 
 // Raw format options (for byte format types)
 const RAW_FORMAT_OPTIONS = [
-  { id: 'raw', label: 'Raw', type: 'item', codeMirrorMode: 'text/plain' },
-  { id: 'hex', label: 'Hex', type: 'item', codeMirrorMode: 'text/plain' },
-  { id: 'base64', label: 'Base64', type: 'item', codeMirrorMode: 'text/plain' }
+  { id: 'raw', label: i18n.t('RESPONSE.FORMAT_RAW', 'Raw'), type: 'item', codeMirrorMode: 'text/plain' },
+  { id: 'hex', label: i18n.t('RESPONSE.FORMAT_HEX', 'Hex'), type: 'item', codeMirrorMode: 'text/plain' },
+  { id: 'base64', label: i18n.t('RESPONSE.FORMAT_BASE64', 'Base64'), type: 'item', codeMirrorMode: 'text/plain' }
 ];
 
 // Preview format options
 const PREVIEW_FORMAT_OPTIONS = [
   // Structured formats
-  { id: 'json', label: 'JSON', type: 'item', codeMirrorMode: 'application/ld+json' },
-  { id: 'html', label: 'HTML', type: 'item', codeMirrorMode: 'xml' },
-  { id: 'xml', label: 'XML', type: 'item', codeMirrorMode: 'xml' },
-  { id: 'javascript', label: 'JavaScript', type: 'item', codeMirrorMode: 'javascript' },
+  { id: 'json', label: i18n.t('RESPONSE.FORMAT_JSON', 'JSON'), type: 'item', codeMirrorMode: 'application/ld+json' },
+  { id: 'html', label: i18n.t('RESPONSE.FORMAT_HTML', 'HTML'), type: 'item', codeMirrorMode: 'xml' },
+  { id: 'xml', label: i18n.t('RESPONSE.FORMAT_XML', 'XML'), type: 'item', codeMirrorMode: 'xml' },
+  { id: 'javascript', label: i18n.t('RESPONSE.FORMAT_JAVASCRIPT', 'JavaScript'), type: 'item', codeMirrorMode: 'javascript' },
   // Divider
   { type: 'divider', id: 'divider-structured-raw' },
   // Raw formats
@@ -29,7 +31,7 @@ const PREVIEW_FORMAT_OPTIONS = [
 ];
 
 const formatErrorMessage = (error) => {
-  if (!error) return 'Something went wrong';
+  if (!error) return i18n.t('RESPONSE.SOMETHING_WENT_WRONG', 'Something went wrong');
 
   const remoteMethodError = 'Error invoking remote method \'send-http-request\':';
 
@@ -108,6 +110,7 @@ const QueryResult = ({
   const contentType = getContentType(headers);
   const [showLargeResponse, setShowLargeResponse] = useState(false);
   const { displayedTheme } = useTheme();
+  const { t } = useTranslation();
 
   const responseSize = useMemo(() => {
     const response = item.response || {};
@@ -189,8 +192,8 @@ const QueryResult = ({
 
           {error && typeof error === 'string' && error.toLowerCase().includes('self signed certificate') ? (
             <div className="mt-6 muted text-xs">
-              You can disable SSL verification in the Preferences. <br />
-              To open the Preferences, click on the gear icon in the bottom left corner.
+              {t('RESPONSE.SSL_DISABLE_HINT', 'You can disable SSL verification in the Preferences.')} <br />
+              {t('RESPONSE.SSL_OPEN_PREFS_HINT', 'To open the Preferences, click on the gear icon in the bottom left corner.')}
             </div>
           ) : null}
         </div>

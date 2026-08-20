@@ -5,8 +5,10 @@ import { updateResponseExampleRequest } from 'providers/ReduxStore/slices/collec
 import ResponseExampleBodyMode from '../ResponseExampleBodyMode';
 import ResponseExampleBodyRenderer from '../ResponseExampleBodyRenderer';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const ResponseExampleBody = ({ editMode, item, collection, exampleUid, onSave }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const body = useMemo(() => {
@@ -50,7 +52,7 @@ const ResponseExampleBody = ({ editMode, item, collection, exampleUid, onSave })
     <StyledWrapper className="w-full mt-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <div className="title text-xs mr-2">Body</div>
+          <div className="title text-xs mr-2">{t('REQUEST.BODY', 'Body')}</div>
         </div>
         <ResponseExampleBodyMode
           item={item}

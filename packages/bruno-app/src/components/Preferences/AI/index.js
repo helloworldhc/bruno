@@ -155,10 +155,10 @@ const AI = () => {
         .then(() => refreshStatus())
         .catch((err) => {
           console.error('Failed to save AI preferences:', err);
-          toast.error('Failed to save AI preferences');
+          toast.error(t('PREFERENCES.AI_SAVE_ERROR', 'Failed to save AI preferences'));
           throw err;
         }),
-    [dispatch, preferences, refreshStatus]
+    [dispatch, preferences, refreshStatus, t]
   );
 
   const handleSaveRef = useRef(handleSave);
@@ -309,7 +309,7 @@ const AI = () => {
         </StatusBadge>
       </div>
 
-      <div className="ai-tabs flex items-center" role="tablist" aria-label="AI preferences">
+      <div className="ai-tabs flex items-center" role="tablist" aria-label={t('PREFERENCES.AI_PREFERENCES', 'AI preferences')}>
         <button
           type="button"
           role="tab"

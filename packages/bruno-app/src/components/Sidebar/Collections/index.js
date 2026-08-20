@@ -8,6 +8,7 @@ import CollectionSearch from './CollectionSearch/index';
 import InlineCollectionCreator from './InlineCollectionCreator';
 import path, { normalizePath } from 'utils/common/path';
 import { isScratchCollection } from 'utils/collections';
+import { useTranslation } from 'react-i18next';
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
@@ -20,6 +21,7 @@ const getSidebarEntryName = (entry) => {
 };
 
 const Collections = ({ showSearch, isCreatingCollection, onCreateClick, onDismissCreate, onOpenAdvancedCreate }) => {
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
   const { collections, collectionSortOrder } = useSelector((state) => state.collections);
   const { workspaces, activeWorkspaceUid } = useSelector((state) => state.workspaces);

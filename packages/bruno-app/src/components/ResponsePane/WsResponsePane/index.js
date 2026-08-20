@@ -11,6 +11,7 @@ import Timeline from '../Timeline';
 import ClearTimeline from '../ClearTimeline';
 import ResponseClear from '../ResponseClear';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 import ResponseLayoutToggle from '../ResponseLayoutToggle';
 import ResponsiveTabs from 'ui/ResponsiveTabs';
 import WSMessagesList from './WSMessagesList';
@@ -97,7 +98,7 @@ const WSResponsePane = ({ item, collection }) => {
   }
 
   if (!activeTabUid) {
-    return <div>Something went wrong</div>;
+    return <div>{t('COMMON.SOMETHING_WENT_WRONG', 'Something went wrong')}</div>;
   }
 
   const focusedTab = find(tabs, (t) => t.uid === activeTabUid);

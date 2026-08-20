@@ -7,8 +7,10 @@ import { updateTableColumnWidths } from 'providers/ReduxStore/slices/tabs';
 import EditableTable from 'components/EditableTable';
 import MultiLineEditor from 'components/MultiLineEditor';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const ResponseExampleFormUrlEncodedParams = ({ item, collection, exampleUid, editMode = false }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const tabs = useSelector((state) => state.tabs.tabs);
@@ -57,16 +59,16 @@ const ResponseExampleFormUrlEncodedParams = ({ item, collection, exampleUid, edi
   const columns = [
     {
       key: 'name',
-      name: 'Key',
+      name: t('COMMON.KEY', 'Key'),
       isKeyField: true,
-      placeholder: 'Key',
+      placeholder: t('COMMON.KEY', 'Key'),
       width: '40%',
       readOnly: !editMode
     },
     {
       key: 'value',
-      name: 'Value',
-      placeholder: 'Value',
+      name: t('COMMON.VALUE', 'Value'),
+      placeholder: t('COMMON.VALUE', 'Value'),
       width: '60%',
       readOnly: !editMode,
       render: ({ value, onChange }) => (
@@ -79,7 +81,7 @@ const ResponseExampleFormUrlEncodedParams = ({ item, collection, exampleUid, edi
           onRun={() => {}}
           collection={collection}
           item={item}
-          placeholder={!value ? 'Value' : ''}
+          placeholder={!value ? t('COMMON.VALUE', 'Value') : ''}
         />
       )
     }

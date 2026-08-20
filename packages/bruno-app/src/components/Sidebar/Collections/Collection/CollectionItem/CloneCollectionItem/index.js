@@ -55,7 +55,7 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
     onSubmit: (values) => {
       dispatch(cloneItem(values.name, values.filename, item.uid, collectionUid))
         .then(() => {
-          toast.success('Request cloned!');
+          toast.success(t('COLLECTIONS.REQUEST_CLONED', 'Request cloned!'));
           onClose();
         })
         .catch((err) => {

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
@@ -15,6 +16,7 @@ import {
 } from 'utils/mock-server/mock-server-instances';
 
 const RenameMockServerModal = ({ instance, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const inputRef = useRef();
   const activeWorkspaceUid = useSelector((state) => state.workspaces.activeWorkspaceUid);
@@ -51,10 +53,10 @@ const RenameMockServerModal = ({ instance, onClose }) => {
       try {
         await dispatch(saveMockServerInstance(nextInstance));
         dispatch(updateMockServerTabName(nextInstance));
-        toast.success('Mock server renamed');
+        toast.success(t('MOCK_SERVER.SERVER_RENAMED', 'Mock server renamed'));
         onClose();
       } catch (err) {
-        toast.error(err?.message || 'Failed to rename mock server');
+        toast.error(err?.message || t('MOCK_SERVER.RENAME_SERVER_ERROR', 'Failed to rename mock server'));
       }
     }
   });
@@ -75,8 +77,8 @@ const RenameMockServerModal = ({ instance, onClose }) => {
     <Portal>
       <Modal
         size="md"
-        title="Rename Mock Server"
-        confirmText="Rename"
+        title={t('MOCK_SERVER.RENAME_MOCK_SERVER', 'Rename Mock Server')}
+        confirmText={t('COMMON.RENAME', 'Rename')}
         handleConfirm={() => formik.handleSubmit()}
         handleCancel={handleCancel}
         dataTestId="mock-server-rename-modal"
@@ -84,7 +86,7 @@ const RenameMockServerModal = ({ instance, onClose }) => {
         <form className="bruno-form" onSubmit={(event) => event.preventDefault()}>
           <div>
             <label htmlFor="mock-server-rename-name" className="block font-medium">
-              Name
+              {t('MOCK_SERVER.NAME', 'Name')}
             </label>
             <input
               id="mock-server-rename-name"

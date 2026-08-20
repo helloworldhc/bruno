@@ -6,8 +6,10 @@ import { useDispatch } from 'react-redux';
 import { updateRequestAuthMode } from 'providers/ReduxStore/slices/collections';
 import { humanizeRequestAuthMode } from 'utils/collections';
 import StyledWrapper from '../../../Auth/AuthMode/StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const GrpcAuthMode = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const authMode = item.draft ? get(item, 'draft.request.auth.mode') : get(item, 'request.auth.mode');
 
@@ -24,40 +26,40 @@ const GrpcAuthMode = ({ item, collection }) => {
   const menuItems = useMemo(() => [
     {
       id: 'basic',
-      label: 'Basic Auth',
+      label: t('REQUEST.AUTH_BASIC', 'Basic Auth'),
       onClick: () => onModeChange('basic')
     },
     {
       id: 'bearer',
-      label: 'Bearer Token',
+      label: t('REQUEST.AUTH_BEARER', 'Bearer Token'),
       onClick: () => onModeChange('bearer')
     },
     {
       id: 'apikey',
-      label: 'API Key',
+      label: t('REQUEST.AUTH_API_KEY', 'API Key'),
       onClick: () => onModeChange('apikey')
     },
     {
       id: 'oauth2',
-      label: 'OAuth 2.0',
+      label: t('REQUEST.AUTH_OAUTH2', 'OAuth 2.0'),
       onClick: () => onModeChange('oauth2')
     },
     {
       id: 'wsse',
-      label: 'WSSE Auth',
+      label: t('REQUEST.AUTH_WSSE', 'WSSE Auth'),
       onClick: () => onModeChange('wsse')
     },
     {
       id: 'inherit',
-      label: 'Inherit',
+      label: t('REQUEST.AUTH_INHERIT', 'Inherit'),
       onClick: () => onModeChange('inherit')
     },
     {
       id: 'none',
-      label: 'No Auth',
+      label: t('REQUEST.AUTH_NONE', 'No Auth'),
       onClick: () => onModeChange('none')
     }
-  ], [onModeChange]);
+  ], [onModeChange, t]);
 
   return (
     <StyledWrapper>

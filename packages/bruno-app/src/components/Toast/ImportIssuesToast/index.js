@@ -2,11 +2,14 @@ import React, { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { IconAlertCircle, IconBrandGithub, IconCopy, IconX } from '@tabler/icons';
 import StyledWrapper from './StyledWrapper';
+import i18n from 'i18n';
+import { useTranslation } from 'react-i18next';
 
 const GITHUB_ISSUES_URL = 'https://github.com/usebruno/bruno/issues/new';
 const MAX_URL_LENGTH = 8000;
 
-const ImportIssuesToastContent = ({ t, issues, summary }) => {
+const ImportIssuesToastContent = ({ t: toastInstance, issues, summary }) => {
+  const { t } = useTranslation();
   const [includeItems, setIncludeItems] = useState(false);
   const hasSourceItems = issues.some((i) => i.sourceItem);
 
@@ -63,9 +66,9 @@ const ImportIssuesToastContent = ({ t, issues, summary }) => {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(issuesSummary);
-      toast.success('Copied to clipboard', { duration: 2000 });
+      toast.success(i18n.t('COMMON.COPIED_TO_CLIPBOARD', 'Copied to clipboard'), { duration: 2000 });
     } catch (err) {
-      toast.error('Failed to copy to clipboard', { duration: 3000 });
+      toast.error(i18n.t('COMMON.FAILED_TO_COPY', 'Failed to copy to clipboard'), { duration: 3000 });
     }
   };
 
@@ -81,9 +84,9 @@ const ImportIssuesToastContent = ({ t, issues, summary }) => {
 
     try {
       await navigator.clipboard.writeText(body);
-      toast.success('Issue details copied — paste them into the GitHub issue body', { duration: 5000 });
+      toast.success(i18n.t('IMPORT_ISSUES_TOAST.ISSUE_DETAILS_COPIED', 'Issue details copied — paste them into the GitHub issue body'), { duration: 5000 });
     } catch (err) {
-      toast.error('Failed to copy to clipboard', { duration: 3000 });
+      toast.error(i18n.t('COMMON.FAILED_TO_COPY', 'Failed to copy to clipboard'), { duration: 3000 });
     }
     const params = new URLSearchParams({ title, labels: 'bug' });
     window.open(`${GITHUB_ISSUES_URL}?${params.toString()}`, '_blank');
@@ -93,8 +96,8 @@ const ImportIssuesToastContent = ({ t, issues, summary }) => {
     <StyledWrapper
       data-testid="import-issues-toast"
       style={{
-        opacity: t.visible ? 1 : 0,
-        transform: t.visible ? 'translateX(0)' : 'translateX(100%)'
+        opacity: toastInstance.visible ? 1 : 0,
+        transform: toastInstance.visible ? 'translateX(0)' : 'translateX(100%)'
       }}
     >
       <div className="toast-accent" />
@@ -102,14 +105,16 @@ const ImportIssuesToastContent = ({ t, issues, summary }) => {
         <button
           type="button"
           className="toast-close"
-          aria-label="Close toast"
+          aria-label={i18n.t('COMMON.CLOSE', 'Close')}
           data-testid="import-issues-toast-close"
-          onClick={() => toast.dismiss(t.id)}
+          onClick={() => toast.dismiss(toastInstance.id)}
         >
           <IconX size={14} />
         </button>
-        <div className="toast-title" data-testid="import-issues-toast-title">Imported with issues: {summary}</div>
-        <div className="toast-hint">Open DevTools console to see which items failed and why.</div>
+        <div className="toast-title" data-testid="import-issues-toast-title">
+          {i18n.t('IMPORT_ISSUES_TOAST.TITLE', 'Imported with issues: {{summary}}', { summary })}
+        </div>
+        <div className="toast-hint">{i18n.t('TOAST.DEVTOOLS_HINT', 'Open DevTools console to see which items failed and why.')}</div>
         {hasSourceItems && (
           <label className="toast-checkbox">
             <input
@@ -119,25 +124,25 @@ const ImportIssuesToastContent = ({ t, issues, summary }) => {
               data-testid="import-issues-include-items-checkbox"
             />
             <div className="toast-checkbox-text">
-              <span className="toast-checkbox-label">Include failed request data</span>
-              <span className="toast-checkbox-desc">Attaches the raw Postman request items that failed. May contain API keys, tokens, or internal URLs.</span>
+              <span className="toast-checkbox-label">{i18n.t('TOAST.INCLUDE_FAILED_REQUEST_DATA', 'Include failed request data')}</span>
+              <span className="toast-checkbox-desc">{i18n.t('TOAST.INCLUDE_FAILED_REQUEST_DATA_DESC', 'Attaches the raw Postman request items that failed. May contain API keys, tokens, or internal URLs.')}</span>
             </div>
           </label>
         )}
         {isUrlTooLong && (
           <div className="toast-warning" data-testid="import-issues-url-too-long-warning">
             <IconAlertCircle size={14} className="toast-warning-icon" />
-            <span>Issue details are too long to embed in the URL. Clicking &quot;Report on GitHub&quot; will copy them to your clipboard — paste it once the GitHub issue page opens.</span>
+            <span>{i18n.t('IMPORT_ISSUES_TOAST.URL_TOO_LONG_WARNING', 'Issue details are too long to embed in the URL. Clicking "Report on GitHub" will copy them to your clipboard — paste it once the GitHub issue page opens.')}</span>
           </div>
         )}
         <div className="toast-actions">
           <button className="toast-btn" onClick={handleReport} data-testid="import-issues-report-btn">
             <IconBrandGithub size={13} />
-            Report on GitHub
+            {i18n.t('COMMON.REPORT_ON_GITHUB', 'Report on GitHub')}
           </button>
           <button className="toast-btn" onClick={handleCopy} data-testid="import-issues-copy-btn">
             <IconCopy size={13} />
-            Copy Issues
+            {i18n.t('COMMON.COPY_ISSUES', 'Copy Issues')}
           </button>
         </div>
       </div>
@@ -159,8 +164,8 @@ export const showImportIssuesToast = (issues) => {
   const errors = issues.filter((i) => i.severity === 'error');
   const warnings = issues.filter((i) => i.severity === 'warning');
   const parts = [];
-  if (errors.length > 0) parts.push(`${errors.length} item(s) skipped`);
-  if (warnings.length > 0) parts.push(`${warnings.length} warning(s)`);
+  if (errors.length > 0) parts.push(i18n.t('IMPORT_ISSUES_TOAST.ITEMS_SKIPPED', '{{count}} item(s) skipped', { count: errors.length }));
+  if (warnings.length > 0) parts.push(i18n.t('IMPORT_ISSUES_TOAST.WARNINGS_COUNT', '{{count}} warning(s)', { count: warnings.length }));
   const summary = parts.join(', ');
 
   activeImportToastId = toast.custom(

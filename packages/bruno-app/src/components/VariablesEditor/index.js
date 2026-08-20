@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import get from 'lodash/get';
 import filter from 'lodash/filter';
 import { IconBolt, IconDatabase } from '@tabler/icons';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { findEnvironmentInCollection } from 'utils/collections';
 import { updateTableColumnWidths } from 'providers/ReduxStore/slices/tabs';
@@ -17,6 +18,7 @@ import { useVariablesScroll } from './hooks/useVariablesScroll';
 import StyledWrapper from './StyledWrapper';
 
 const VariablesEditor = ({ collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const persistenceScope = usePersistenceScope();
   const tabs = useSelector((state) => state.tabs.tabs);
@@ -201,7 +203,7 @@ const VariablesEditor = ({ collection }) => {
         <div className="variables-scroll" data-testid="variables-scroll-container">
           <VariablesSection
             icon={IconBolt}
-            title="Runtime Variables"
+            title={t('VARIABLES.RUNTIME_VARIABLES', 'Runtime Variables')}
             count={runtimeRows.length}
             expanded={isSectionExpanded('runtime')}
             onToggle={() => toggleSection('runtime')}
@@ -221,13 +223,13 @@ const VariablesEditor = ({ collection }) => {
                 testId="variables-runtime-table"
               />
             ) : (
-              <div className="muted text-xs px-2 py-1">No runtime variables found</div>
+              <div className="muted text-xs px-2 py-1">{t('VARIABLES.NO_RUNTIME_VARIABLES', 'No runtime variables found')}</div>
             )}
           </VariablesSection>
 
           <VariablesSection
             icon={IconDatabase}
-            title="Environment Variables"
+            title={t('VARIABLES.ENVIRONMENT_VARIABLES', 'Environment Variables')}
             count={envRows.length}
             subtitle={environment?.name}
             expanded={isSectionExpanded('environment')}
@@ -235,7 +237,7 @@ const VariablesEditor = ({ collection }) => {
             testId="variables-env-section"
           >
             {!environment ? (
-              <div className="muted text-xs px-2 py-1">No environment selected</div>
+              <div className="muted text-xs px-2 py-1">{t('VARIABLES.NO_ENVIRONMENT_SELECTED', 'No environment selected')}</div>
             ) : envRows.length > 0 ? (
               <VariablesTable
                 key={activeEnvironmentUid || 'no-env'}
@@ -252,7 +254,7 @@ const VariablesEditor = ({ collection }) => {
                 testId="variables-env-table"
               />
             ) : (
-              <div className="muted text-xs px-2 py-1">No environment variables found</div>
+              <div className="muted text-xs px-2 py-1">{t('VARIABLES.NO_ENV_VARIABLES', 'No environment variables found')}</div>
             )}
           </VariablesSection>
         </div>

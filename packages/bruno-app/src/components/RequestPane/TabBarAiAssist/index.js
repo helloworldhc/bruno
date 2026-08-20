@@ -12,10 +12,12 @@ import {
   updateAppCode
 } from 'providers/ReduxStore/slices/collections';
 import { getActiveScriptTab } from 'utils/tabs';
+import { useTranslation } from 'react-i18next';
 
 const getFromItem = (item, path) => (item.draft ? get(item, `draft.${path}`) : get(item, path));
 
 const TabBarAiAssist = ({ item, collection, activeTab }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tabs = useSelector((state) => state.tabs.tabs);
   const activeTabUid = useSelector((state) => state.tabs.activeTabUid);

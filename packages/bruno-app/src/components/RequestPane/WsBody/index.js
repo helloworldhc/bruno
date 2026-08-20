@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { usePersistedState } from 'hooks/usePersistedState';
 import StyledWrapper from './StyledWrapper';
 import { SingleWSMessage } from './SingleWSMessage/index';
+import { useTranslation } from 'react-i18next';
 
 const getSelectedIndex = (messages) => {
   const idx = messages.findIndex((msg) => msg.selected);
@@ -14,6 +15,7 @@ const getSelectedIndex = (messages) => {
 
 const WSBody = ({ item, collection, handleRun, onAddMessage }) => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const messagesContainerRef = useRef(null);
   const pinScrollRef = useRef(null);
   const [listScrollTop, setListScrollTop] = usePersistedState({
@@ -242,10 +244,10 @@ const WSBody = ({ item, collection, handleRun, onAddMessage }) => {
     return (
       <StyledWrapper>
         <div className="empty-state">
-          <p>No WebSocket messages available</p>
+          <p>{t('WS.NO_MESSAGES', 'No WebSocket messages available')}</p>
           <button className="add-message-link" data-testid="ws-add-message" onClick={onAddMessage}>
             <IconPlus size={14} strokeWidth={1.5} />
-            <span>Add message</span>
+            <span>{t('WS.ADD_MESSAGE', 'Add message')}</span>
           </button>
         </div>
       </StyledWrapper>

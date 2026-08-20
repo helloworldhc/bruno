@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { isEqual } from 'lodash';
 import { IconServer2 } from '@tabler/icons';
 import { closeTabs, makeTabPermanent } from 'providers/ReduxStore/slices/tabs';
@@ -8,8 +9,9 @@ import GradientCloseButton from '../../../RequestTabs/RequestTab/GradientCloseBu
 import StyledWrapper from '../../../RequestTabs/RequestTab/StyledWrapper';
 
 const MockResponseTab = ({ tab }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
-  const tabLabel = tab.responseName || tab.tabName || 'Mock Response';
+  const tabLabel = tab.responseName || tab.tabName || t('MOCK_SERVER.MOCK_RESPONSE', 'Mock Response');
   const editor = useSelector((state) => state.collections.mockResponseEditors[tab.uid]);
 
   const hasUnsavedChanges = () => {
@@ -24,7 +26,7 @@ const MockResponseTab = ({ tab }) => {
 
   const handleCloseClick = (event) => {
     event.stopPropagation();
-    if (hasUnsavedChanges() && !window.confirm('This mock response has unsaved changes. Close without saving?')) {
+    if (hasUnsavedChanges() && !window.confirm(t('MOCK_SERVER.UNSAVED_CHANGES_CONFIRM', 'This mock response has unsaved changes. Close without saving?'))) {
       return;
     }
     dispatch(closeTabs({ tabUids: [tab.uid] }));

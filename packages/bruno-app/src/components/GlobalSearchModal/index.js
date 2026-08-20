@@ -344,7 +344,7 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
         className="command-k-modal-container"
         role="dialog"
         aria-modal="true"
-        aria-label="Global Search"
+        aria-label={t('GLOBAL_SEARCH.TITLE', 'Global Search')}
       >
         <div className="command-k-modal" onClick={(e) => e.stopPropagation()}>
           <div className="sr-only" aria-live="polite" aria-atomic="true">
@@ -374,7 +374,7 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
                 <button
                   onClick={clearSearch}
                   className="clear-button"
-                  aria-label="Clear search query"
+                  aria-label={t('GLOBAL_SEARCH.CLEAR_QUERY', 'Clear search query')}
                   type="button"
                 >
                   <IconX size={16} aria-hidden="true" />
@@ -387,7 +387,7 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
             className="command-k-results"
             ref={resultsRef}
             role="listbox"
-            aria-label="Search results"
+            aria-label={t('GLOBAL_SEARCH.SEARCH_RESULTS', 'Search results')}
           >
             {results.length === 0 && query ? (
               <div className="no-results">
@@ -443,17 +443,17 @@ const GlobalSearchModal = ({ isOpen, onClose }) => {
           </div>
 
           <div className="command-k-footer">
-            <div className="keyboard-hints" role="region" aria-label="Keyboard shortcuts">
-              <span aria-label="Use up and down arrows to navigate">
+            <div className="keyboard-hints" role="region" aria-label={t('COMMON.KEYBOARD_SHORTCUTS', 'Keyboard shortcuts')}>
+              <span aria-label={t('GLOBAL_SEARCH.NAVIGATE_ARIA', 'Use up and down arrows to navigate')}>
                 <span className="keycap" aria-hidden="true">↑</span>
                 <span className="keycap" aria-hidden="true">↓</span>
                 <span className="hint-label">{t('GLOBAL_SEARCH.TO_NAVIGATE', 'to navigate')}</span>
               </span>
-              <span aria-label="Press Enter to select">
+              <span aria-label={t('GLOBAL_SEARCH.SELECT_ARIA', 'Press Enter to select')}>
                 <span className="keycap" aria-hidden="true">↵</span>
                 <span className="hint-label">{t('GLOBAL_SEARCH.TO_SELECT', 'to select')}</span>
               </span>
-              <span aria-label="Press Escape to close">
+              <span aria-label={t('GLOBAL_SEARCH.CLOSE_ARIA', 'Press Escape to close')}>
                 <span className="keycap" aria-hidden="true">esc</span>
                 <span className="hint-label">{t('GLOBAL_SEARCH.TO_CLOSE', 'to close')}</span>
               </span>

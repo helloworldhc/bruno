@@ -11,6 +11,7 @@ import ToggleSwitch from 'components/ToggleSwitch/index';
 import { TabNavigation, ProtoFilesTab, ImportPathsTab } from '../Tabs';
 import useProtoFileManagement from 'hooks/useProtoFileManagement/index';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const ProtoFileDropdown = ({
   collection,
@@ -23,6 +24,7 @@ const ProtoFileDropdown = ({
   onReflectionModeToggle,
   onProtoFileLoad
 }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState('protofiles'); // 'protofiles' or 'importpaths'
@@ -35,7 +37,7 @@ const ProtoFileDropdown = ({
     const { success, filePath, error } = await protoFileManagement.browseForProtoFile();
     if (!success) {
       if (error) {
-        toast.error(`Failed to browse for proto file: ${error.message}`);
+        toast.error(t('GRPC.FAILED_BROWSE_PROTO', 'Failed to browse for proto file: {{message}}', { message: error.message }));
       }
       return;
     }
@@ -43,15 +45,15 @@ const ProtoFileDropdown = ({
     const { success: addSuccess, relativePath, alreadyExists, error: addError } = await protoFileManagement.addProtoFileFromRequest(filePath);
     if (!addSuccess) {
       if (addError) {
-        toast.error(`Failed to add proto file: ${addError.message}`);
+        toast.error(t('GRPC.FAILED_ADD_PROTO', 'Failed to add proto file: {{message}}', { message: addError.message }));
       }
       return;
     }
 
     if (alreadyExists) {
-      toast.error('Proto file already exists in collection settings');
+      toast.error(t('GRPC.PROTO_ALREADY_EXISTS', 'Proto file already exists in collection settings'));
     } else {
-      toast.success('Added proto file to collection');
+      toast.success(t('GRPC.ADDED_PROTO_SUCCESS', 'Added proto file to collection'));
     }
 
     dispatch(updateRequestProtoPath({
@@ -67,7 +69,7 @@ const ProtoFileDropdown = ({
 
   const handleSelectCollectionProtoFile = (protoFile) => {
     if (!protoFile || !protoFile.exists) {
-      toast.error('Proto file not found');
+      toast.error(t('GRPC.PROTO_NOT_FOUND', 'Proto file not found'));
       return;
     }
 
@@ -87,7 +89,7 @@ const ProtoFileDropdown = ({
     const { success, directoryPath, error } = await protoFileManagement.browseForImportDirectory();
     if (!success) {
       if (error) {
-        toast.error(`Failed to browse for import directory: ${error.message}`);
+        toast.error(t('GRPC.FAILED_BROWSE_IMPORT', 'Failed to browse for import directory: {{message}}', { message: error.message }));
       }
       return;
     }
@@ -95,24 +97,24 @@ const ProtoFileDropdown = ({
     const { success: addSuccess, error: addError } = await protoFileManagement.addImportPathFromRequest(directoryPath);
     if (!addSuccess) {
       if (addError) {
-        toast.error(`Failed to add import path: ${addError.message}`);
+        toast.error(t('GRPC.FAILED_ADD_IMPORT', 'Failed to add import path: {{message}}', { message: addError.message }));
       }
       return;
     }
 
-    toast.success('Added import path to collection');
+    toast.success(t('GRPC.ADDED_IMPORT_SUCCESS', 'Added import path to collection'));
   };
 
   const handleToggleImportPath = async (index) => {
     const { success, enabled, error } = await protoFileManagement.toggleImportPathFromRequest(index);
     if (!success) {
       if (error) {
-        toast.error(`Failed to toggle import path: ${error.message}`);
+        toast.error(t('GRPC.FAILED_TOGGLE_IMPORT', 'Failed to toggle import path: {{message}}', { message: error.message }));
       }
       return;
     }
 
-    toast.success(`Import path ${enabled ? 'enabled' : 'disabled'}`);
+    toast.success(t('GRPC.IMPORT_PATH_STATUS', 'Import path {{status}}', { status: enabled ? 'enabled' : 'disabled' }));
   };
 
   const handleOpenCollectionProtobufSettings = (e) => {
@@ -127,7 +129,7 @@ const ProtoFileDropdown = ({
           <IconFile size={20} strokeWidth={1.5} className="proto-file-dropdown-icon" />
         )}
         <span className="proto-file-dropdown-text">
-          {isReflectionMode ? 'Using Reflection' : (protoFilePath ? getBasename(collection.pathname, protoFilePath) : 'Select Proto File')}
+          {isReflectionMode ? t('GRPC.USING_REFLECTION', 'Using Reflection') : (protoFilePath ? getBasename(collection.pathname, protoFilePath) : t('GRPC.SELECT_PROTO_FILE', 'Select Proto File'))}
         </span>
         <IconChevronDown className="proto-file-dropdown-caret" size={14} strokeWidth={2} />
       </div>
@@ -148,10 +150,10 @@ const ProtoFileDropdown = ({
           <div className="proto-file-dropdown-content">
             <div className="proto-file-dropdown-mode-section" data-testid="grpc-mode-toggle">
               <div className="proto-file-dropdown-mode-controls">
-                <span>Mode</span>
+                <span>{t('GRPC.MODE', 'Mode')}</span>
                 <div className="proto-file-dropdown-mode-options">
                   <span className={`proto-file-dropdown-mode-option ${!isReflectionMode ? 'proto-file-dropdown-mode-option--active' : ''}`} style={{ color: !isReflectionMode ? theme.primary.text : undefined }}>
-                    Proto File
+                    {t('GRPC.PROTO_FILE', 'Proto File')}
                   </span>
                   <ToggleSwitch
                     isOn={isReflectionMode}
@@ -160,7 +162,7 @@ const ProtoFileDropdown = ({
                     activeColor={theme.primary.solid}
                   />
                   <span className={`proto-file-dropdown-mode-option ${isReflectionMode ? 'proto-file-dropdown-mode-option--active' : ''}`} style={{ color: isReflectionMode ? theme.primary.text : undefined }}>
-                    Reflection
+                    {t('GRPC.REFLECTION', 'Reflection')}
                   </span>
                 </div>
               </div>
@@ -204,7 +206,7 @@ const ProtoFileDropdown = ({
 
             {isReflectionMode && (
               <div className="proto-file-dropdown-reflection-message">
-                Using server reflection to discover gRPC methods.
+                {t('GRPC.USING_REFLECTION_MESSAGE', 'Using server reflection to discover gRPC methods.')}
               </div>
             )}
           </div>

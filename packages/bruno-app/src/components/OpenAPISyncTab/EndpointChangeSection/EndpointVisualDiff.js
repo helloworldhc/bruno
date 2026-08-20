@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import VisualDiffUrlBar from 'components/Git/VisualDiffViewer/VisualDiffUrlBar';
@@ -96,11 +97,20 @@ const openAPIDiffHasContent = {
 };
 
 const openAPIDiffSections = [
-  { key: 'url', title: 'URL', Component: VisualDiffUrlBar, hasContent: openAPIDiffHasContent.url },
-  { key: 'params', title: 'Parameters', Component: VisualDiffParams, hasContent: openAPIDiffHasContent.params },
-  { key: 'headers', title: 'Headers', Component: VisualDiffHeaders, hasContent: openAPIDiffHasContent.headers },
-  { key: 'auth', title: 'Authentication', Component: VisualDiffAuth, hasContent: openAPIDiffHasContent.auth },
-  { key: 'body', title: 'Body', Component: VisualDiffBody, hasContent: openAPIDiffHasContent.body }
+  { key: 'url', Component: VisualDiffUrlBar, hasContent: openAPIDiffHasContent.url },
+  { key: 'params', Component: VisualDiffParams, hasContent: openAPIDiffHasContent.params },
+  { key: 'headers', Component: VisualDiffHeaders, hasContent: openAPIDiffHasContent.headers },
+  { key: 'auth', Component: VisualDiffAuth, hasContent: openAPIDiffHasContent.auth },
+  { key: 'body', Component: VisualDiffBody, hasContent: openAPIDiffHasContent.body }
+];
+
+// Section titles are looked up via t() at render time so they follow the UI language.
+const openAPIDiffSectionTitles = (t) => [
+  t('COMMON.URL', 'URL'),
+  t('VISUAL_DIFF.PARAMETERS', 'Parameters'),
+  t('COMMON.HEADERS', 'Headers'),
+  t('VISUAL_DIFF.AUTHENTICATION', 'Authentication'),
+  t('COMMON.BODY', 'Body')
 ];
 
 /**
@@ -115,11 +125,15 @@ const openAPIDiffSections = [
 const EndpointVisualDiff = ({
   oldData,
   newData,
-  leftLabel = 'Current (in collection)',
-  rightLabel = 'Expected (from spec)',
+  leftLabel,
+  rightLabel,
   swapSides = false
 }) => {
-  const sections = openAPIDiffSections;
+  const { t } = useTranslation();
+  const sections = useMemo(() => {
+    const titles = openAPIDiffSectionTitles(t);
+    return openAPIDiffSections.map((section, index) => ({ ...section, title: titles[index] }));
+  }, [t]);
 
   // Determine which data goes on which side based on swapSides
   const displayOldData = swapSides ? newData : oldData;
@@ -131,8 +145,8 @@ const EndpointVisualDiff = ({
       newData={displayNewData}
       sections={sections}
       sectionHasChanges={openAPISectionHasChanges}
-      oldLabel={leftLabel}
-      newLabel={rightLabel}
+      oldLabel={leftLabel || t('OPENAPI.CURRENT_IN_COLLECTION', 'Current (in collection)')}
+      newLabel={rightLabel || t('OPENAPI.EXPECTED_FROM_SPEC', 'Expected (from spec)')}
       hideUnchanged={true}
     />
   );

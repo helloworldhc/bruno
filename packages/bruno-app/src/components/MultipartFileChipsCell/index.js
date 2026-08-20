@@ -4,16 +4,18 @@ import Dropdown from 'components/Dropdown';
 import ToolHint from 'components/ToolHint';
 import path, { normalizePath } from 'utils/common/path';
 import Wrapper, { OverflowList } from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const basename = (filePath) => (filePath ? path.basename(normalizePath(String(filePath))) : '');
 
 const FileEntry = ({ filePath, toolhintId, editMode, onRemove, variant }) => {
+  const { t } = useTranslation();
   const [overRemove, setOverRemove] = useState(false);
   const isChip = variant === 'chip';
 
   return (
     <ToolHint
-      text={overRemove ? 'Remove file' : filePath}
+      text={overRemove ? t('MULTIPART.REMOVE_FILE', 'Remove file') : filePath}
       toolhintId={toolhintId}
       place={overRemove ? 'bottom-end' : 'bottom-start'}
       positionStrategy="fixed"
@@ -54,6 +56,7 @@ const UPLOAD_RESERVE = 28;
 const MORE_CHIP_RESERVE = 56;
 
 const MultipartFileChipsCell = ({ files, onRemove, onAdd, editMode = true }) => {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
   const tooltipPrefix = useRef(`mp-tip-${Math.random().toString(36).slice(2, 10)}`).current;
   const [visibleCount, setVisibleCount] = useState(files.length);
@@ -139,10 +142,10 @@ const MultipartFileChipsCell = ({ files, onRemove, onAdd, editMode = true }) => 
                 data-testid="multipart-file-summary"
                 className="file-summary-chip"
                 onClick={(e) => e.stopPropagation()}
-                title={`${files.length} file${files.length > 1 ? 's' : ''}`}
+                title={t('MULTIPART.FILES_COUNT', '{{count}} file{{plural}}', { count: files.length, plural: files.length > 1 ? 's' : '' })}
               >
                 <IconFile size={14} stroke={1.5} className="file-chip-icon" />
-                <span>{files.length} file{files.length > 1 ? 's' : ''}</span>
+                <span>{t('MULTIPART.FILES_COUNT', '{{count}} file{{plural}}', { count: files.length, plural: files.length > 1 ? 's' : '' })}</span>
                 <IconChevronDown size={14} stroke={1.5} />
               </button>
             )}
@@ -168,9 +171,9 @@ const MultipartFileChipsCell = ({ files, onRemove, onAdd, editMode = true }) => 
                   data-testid="multipart-file-more"
                   className="file-more-chip"
                   onClick={(e) => e.stopPropagation()}
-                  title={`${overflow.length} more file${overflow.length > 1 ? 's' : ''}`}
+                  title={t('MULTIPART.MORE_FILES_COUNT', '{{count}} more file{{plural}}', { count: overflow.length, plural: overflow.length > 1 ? 's' : '' })}
                 >
-                  +{overflow.length} more
+                  {t('MULTIPART.MORE_COUNT', '+{{count}} more', { count: overflow.length })}
                 </button>
               )}
             >
@@ -185,7 +188,7 @@ const MultipartFileChipsCell = ({ files, onRemove, onAdd, editMode = true }) => 
           data-testid="multipart-file-upload"
           className="upload-btn ml-1"
           onClick={onAdd}
-          title="Add files"
+          title={t('MULTIPART.ADD_FILES', 'Add files')}
         >
           <IconUpload size={16} />
         </button>

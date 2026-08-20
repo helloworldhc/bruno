@@ -14,8 +14,10 @@ import StyledWrapper from './StyledWrapper';
 import Button from 'ui/Button';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useFocusErrorLine } from 'hooks/useFocusErrorLine';
+import { useTranslation } from 'react-i18next';
 
 const Script = ({ collection, folder }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const preRequestEditorRef = useRef(null);
   const postResponseEditorRef = useRef(null);
@@ -108,19 +110,19 @@ const Script = ({ collection, folder }) => {
   return (
     <StyledWrapper className="w-full flex flex-col h-full">
       <div className="text-xs mb-4 text-muted">
-        Pre and post-request scripts that will run before and after any request inside this folder is sent.
+        {t('FOLDER_SETTINGS.SCRIPT_DESCRIPTION', 'Pre and post-request scripts that will run before and after any request inside this folder is sent.')}
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="pre-request">
-            Pre Request
+            {t('REQUEST.PRE_REQUEST', 'Pre Request')}
             {requestScript && requestScript.trim().length > 0 && (
               <StatusDot type={hasPreRequestScriptError ? 'error' : 'default'} />
             )}
           </TabsTrigger>
           <TabsTrigger value="post-response">
-            Post Response
+            {t('REQUEST.POST_RESPONSE', 'Post Response')}
             {responseScript && responseScript.trim().length > 0 && (
               <StatusDot type={hasPostResponseScriptError ? 'error' : 'default'} />
             )}
@@ -172,7 +174,7 @@ const Script = ({ collection, folder }) => {
 
       <div className="mt-12">
         <Button type="submit" size="sm" onClick={handleSave}>
-          Save
+          {t('COMMON.SAVE', 'Save')}
         </Button>
       </div>
     </StyledWrapper>

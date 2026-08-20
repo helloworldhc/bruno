@@ -7,8 +7,10 @@ import { updateResponseExampleResponse } from 'providers/ReduxStore/slices/colle
 import CodeEditor from 'components/CodeEditor';
 import { getCodeMirrorModeBasedOnContentType } from 'utils/common/codemirror';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const ResponseExampleResponseContent = ({ editMode, item, collection, exampleUid, onSave }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { displayedTheme } = useTheme();
   const preferences = useSelector((state) => state.app.preferences);

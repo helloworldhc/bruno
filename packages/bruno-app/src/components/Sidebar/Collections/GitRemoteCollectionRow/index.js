@@ -7,8 +7,10 @@ import { useSidebarAccordion } from 'components/Sidebar/SidebarAccordionContext'
 import CloneGitRepository from 'components/Sidebar/CloneGitRespository';
 import RemoveGitRemote from 'components/WorkspaceHome/WorkspaceOverview/CollectionsList/RemoveGitRemote';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const GitRemoteCollectionRow = ({ entry }) => {
+  const { t } = useTranslation();
   const { dropdownContainerRef } = useSidebarAccordion();
   const menuDropdownRef = useRef(null);
   const [showCloneModal, setShowCloneModal] = useState(false);
@@ -20,9 +22,9 @@ const GitRemoteCollectionRow = ({ entry }) => {
   const handleCopyUrl = async () => {
     try {
       await navigator.clipboard.writeText(entry.remote);
-      toast.success('Git URL copied');
+      toast.success(t('GIT_REMOTE.URL_COPIED', 'Git URL copied'));
     } catch (e) {
-      toast.error('Failed to copy URL');
+      toast.error(t('GIT_REMOTE.COPY_URL_ERROR', 'Failed to copy URL'));
     }
   };
 
@@ -35,19 +37,19 @@ const GitRemoteCollectionRow = ({ entry }) => {
     {
       id: 'clone-git',
       leftSection: IconBrandGit,
-      label: 'Clone from Git',
+      label: t('GIT_REMOTE.CLONE_FROM_GIT', 'Clone from Git'),
       onClick: openCloneModal
     },
     {
       id: 'copy-url',
       leftSection: IconCopy,
-      label: 'Copy Git URL',
+      label: t('GIT_REMOTE.COPY_GIT_URL', 'Copy Git URL'),
       onClick: handleCopyUrl
     },
     {
       id: 'remove-git-remote',
       leftSection: IconUnlink,
-      label: 'Remove Git Remote',
+      label: t('GIT_REMOTE.REMOVE_GIT_REMOTE', 'Remove Git Remote'),
       onClick: () => setShowRemoveGitModal(true)
     }
   ];
@@ -73,7 +75,10 @@ const GitRemoteCollectionRow = ({ entry }) => {
         className="git-collection-row"
         onClick={openCloneModal}
         onContextMenu={handleRightClick}
-        title={`${entry.name} — click to clone from ${entry.remote}`}
+        title={t('GIT_REMOTE.ROW_TOOLTIP', '{{name}} — click to clone from {{remote}}', {
+          name: entry.name,
+          remote: entry.remote
+        })}
         data-testid="sidebar-git-collection-row"
       >
         <div className="flex flex-grow items-center overflow-hidden">

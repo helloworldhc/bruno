@@ -8,8 +8,10 @@ import StyledWrapper from './StyledWrapper';
 import { usePersistedState } from 'hooks/usePersistedState';
 import { useDocsEditingState } from './useDocsEditingState';
 import DocsEditor from './DocsEditor';
+import { useTranslation } from 'react-i18next';
 
 const Documentation = ({ item, collection }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { isEditing, setEditing } = useDocsEditingState();
   const docs = item?.draft ? get(item, 'draft.request.docs') : get(item, 'request.docs');

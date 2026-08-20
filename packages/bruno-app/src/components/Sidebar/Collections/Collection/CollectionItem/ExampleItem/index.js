@@ -116,7 +116,7 @@ const ExampleItem = ({ example, item, collection }) => {
     ) {
       setGenerateCodeItemModalOpen(true);
     } else {
-      toast.error('URL is required');
+      toast.error(t('REQUEST.URL_REQUIRED', 'URL is required'));
     }
   };
 

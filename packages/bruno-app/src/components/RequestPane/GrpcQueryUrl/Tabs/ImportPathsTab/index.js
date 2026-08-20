@@ -1,6 +1,7 @@
 import React from 'react';
 import { IconFolder, IconSettings, IconAlertCircle, IconFileImport } from '@tabler/icons';
 import StyledWrapper from './StyledWrapper';
+import { useTranslation } from 'react-i18next';
 
 const ImportPathsTab = ({
   collectionImportPaths,
@@ -9,12 +10,13 @@ const ImportPathsTab = ({
   onBrowseImportPath,
   onToggleImportPath
 }) => {
+  const { t } = useTranslation();
   return (
     <StyledWrapper>
       {collectionImportPaths && collectionImportPaths.length > 0 && (
         <div className="content-wrapper">
           <div className="header-wrapper">
-            <div className="header-text">From Collection Settings</div>
+            <div className="header-text">{t('GRPC.FROM_COLLECTION_SETTINGS', 'From Collection Settings')}</div>
             <button
               onClick={onOpenCollectionProtobufSettings}
               className="settings-button"
@@ -27,13 +29,13 @@ const ImportPathsTab = ({
             <div className="error-wrapper">
               <p className="error-text">
                 <IconAlertCircle size={16} strokeWidth={1.5} style={{ marginRight: '0.25rem' }} />
-                Some import paths could not be found.
+                {t('GRPC.SOME_IMPORTS_NOT_FOUND', 'Some import paths could not be found.')}
                 {' '}
                 <button
                   onClick={onOpenCollectionProtobufSettings}
                   className="error-link"
                 >
-                  Manage import paths
+                  {t('GRPC.MANAGE_IMPORT_PATHS', 'Manage import paths')}
                 </button>
               </p>
             </div>

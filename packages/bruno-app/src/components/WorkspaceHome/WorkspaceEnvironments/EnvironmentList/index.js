@@ -211,16 +211,16 @@ const EnvironmentList = ({
     e.stopPropagation();
     dispatch(selectGlobalEnvironment({ environmentUid: env.uid }))
       .then(() => {
-        toast.success(`Environment "${env.name}" activated`);
+        toast.success(t('ENVIRONMENTS.ACTIVATED', 'Environment "{{name}}" activated', { name: env.name }));
       })
       .catch(() => {
-        toast.error('Failed to activate environment');
+        toast.error(t('ENVIRONMENTS.ACTIVATE_ERROR', 'Failed to activate environment'));
       });
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   const validateEnvironmentName = (name, excludeUid = null) => {
     if (!name || name.trim() === '') {
-      return 'Name is required';
+      return t('ENVIRONMENTS.NAME_REQUIRED', 'Name is required');
     }
 
     if (!validateName(name)) {
@@ -232,7 +232,7 @@ const EnvironmentList = ({
       (env) => env?.uid !== excludeUid && env?.name?.toLowerCase().trim() === trimmedName
     );
     if (isDuplicate) {
-      return 'Environment already exists';
+      return t('ENVIRONMENTS.ALREADY_EXISTS', 'Environment already exists');
     }
 
     return null;
@@ -268,13 +268,13 @@ const EnvironmentList = ({
 
     dispatch(addGlobalEnvironment({ name: newEnvName }))
       .then(() => {
-        toast.success('Environment created!');
+        toast.success(t('ENVIRONMENTS.CREATED', 'Environment created!'));
         setIsCreatingInline(false);
         setNewEnvName('');
         setEnvNameError('');
       })
       .catch(() => {
-        toast.error('An error occurred while creating the environment');
+        toast.error(t('ENVIRONMENTS.CREATE_ERROR', 'An error occurred while creating the environment'));
       });
   };
 
@@ -314,13 +314,13 @@ const EnvironmentList = ({
 
     dispatch(renameGlobalEnvironment({ name: newEnvName, environmentUid: renamingEnvUid }))
       .then(() => {
-        toast.success('Environment renamed!');
+        toast.success(t('ENVIRONMENTS.RENAMED', 'Environment renamed!'));
         setRenamingEnvUid(null);
         setNewEnvName('');
         setEnvNameError('');
       })
       .catch(() => {
-        toast.error('An error occurred while renaming the environment');
+        toast.error(t('ENVIRONMENTS.RENAME_ERROR', 'An error occurred while renaming the environment'));
       });
   };
 
@@ -533,13 +533,13 @@ const EnvironmentList = ({
     return (
       <div className="empty-state">
         <IconFileAlert size={48} strokeWidth={1.5} />
-        <div className="title">No Environments</div>
+        <div className="title">{t('ENVIRONMENTS.NO_ENVIRONMENTS', 'No Environments')}</div>
         <div className="actions">
           <Button size="sm" color="secondary" onClick={() => handleCreateEnvClick()}>
-            Create Environment
+            {t('ENVIRONMENTS.CREATE_ENVIRONMENT', 'Create Environment')}
           </Button>
           <Button size="sm" color="secondary" onClick={() => handleImportClick()}>
-            Import Environment
+            {t('ENVIRONMENTS.IMPORT_ENVIRONMENT', 'Import Environment')}
           </Button>
         </div>
       </div>

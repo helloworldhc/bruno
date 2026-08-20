@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import Button from 'ui/Button';
 import Modal from 'components/Modal';
@@ -7,6 +8,7 @@ import { isOpenApiSpec } from 'utils/importers/openapi-collection';
 import { parseFileAsJsonOrYaml } from 'utils/importers/file-reader';
 
 const ConnectionSettingsModal = ({ collection, sourceUrl, onSave, onDisconnect, onClose }) => {
+  const { t } = useTranslation();
   const openApiSyncConfig = collection?.brunoConfig?.openapi?.[0];
   const normalizedSourceUrl = (sourceUrl || '').trim();
   const isUrl = isHttpUrl(normalizedSourceUrl);
@@ -39,28 +41,28 @@ const ConnectionSettingsModal = ({ collection, sourceUrl, onSave, onDisconnect, 
   return (
     <Modal
       size="md"
-      title="Connection Settings"
+      title={t('OPENAPI.CONNECTION_SETTINGS_TITLE', 'Connection Settings')}
       hideFooter={true}
       handleCancel={onClose}
     >
       <div className="settings-modal">
         <div className="settings-body">
           <div className="settings-field">
-            <label className="settings-label">Spec Source</label>
+            <label className="settings-label">{t('OPENAPI.SPEC_SOURCE', 'Spec Source')}</label>
             <div className="setup-mode-toggle" style={{ marginBottom: '8px' }}>
               <button
                 type="button"
                 className={`setup-mode-btn ${mode === 'url' ? 'active' : ''}`}
                 onClick={() => setMode('url')}
               >
-                URL
+                {t('OPENAPI.URL', 'URL')}
               </button>
               <button
                 type="button"
                 className={`setup-mode-btn ${mode === 'file' ? 'active' : ''}`}
                 onClick={() => setMode('file')}
               >
-                File
+                {t('OPENAPI.FILE', 'File')}
               </button>
             </div>
 
@@ -85,13 +87,13 @@ const ConnectionSettingsModal = ({ collection, sourceUrl, onSave, onDisconnect, 
                       try {
                         const data = await parseFileAsJsonOrYaml(file);
                         if (!isOpenApiSpec(data)) {
-                          toast.error('The selected file is not a valid OpenAPI 3.x specification');
+                          toast.error(t('OPENAPI.INVALID_OPENAPI_3', 'The selected file is not a valid OpenAPI 3.x specification'));
                           return;
                         }
                         const path = window.ipcRenderer.getFilePath(file);
                         if (path) setFilePath(path);
                       } catch (err) {
-                        toast.error(err.message || 'Failed to read the selected file');
+                        toast.error(err.message || t('OPENAPI.FAILED_TO_READ_FILE', 'Failed to read the selected file'));
                       }
                     }
                   }}
@@ -101,18 +103,18 @@ const ConnectionSettingsModal = ({ collection, sourceUrl, onSave, onDisconnect, 
                   className="settings-input file-pick-btn"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  {filePath ? filePath.split(/[\\/]/).pop() : 'Select File'}
+                  {filePath ? filePath.split(/[\\/]/).pop() : t('OPENAPI.SELECT_FILE', 'Select File')}
                 </button>
               </>
             )}
           </div>
 
           <div className="settings-field">
-            <label className="settings-label">Auto-check for updates</label>
+            <label className="settings-label">{t('OPENAPI.AUTO_CHECK_FOR_UPDATES', 'Auto-check for updates')}</label>
             <div className="settings-toggle-row">
               <div className="toggle-info">
                 <div className="toggle-description">
-                  Automatically check for spec changes at a regular interval
+                  {t('OPENAPI.AUTO_CHECK_DESC', 'Automatically check for spec changes at a regular interval')}
                 </div>
               </div>
               <button
@@ -127,7 +129,7 @@ const ConnectionSettingsModal = ({ collection, sourceUrl, onSave, onDisconnect, 
 
           {autoCheck && (
             <div className="settings-field">
-              <label className="settings-label">Check interval</label>
+              <label className="settings-label">{t('OPENAPI.CHECK_INTERVAL', 'Check interval')}</label>
               <div className="interval-buttons">
                 {intervals.map((mins) => (
                   <button
@@ -136,7 +138,7 @@ const ConnectionSettingsModal = ({ collection, sourceUrl, onSave, onDisconnect, 
                     className={checkInterval === mins ? 'active' : ''}
                     onClick={() => setCheckInterval(mins)}
                   >
-                    {mins} min
+                    {t('OPENAPI.MINS', { count: mins, defaultValue: `${mins} min` })}
                   </button>
                 ))}
               </div>
@@ -146,11 +148,11 @@ const ConnectionSettingsModal = ({ collection, sourceUrl, onSave, onDisconnect, 
 
         <div className="settings-footer">
           <button className="disconnect-link" onClick={onDisconnect} type="button">
-            Disconnect sync
+            {t('OPENAPI.DISCONNECT_SYNC', 'Disconnect sync')}
           </button>
           <div className="settings-actions">
-            <Button variant="ghost" color="secondary" size="sm" onClick={onClose}>Cancel</Button>
-            <Button size="sm" onClick={handleSave} loading={isSaving} disabled={!canSave || isSaving}>Save</Button>
+            <Button variant="ghost" color="secondary" size="sm" onClick={onClose}>{t('COMMON.CANCEL', 'Cancel')}</Button>
+            <Button size="sm" onClick={handleSave} loading={isSaving} disabled={!canSave || isSaving}>{t('COMMON.SAVE', 'Save')}</Button>
           </div>
         </div>
       </div>

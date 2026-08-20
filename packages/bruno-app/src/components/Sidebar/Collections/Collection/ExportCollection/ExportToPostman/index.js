@@ -58,13 +58,13 @@ const ExportToPostman = ({ onClose, onExported, collection }) => {
     try {
       const content = exportPostmanCollection(cloneDeep(collection), { preserveScripts });
       await dispatch(exportCollectionToPostman(values.location, `${values.fileName.trim()}.json`, content, overwrite));
-      toast.success('Collection exported successfully');
+      toast.success(t('SHARE_COLLECTION.EXPORT_SUCCESS', 'Collection exported successfully'));
       onExported();
     } catch (error) {
       if (error.message === FILE_EXISTS_ERROR) {
         formik.setFieldError('fileName', FILE_EXISTS_ERROR);
       } else {
-        toast.error(error.message || 'Export failed');
+        toast.error(error.message || t('SHARE_COLLECTION.EXPORT_FAILED', 'Export failed'));
       }
     } finally {
       setIsExporting(false);

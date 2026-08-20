@@ -25,7 +25,7 @@ const RemoveCollection = ({ onClose, collectionUid }) => {
 
   const onConfirm = () => {
     if (!collection) {
-      toast.error('Collection not found');
+      toast.error(t('COLLECTIONS.COLLECTION_NOT_FOUND', 'Collection not found'));
       onClose();
       return;
     }
@@ -34,11 +34,11 @@ const RemoveCollection = ({ onClose, collectionUid }) => {
         toast.success(t('COMMON.SUCCESS', 'Collection removed from workspace'));
         onClose();
       })
-      .catch(() => toast.error('An error occurred while removing the collection'));
+      .catch(() => toast.error(t('COLLECTIONS.REMOVE_ERROR', 'An error occurred while removing the collection')));
   };
 
   if (!collection) {
-    return <div>Collection not found</div>;
+    return <div>{t('COMMON.COLLECTION_NOT_FOUND', 'Collection not found')}</div>;
   }
 
   // If there are drafts, show the draft confirmation modal
