@@ -6,6 +6,7 @@ import { useState } from 'react';
 import StyledWrapper from './StyledWrapper';
 
 const SaveFileErrorModal = ({ error }) => {
+  const { t } = useTranslation();
   const [showModal, setShowModal] = useState(true);
   return (
     <>

@@ -20,6 +20,7 @@ const fileBasename = (filePath) =>
   filePath ? path.basename(normalizePath(String(filePath))) : '';
 
 const ResponseExampleMultipartFormParams = ({ item, collection, exampleUid, editMode = false }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
   const tabs = useSelector((state) => state.tabs.tabs);

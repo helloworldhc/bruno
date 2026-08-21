@@ -30,6 +30,7 @@ const EventTypeNames = {
 };
 
 const GrpcTimelineItem = ({ timestamp, request, response, eventType, collection, eventData, item }) => {
+  const { t } = useTranslation();
   const [isExpanded, onToggleExpand] = usePersistedState({
     key: `grpc-timeline-${timestamp}`,
     default: false
@@ -83,7 +84,8 @@ const GrpcTimelineItem = ({ timestamp, request, response, eventType, collection,
             {effectiveRequest.proxy && effectiveRequest.proxy.mode !== 'off' && (
               <div>
                 <div className="content-request-label mb-1">
-                  <IconArrowsRightLeft size={14} strokeWidth={1.5} className="inline-block mr-1" />{t('COMMON.PROXY', 'Proxy')}</div>
+                  <IconArrowsRightLeft size={14} strokeWidth={1.5} className="inline-block mr-1" />{t('COMMON.PROXY', 'Proxy')}
+                </div>
                 <div className="content-box">
                   {effectiveRequest.proxy.url ? (
                     <div>

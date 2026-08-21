@@ -10,7 +10,6 @@ import { updateCollectionAuth } from 'providers/ReduxStore/slices/collections';
 import { saveCollectionRoot } from 'providers/ReduxStore/slices/collections/actions';
 import { useTheme } from 'providers/Theme';
 import StyledWrapper from './StyledWrapper';
-import { useTranslation } from 'react-i18next';
 
 interface AkamaiEdgeGridAuthValues {
   accessToken?: string;

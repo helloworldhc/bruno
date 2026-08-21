@@ -6,6 +6,7 @@ import StyledWrapper from './StyledWrapper';
 import { useTranslation } from 'react-i18next';
 
 const ResponseExampleDescription = ({ editMode, item, collection, exampleUid }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const description = useMemo(() => {

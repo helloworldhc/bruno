@@ -4,6 +4,7 @@ import CodeEditor from 'components/CodeEditor';
 import { useTheme } from 'providers/Theme';
 import { useSelector } from 'react-redux';
 import { parseBulkKeyValue, serializeBulkKeyValue } from 'utils/common/bulkKeyValueUtils';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Preserve hidden metadata (uid, description, annotations) across a bulk edit
@@ -56,6 +57,7 @@ const preserveMetadata = (parsed, original) => {
 };
 
 const BulkEditor = ({ params, onChange, onToggle, onSave, onRun }) => {
+  const { t } = useTranslation();
   const preferences = useSelector((state) => state.app.preferences);
   const { displayedTheme } = useTheme();
 

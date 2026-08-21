@@ -147,6 +147,7 @@ const REQUEST_CTX_BOOTSTRAP = `<script>
 </script>`;
 
 const AppView = ({ item, collection, code }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { displayedTheme, theme, themeVariantLight, themeVariantDark } = useTheme();
   const src = useMemo(() => toDataUrl(wrapHtml(REQUEST_CTX_BOOTSTRAP, code || '')), [code]);

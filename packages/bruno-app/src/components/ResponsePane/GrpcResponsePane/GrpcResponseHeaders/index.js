@@ -3,6 +3,7 @@ import StyledWrapper from './StyledWrapper';
 import { useTranslation } from 'react-i18next';
 
 const GrpcResponseHeaders = ({ metadata }) => {
+  const { t } = useTranslation();
   // Ensure headers is an array
   const metadataArray = Array.isArray(metadata) ? metadata : [];
 
