@@ -33,6 +33,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUid, hasOverflow, setHasOverflow, dropdownContainerRef }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { theme } = useTheme();
   const tabNameRef = useRef(null);

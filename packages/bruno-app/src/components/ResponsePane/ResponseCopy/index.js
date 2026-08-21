@@ -43,12 +43,13 @@ export const useResponseCopy = (item, selectedFormat, selectedTab, data, dataBuf
     } catch (error) {
       toast.error(t('RESPONSE.COPY_FAILED', 'Failed to copy response'));
     }
-  }, [selectedTab, selectedFormat, data, dataBuffer]);
+  }, [selectedTab, selectedFormat, data, dataBuffer, t]);
 
   return { copyResponse, copied, hasData: !!data };
 };
 
 const ResponseCopy = forwardRef(({ item, children, selectedFormat, selectedTab, data, dataBuffer }, ref) => {
+  const { t } = useTranslation();
   const { copyResponse, copied, hasData } = useResponseCopy(item, selectedFormat, selectedTab, data, dataBuffer);
   const elementRef = useRef(null);
 

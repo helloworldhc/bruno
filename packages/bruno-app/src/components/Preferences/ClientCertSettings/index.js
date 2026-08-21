@@ -26,46 +26,49 @@ const CertField = ({ label, value, title, action }) => (
   </div>
 );
 
-const CertFileInput = ({ label, name, value, inputRef, onSelect, onClear, error, touched, dangerColor, chooseFileText = 'Choose file' }) => (
-  <div className="mb-3 flex items-start">
-    <label className="settings-label mt-1" htmlFor={name}>
-      {label}
-    </label>
-    <div className="flex flex-col gap-1">
-      <input
-        key={name}
-        id={name}
-        type="file"
-        name={name}
-        className="hidden"
-        onChange={(e) => onSelect(e.target)}
-        ref={inputRef}
-      />
-      {value ? (
-        <div className="file-chip" data-testid={`file-chip-${name}`}>
-          <IconFile size={14} strokeWidth={1.5} className="flex-shrink-0" />
-          <span className="truncate max-w-[260px]" title={value}>
-            {path.basename(value)}
-          </span>
-          <ActionIcon type="button" label={t('PREFERENCES.REMOVE_FILE', 'Remove file')} size="sm" colorOnHover={dangerColor} onClick={onClear}>
-            <IconX size={14} strokeWidth={1.5} />
-          </ActionIcon>
-        </div>
-      ) : (
-        <Button
-          size="xs"
-          variant="outline"
-          icon={<IconUpload size={13} strokeWidth={1.5} />}
-          onClick={() => inputRef.current?.click()}
-          data-testid={`choose-file-${name}`}
-        >
-          {chooseFileText || t('PREFERENCES.CHOOSE_FILE', 'Choose file')}
-        </Button>
-      )}
-      {touched && error ? <div className="text-red-500 text-xs">{error}</div> : null}
+const CertFileInput = ({ label, name, value, inputRef, onSelect, onClear, error, touched, dangerColor, chooseFileText = 'Choose file' }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="mb-3 flex items-start">
+      <label className="settings-label mt-1" htmlFor={name}>
+        {label}
+      </label>
+      <div className="flex flex-col gap-1">
+        <input
+          key={name}
+          id={name}
+          type="file"
+          name={name}
+          className="hidden"
+          onChange={(e) => onSelect(e.target)}
+          ref={inputRef}
+        />
+        {value ? (
+          <div className="file-chip" data-testid={`file-chip-${name}`}>
+            <IconFile size={14} strokeWidth={1.5} className="flex-shrink-0" />
+            <span className="truncate max-w-[260px]" title={value}>
+              {path.basename(value)}
+            </span>
+            <ActionIcon type="button" label={t('PREFERENCES.REMOVE_FILE', 'Remove file')} size="sm" colorOnHover={dangerColor} onClick={onClear}>
+              <IconX size={14} strokeWidth={1.5} />
+            </ActionIcon>
+          </div>
+        ) : (
+          <Button
+            size="xs"
+            variant="outline"
+            icon={<IconUpload size={13} strokeWidth={1.5} />}
+            onClick={() => inputRef.current?.click()}
+            data-testid={`choose-file-${name}`}
+          >
+            {chooseFileText || t('PREFERENCES.CHOOSE_FILE', 'Choose file')}
+          </Button>
+        )}
+        {touched && error ? <div className="text-red-500 text-xs">{error}</div> : null}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ClientCertSettings = () => {
   const { t } = useTranslation();

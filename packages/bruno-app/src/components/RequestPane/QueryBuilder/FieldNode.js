@@ -109,6 +109,7 @@ const ArgValueInput = ({ value, onChange, field }) => {
 };
 
 const InputObjectFields = ({ namedType, parentKey, fieldPath, indent, argValues, enabledArgs, onToggleInputField, onSetInputFieldValue }) => {
+  const { t } = useTranslation();
   const [expandedFields, setExpandedFields] = useState(new Set());
   const fields = useMemo(() => getInputObjectFields(namedType), [namedType]);
 
@@ -209,6 +210,7 @@ const FieldNode = ({
   onSetInputFieldValue,
   hasChildren
 }) => {
+  const { t } = useTranslation();
   const indent = depth * 20;
 
   const handleCheck = useCallback(
