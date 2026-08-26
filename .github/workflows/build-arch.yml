@@ -1,0 +1,87 @@
+name: Build Arch Linux Pacman
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create GitHub Release draft?'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-arch:
+    name: Build Arch Pacman Package
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install packaging dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+          cache-dependency-path: './package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build libraries
+        run: |
+          npm run build:graphql-docs
+          npm run build:bruno-query
+          npm run build:bruno-common
+          npm run sandbox:bundle-libraries --workspace=packages/bruno-js
+          npm run build:bruno-converters
+          npm run build:bruno-requests
+          npm run build:schema-types
+          npm run build:bruno-filestore
+          npm run build:bruno-sqlite
+
+      - name: Build web application
+        run: npm run build:web
+
+      - name: Build Electron pacman package
+        run: node ./scripts/build-electron.js
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          BRUNO_LINUX_TARGET: pacman
+
+      - name: Upload Arch pacman package
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruno-arch-pacman
+          path: |
+            packages/bruno-electron/out/*.pkg.tar.zst
+            packages/bruno-electron/out/*.pkg.tar.xz
+            packages/bruno-electron/out/*.pacman
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: ${{ inputs.create_release }}
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            packages/bruno-electron/out/*.pkg.tar.zst
+            packages/bruno-electron/out/*.pkg.tar.xz
+            packages/bruno-electron/out/*.pacman
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

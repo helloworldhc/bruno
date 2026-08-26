@@ -119,6 +119,8 @@ async function main() {
       osArg = 'win';
     } else if (os.platform() === 'darwin') {
       osArg = 'mac';
+    } else if (process.env.BRUNO_LINUX_TARGET === 'pacman') {
+      osArg = 'pacman';
     } else {
       osArg = 'linux';
     }

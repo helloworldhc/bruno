@@ -92,6 +92,20 @@ const config = {
       'libasound2' // #1036
     ]
   },
+  // Override electron-builder defaults — several (http-parser, etc.) are not in Arch repos.
+  pacman: {
+    depends: [
+      'gtk3',
+      'libnotify',
+      'nss',
+      'libxss',
+      'libxtst',
+      'xdg-utils',
+      'at-spi2-core',
+      'libsecret',
+      'libuuid'
+    ]
+  },
   win: {
     artifactName: '${name}_${version}_${arch}_portable.${ext}',
     icon: 'resources/icons/win/icon.ico',
