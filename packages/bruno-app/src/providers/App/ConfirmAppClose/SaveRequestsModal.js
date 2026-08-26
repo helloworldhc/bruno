@@ -32,6 +32,7 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
     const collectionDrafts = [];
     const folderDrafts = [];
     const environmentDrafts = [];
+    const appDrafts = [];
     const relevantTabs = forceCloseTabs ? tabs.filter((t) => tabUidsToClose.includes(t.uid)) : tabs;
     const tabsByCollection = groupBy(relevantTabs, (t) => t.collectionUid);
 
@@ -74,6 +75,14 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
           });
         });
 
+        const apps = filter(items, (item) => item.type === 'app' && hasRequestChanges(item));
+        each(apps, (draft) => {
+          appDrafts.push({
+            ...draft,
+            collectionUid: collectionUid
+          });
+        });
+
         // Folder drafts
         const folders = filter(items, (item) => item.type === 'folder' && item.draft);
         each(folders, (folder) => {
@@ -101,7 +110,7 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
       }
     }
 
-    return [...collectionDrafts, ...folderDrafts, ...environmentDrafts, ...requestDrafts];
+    return [...collectionDrafts, ...folderDrafts, ...environmentDrafts, ...appDrafts, ...requestDrafts];
   }, [collections, tabs, globalEnvironments, globalEnvironmentDraft, forceCloseTabs, tabUidsToClose]);
 
   const totalDraftsCount = allDrafts.length;
@@ -135,7 +144,7 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
             dispatch(clearGlobalEnvironmentDraft());
             break;
           default:
-            // Request drafts
+            // Request and app drafts both live on collection items.
             dispatch(deleteRequestDraft({ collectionUid: draft.collectionUid, itemUid: draft.uid }));
             break;
         }
@@ -152,7 +161,7 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
       // Separate drafts by type
       const collectionDrafts = allDrafts.filter((d) => d.type === 'collection');
       const folderDrafts = allDrafts.filter((d) => d.type === 'folder');
-      const requestDrafts = allDrafts.filter((d) => isItemARequest(d));
+      const requestDrafts = allDrafts.filter((d) => isItemARequest(d) || d.type === 'app');
       const transientRequestDrafts = requestDrafts.filter((d) => d.isTransient);
       const nonTransientRequestDrafts = requestDrafts.filter((d) => !d.isTransient);
       const collectionEnvironmentDrafts = allDrafts.filter((d) => d.type === 'collection-environment');
@@ -271,6 +280,9 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
             case 'global-environment':
               prefix = `${t('ENVIRONMENT.GLOBAL_ENVIRONMENT', 'Global Environment')}: `;
               break;
+            case 'app':
+              prefix = 'App: ';
+              break;
             default:
               prefix = `${t('COMMON.REQUEST', 'Request')}: `;
           }
@@ -295,7 +307,7 @@ const SaveRequestsModal = ({ onClose, forceCloseTabs = false, tabUidsToClose = [
       <div className="flex justify-between mt-6">
         <div>
           <Button color="danger" onClick={closeWithoutSave}>
-            {t('COMMON.DONT_SAVE', "Don't Save")}
+            {t('COMMON.DONT_SAVE', 'Don\'t Save')}
           </Button>
         </div>
         <div className="flex gap-2">

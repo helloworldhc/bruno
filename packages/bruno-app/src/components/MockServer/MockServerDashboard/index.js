@@ -13,6 +13,7 @@ import {
   getMockServerInstances,
   checkMockServerPortAvailable,
   getMockServerPortError,
+  getMockServerPortRangeError,
   getMockServerNameError,
   isMockServerNameTaken,
   resolveInstanceSpec,
@@ -86,46 +87,52 @@ const MockServerDashboard = ({ instance, collection }) => {
   const nameValue = nameDraft ?? storedInstance.name;
   const delayValue = delayDraft ?? activeDelay;
 
-  useEffect(() => {
-    validatePort(activePort);
-  }, [activePort]);
-
-  const validatePort = async (value = activePort) => {
-    const trimmed = String(value).trim();
-
-    if (!trimmed) {
-      const error = 'Port is required';
-      setPortError(error);
-      return error;
+  const resolvePortError = async (value) => {
+    const rangeError = getMockServerPortRangeError(value);
+    if (rangeError) {
+      return rangeError;
     }
 
-    const nextPort = Number(trimmed);
-    if (!Number.isInteger(nextPort) || nextPort < 1 || nextPort > 65535) {
-      const error = 'Port must be between 1 and 65535';
-      setPortError(error);
-      return error;
+    try {
+      const portCheck = await checkMockServerPortAvailable(Number(value), workspaceInstances, {
+        excludeUid: storedInstance.uid
+      });
+      return getMockServerPortError(portCheck, value);
+    } catch (err) {
+      return err.message || t('MOCK_SERVER.PORT_VALIDATE_ERROR', 'Failed to validate port');
     }
-
-    const portCheck = await checkMockServerPortAvailable(nextPort, workspaceInstances, {
-      excludeUid: mockServerUid
-    });
-    const error = getMockServerPortError(portCheck, nextPort);
-    setPortError(error);
-    return error;
   };
+
+  const conflictingPortsKey = workspaceInstances
+    .filter((i) => i.uid !== storedInstance.uid)
+    .map((i) => Number(i.port))
+    .join(',');
+
+  useEffect(() => {
+    let isCurrent = true;
+    resolvePortError(activePort).then((error) => {
+      if (isCurrent) {
+        setPortError(error);
+      }
+    });
+    return () => {
+      isCurrent = false;
+    };
+  }, [activePort, conflictingPortsKey]);
 
   useEffect(() => {
     dispatch(syncMockServerState(location));
   }, [dispatch, location.mockServerUid, location.workspacePath]);
 
   const handleStart = async () => {
-    try {
-      const error = await validatePort();
-      if (error) {
-        toast.error(error);
-        return;
-      }
+    const validationError = await resolvePortError(activePort);
+    setPortError(validationError);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
 
+    try {
       const payload = resolveMockServerStartPayload(storedInstance, {
         collection,
         apiSpecs,
@@ -133,9 +140,9 @@ const MockServerDashboard = ({ instance, collection }) => {
       });
       const result = await dispatch(startMockServer(payload)).unwrap();
       await dispatch(syncMockServerState(location));
-      toast.success(`Mock server started at ${result.baseUrl}`);
+      toast.success(t('MOCK_SERVER.SERVER_STARTED_AT', { url: result.baseUrl, defaultValue: `Mock server started at ${result.baseUrl}` }));
     } catch (err) {
-      toast.error(err.message || 'Failed to start mock server');
+      toast.error(err.message || t('MOCK_SERVER.START_ERROR', 'Failed to start mock server'));
     }
   };
 
@@ -151,9 +158,13 @@ const MockServerDashboard = ({ instance, collection }) => {
 
   const handleRefresh = async () => {
     try {
-      await dispatch(refreshMockRoutes({ mockServerUid })).unwrap();
-      await dispatch(loadMockResponses(location));
-      toast.success(t('MOCK_SERVER.ROUTES_REFRESHED', 'Routes refreshed'));
+      await dispatch(refreshMockRoutes(location)).unwrap();
+      const { responses } = await dispatch(loadMockResponses(location)).unwrap();
+      toast.success(t('MOCK_SERVER.ROUTES_REFRESHED_DETAIL', {
+        routes: countMockRoutes(responses),
+        responses: responses.length,
+        defaultValue: `Routes refreshed: ${countMockRoutes(responses)} routes, ${responses.length} responses`
+      }));
     } catch (err) {
       toast.error(err.message || t('MOCK_SERVER.REFRESH_ROUTES_ERROR', 'Failed to refresh routes'));
     }

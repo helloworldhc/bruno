@@ -6,27 +6,40 @@ import StyledWrapper from './StyledWrapper';
 // The expected "data" prop must be an XML string.
 export default function XmlPreview({ data, defaultExpanded = true }) {
   const { t } = useTranslation();
-  // Parse XML string
-  const parsedData = useMemo(() => {
+  const parsedResult = useMemo(() => {
     if (typeof data !== 'string') {
-      return { error: t('RESPONSE.XML_INVALID_INPUT', 'Invalid input. Expected an XML string.') };
+      return {
+        error: t('RESPONSE.XML_INVALID_INPUT', 'Invalid input. Expected an XML string.'),
+        data: null
+      };
     }
 
     const parsed = parseXMLString(data);
-    if (parsed === null) {
-      return { error: t('RESPONSE.XML_PARSE_FAILED', 'Failed to parse XML string. Invalid XML format.') };
-    }
-    return parsed;
-  }, [data]);
 
-  // Check for parsing error
-  if (parsedData && typeof parsedData === 'object' && parsedData.error) {
+    if (parsed === null) {
+      return {
+        error: t('RESPONSE.XML_PARSE_FAILED', 'Failed to parse XML string. Invalid XML format.'),
+        data: null
+      };
+    }
+
+    return {
+      error: null,
+      data: parsed
+    };
+  }, [data, t]);
+
+  if (parsedResult.error) {
     return (
       <div className="px-2">
-        <ErrorBanner errors={[{ title: t('RESPONSE.CANNOT_PREVIEW_XML', 'Cannot preview as XML'), message: parsedData.error }]} />
+        <ErrorBanner
+          errors={[{ title: t('RESPONSE.CANNOT_PREVIEW_XML', 'Cannot preview as XML'), message: parsedResult.error }]}
+        />
       </div>
     );
   }
+
+  const parsedData = parsedResult.data;
 
   // Validate that data can be rendered as a tree
   const isValidTreeData = (data) => {
@@ -65,7 +78,7 @@ export default function XmlPreview({ data, defaultExpanded = true }) {
 
   return (
     <StyledWrapper>
-      <div className="xml-container">
+      <div className="xml-container" data-testid="xml-tree">
         <XmlNode
           node={rootNode}
           nodeName={rootNodeName}
@@ -224,7 +237,6 @@ const XmlNode = ({
   if (!displayNodeName) {
     displayNodeName = t('RESPONSE.XML_UNNAMED_NODE', '(unnamed)');
   }
-
 
   // Determine if this node's value is an array
   const hasArrayValue = Array.isArray(node);

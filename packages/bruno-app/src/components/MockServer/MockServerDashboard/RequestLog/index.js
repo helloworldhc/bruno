@@ -87,7 +87,11 @@ const MatchTracePanel = ({ entry }) => {
   if (!trace) {
     return (
       <div className="match-trace-panel" data-testid="mock-server-match-trace">
-        <div className="match-trace-empty">{t('MOCK_SERVER.NO_MATCH_TRACE', 'No match trace for this entry.')}</div>
+        {entry?.error ? (
+          <div className="match-trace-error" data-testid="mock-server-log-error">{entry.error}</div>
+        ) : (
+          <div className="match-trace-empty">{t('MOCK_SERVER.NO_MATCH_TRACE', 'No match trace for this entry.')}</div>
+        )}
       </div>
     );
   }
@@ -108,6 +112,10 @@ const MatchTracePanel = ({ entry }) => {
             )
           : <span className="match-trace-result match-trace-result-fail">{failureLabel || t('MOCK_SERVER.NO_MATCH', 'No match')}</span>}
       </div>
+
+      {entry.error ? (
+        <div className="match-trace-error" data-testid="mock-server-log-error">{entry.error}</div>
+      ) : null}
 
       {trace.availableRoutes?.length ? (
         <div className="match-trace-section">

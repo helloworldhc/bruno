@@ -84,7 +84,7 @@
     "AUTOCOMPLETE": "代码补全",
     "SECURITY": "安全设置",
     "RESET_DEFAULT": "恢复默认",
-    "HOLD_ON": "请稍候...",
+    "HOLD_ON": "请稍候..",
     "CLEAR_ALL": "全部清空",
     "TRY_DIFFERENT_SEARCH": "尝试其他搜索关键词",
     "NO_SEARCH_RESULTS": "无搜索结果",
@@ -135,7 +135,6 @@
     "DEPRECATED": "已弃用",
     "TRY_AGAIN": "重试",
     "FAILED_TO_SAVE_CHANGES": "保存更改失败",
-    "HOLD_ON": "请稍候..",
     "NOTHING_TO_PRETTIFY": "无可美化内容",
     "CHANGES_SAVED": "更改已成功保存",
     "ITEM_COPIED": "{{item}}已复制",
@@ -374,7 +373,9 @@
     "DELETE_DIR": "删除目录",
     "FILE_FORMAT": "文件格式",
     "FILE_FORMAT_DESC": "选择该集合中请求文件的保存格式。",
-    "AUTH_DESC": "为整个集合配置认证方式。这适用于在“认证”选项卡中选择“继承”选项的所有请求。"
+    "AUTH_DESC": "为整个集合配置认证方式。这适用于在“认证”选项卡中选择“继承”选项的所有请求。",
+    "DEFAULT_ENVIRONMENT": "默认环境",
+    "DEFAULT_ENVIRONMENT_DESC": "在集合被分享并首次打开时自动选中。"
   },
   "REQUEST": {
     "PARAMS": "参数",
@@ -1198,7 +1199,6 @@
     "FAILED_TO_CONNECT": "连接失败",
     "SYNC_DISCONNECTED": "OpenAPI 同步已断开",
     "FAILED_TO_DISCONNECT_SYNC": "断开同步失败",
-    "URL_NOT_VALID_SPEC": "该 URL 未指向有效的 OpenAPI 3.x 规范",
     "SETTINGS_SAVED": "设置已保存",
     "FAILED_SAVE_SETTINGS": "保存设置失败"
   },
@@ -1405,7 +1405,9 @@
     "RESPONSE_RENAMED": "Mock 响应已重命名",
     "RENAME_RESPONSE_ERROR": "重命名 Mock 响应失败",
     "RESPONSE_CLONED": "Mock 响应已克隆",
-    "CLONE_RESPONSE_ERROR": "克隆 Mock 响应失败"
+    "CLONE_RESPONSE_ERROR": "克隆 Mock 响应失败",
+    "ROUTES_REFRESHED_DETAIL": "路由已刷新：{{routes}} 条路由，{{responses}} 条响应",
+    "PORT_VALIDATE_ERROR": "端口校验失败"
   },
   "API_SPEC": {
     "API_SPEC": "API 规范",
@@ -1682,9 +1684,10 @@
     "NO_FIELDS": "无可用字段。"
   },
   "GRAPHQL": {
+    "SCHEMA": "Schema",
     "DOCS": "文档",
-    "REFRESH_FROM_INTROSPECTION": "从内省刷新",
-    "LOAD_FROM_INTROSPECTION": "从内省加载",
+    "REFRESH_FROM_INTROSPECTION": "从内省 (Introspection) 刷新",
+    "LOAD_FROM_INTROSPECTION": "从内省 (Introspection) 加载",
     "LOAD_FROM_FILE": "从文件加载"
   },
   "QUERY_EDITOR": {
@@ -1704,13 +1707,6 @@
     "CURL_IMPORTED": "cURL 命令导入成功",
     "CURL_PARSE_FAILED": "解析 cURL 命令失败",
     "SAVE_SHORTCUT": "保存 ({{shortcut}})"
-  },
-  "GRAPHQL": {
-    "SCHEMA": "Schema",
-    "DOCS": "文档",
-    "REFRESH_FROM_INTROSPECTION": "从内省 (Introspection) 刷新",
-    "LOAD_FROM_INTROSPECTION": "从内省 (Introspection) 加载",
-    "LOAD_FROM_FILE": "从文件加载"
   },
   "SCRIPT_ERROR": {
     "PRE_REQUEST_ERROR": "前置请求脚本错误",

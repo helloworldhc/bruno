@@ -135,7 +135,6 @@
     "DEPRECATED": "Deprecated",
     "TRY_AGAIN": "Try Again",
     "FAILED_TO_SAVE_CHANGES": "Failed to save changes",
-    "HOLD_ON": "Hold on..",
     "NOTHING_TO_PRETTIFY": "Nothing to prettify",
     "CHANGES_SAVED": "Changes saved successfully",
     "ITEM_COPIED": "{{item}} copied",
@@ -374,7 +373,9 @@
     "DELETE_DIR": "Delete Directory",
     "FILE_FORMAT": "File Format",
     "FILE_FORMAT_DESC": "Choose the file format for storing requests in this collection.",
-    "AUTH_DESC": "Configures authentication for the entire collection. This applies to all requests using the Inherit option in the Auth tab."
+    "AUTH_DESC": "Configures authentication for the entire collection. This applies to all requests using the Inherit option in the Auth tab.",
+    "DEFAULT_ENVIRONMENT": "Default Environment",
+    "DEFAULT_ENVIRONMENT_DESC": "Selected when this collection is shared and first opened."
   },
   "REQUEST": {
     "PARAMS": "Params",
@@ -1198,7 +1199,6 @@
     "FAILED_TO_CONNECT": "Failed to connect",
     "SYNC_DISCONNECTED": "OpenAPI sync disconnected",
     "FAILED_TO_DISCONNECT_SYNC": "Failed to disconnect sync",
-    "URL_NOT_VALID_SPEC": "The URL does not point to a valid OpenAPI 3.x specification",
     "SETTINGS_SAVED": "Settings saved",
     "FAILED_SAVE_SETTINGS": "Failed to save settings"
   },
@@ -1405,7 +1405,9 @@
     "RESPONSE_RENAMED": "Mock response renamed",
     "RENAME_RESPONSE_ERROR": "Failed to rename mock response",
     "RESPONSE_CLONED": "Mock response cloned",
-    "CLONE_RESPONSE_ERROR": "Failed to clone mock response"
+    "CLONE_RESPONSE_ERROR": "Failed to clone mock response",
+    "ROUTES_REFRESHED_DETAIL": "Routes refreshed: {{routes}} routes, {{responses}} responses",
+    "PORT_VALIDATE_ERROR": "Failed to validate port"
   },
   "API_SPEC": {
     "API_SPEC": "API Spec",
@@ -1682,6 +1684,7 @@
     "NO_FIELDS": "No fields available."
   },
   "GRAPHQL": {
+    "SCHEMA": "Schema",
     "DOCS": "Docs",
     "REFRESH_FROM_INTROSPECTION": "Refresh from Introspection",
     "LOAD_FROM_INTROSPECTION": "Load from Introspection",
@@ -1704,13 +1707,6 @@
     "CURL_IMPORTED": "cURL command imported successfully",
     "CURL_PARSE_FAILED": "Failed to parse cURL command",
     "SAVE_SHORTCUT": "Save ({{shortcut}})"
-  },
-  "GRAPHQL": {
-    "SCHEMA": "Schema",
-    "DOCS": "Docs",
-    "REFRESH_FROM_INTROSPECTION": "Refresh from Introspection",
-    "LOAD_FROM_INTROSPECTION": "Load from Introspection",
-    "LOAD_FROM_FILE": "Load from File"
   },
   "SCRIPT_ERROR": {
     "PRE_REQUEST_ERROR": "Pre-Request Script Error",

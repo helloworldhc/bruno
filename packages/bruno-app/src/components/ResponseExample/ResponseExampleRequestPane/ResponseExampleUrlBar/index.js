@@ -5,10 +5,8 @@ import SingleLineEditor from 'components/SingleLineEditor';
 import HttpMethodSelector from 'components/RequestPane/QueryUrl/HttpMethodSelector';
 import StyledWrapper from './StyledWrapper';
 import get from 'lodash/get';
-import { useTranslation } from 'react-i18next';
 
-const ResponseExampleUrlBar = ({ item, collection, editMode, onSave, exampleUid, allowMethodSelect = false, urlPrefix = null }) => {
-  const { t } = useTranslation();
+const ResponseExampleUrlBar = ({ item, collection, editMode, onSave, exampleUid, allowMethodSelect = false, urlPrefix = null, highlightPathParams = true }) => {
   const dispatch = useDispatch();
 
   const exampleData = useMemo(() => {
@@ -98,7 +96,7 @@ const ResponseExampleUrlBar = ({ item, collection, editMode, onSave, exampleUid,
             onSave={onSave}
             onChange={onChange}
             collection={collection}
-            highlightPathParams={true}
+            highlightPathParams={highlightPathParams}
             item={item}
             readOnly={!editMode}
           />
