@@ -74,7 +74,9 @@ const config = {
     ],
     category: 'Development',
     desktop: {
-      MimeType: 'x-scheme-handler/bruno;'
+      MimeType: 'x-scheme-handler/bruno;',
+      // Electron WM_CLASS is the package.json name ("bruno"), not productName ("Bruno").
+      StartupWMClass: 'bruno'
     }
   },
   deb: {

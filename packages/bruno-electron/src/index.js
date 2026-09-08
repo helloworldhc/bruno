@@ -96,6 +96,13 @@ const isMac = process.platform === 'darwin';
 const isWindows = process.platform === 'win32';
 const isLinux = process.platform === 'linux';
 
+if (isLinux) {
+  // Must match the installed desktop file (bruno.desktop) so the DE can
+  // associate the running window with the app icon. Electron otherwise
+  // falls back to `${productName}.desktop`.
+  app.setDesktopName('bruno.desktop');
+}
+
 let mainWindow;
 let appProtocolUrl;
 
