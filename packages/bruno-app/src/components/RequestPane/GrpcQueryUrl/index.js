@@ -297,7 +297,8 @@ const GrpcQueryUrl = ({ item, collection, handleRun }) => {
       <div className="flex items-center h-full method-selector-container">
         <div className="flex items-center justify-center h-full px-[10px]" data-testid="grpc-method-indicator">
           <span className="text-xs font-medium" style={{ color: theme.request.grpc }}>gRPC</span>
-        </div>      </div>
+        </div>
+      </div>
       <div className="flex items-center w-full input-container h-full relative overflow-auto">
         <SingleLineEditor
           ref={editorRef}
@@ -309,6 +310,7 @@ const GrpcQueryUrl = ({ item, collection, handleRun }) => {
           collection={collection}
           highlightPathParams={true}
           item={item}
+          disableLinkAwareClick={true}
         />
 
       </div>

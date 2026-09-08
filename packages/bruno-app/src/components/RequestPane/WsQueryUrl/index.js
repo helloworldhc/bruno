@@ -139,6 +139,7 @@ const WsQueryUrl = ({ item, collection, handleRun }) => {
             onRun={handleWsRun}
             collection={collection}
             item={item}
+            disableLinkAwareClick={true}
           />
           <div className="flex items-center h-full cursor-pointer gap-3 mx-3">
             <ToolHint text={t('QUERY_URL.SAVE_SHORTCUT', 'Save ({{shortcut}})', { shortcut: saveShortcut })} toolhintId="ws-save-request" place="top" positionStrategy="fixed">

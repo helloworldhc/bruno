@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTheme } from 'providers/Theme';
 import { moveVar, setRequestVars } from 'providers/ReduxStore/slices/collections';
@@ -12,9 +12,9 @@ import { valueToString } from '@usebruno/common/utils';
 import EditableTable from 'components/EditableTable';
 import { createDescriptionColumn } from 'components/EditableTable/descriptionColumn';
 import StyledWrapper from './StyledWrapper';
-import toast from 'react-hot-toast';
 import { variableNameRegex } from 'utils/common/regex';
 import { useTranslation } from 'react-i18next';
+import { getAllVariables } from 'utils/collections';
 
 const VarsTable = ({ item, collection, vars, varType, initialScroll = 0, isDraft }) => {
   const { t } = useTranslation();
@@ -33,6 +33,8 @@ const VarsTable = ({ item, collection, vars, varType, initialScroll = 0, isDraft
 
   const onSave = () => dispatch(saveRequest(item.uid, collection.uid));
   const handleRun = () => dispatch(sendRequest(item, collection.uid));
+
+  const resolvableVariables = useMemo(() => getAllVariables(collection, item), [collection, item]);
 
   const handleVarsChange = useCallback((updatedVars) => {
     dispatch(setRequestVars({
@@ -56,10 +58,10 @@ const VarsTable = ({ item, collection, vars, varType, initialScroll = 0, isDraft
     if (key !== 'name') return null;
     if (!row.name || row.name.trim() === '') return null;
     if (!variableNameRegex.test(row.name)) {
-      return 'Variable contains invalid characters. Must only contain alphanumeric characters, "-", "_", "."';
+      return t('COMMON.VARIABLE_NAME_ERROR', 'Variable contains invalid characters. Must only contain alphanumeric characters, "-", "_", "."');
     }
     return null;
-  }, []);
+  }, [t]);
 
   const descriptionColumn = createDescriptionColumn({
     theme: storedTheme,
@@ -109,7 +111,7 @@ const VarsTable = ({ item, collection, vars, varType, initialScroll = 0, isDraft
                   compact={compact}
                   variable={row}
                   theme={storedTheme}
-                  collection={collection}
+                  resolvableVariables={resolvableVariables}
                   onChange={(fields) => {
                     const updated = (vars || []).map((v) => v.uid === row.uid ? { ...v, ...fields } : v);
                     handleVarsChange(updated);

@@ -2,10 +2,10 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { updateResponseExampleRequest } from 'providers/ReduxStore/slices/collections';
 import BodyModeSelector from 'components/BodyModeSelector';
-import { format, applyEdits } from 'jsonc-parser';
 import xmlFormat from 'xml-formatter';
 import { toastError } from 'utils/common/error';
 import { useTranslation } from 'react-i18next';
+import { prettifyJsonString } from 'utils/common/index';
 
 const ResponseExampleBodyMode = ({ item, collection, exampleUid, body, bodyMode, onBodyEdit, editMode = false }) => {
   const { t } = useTranslation();
@@ -60,8 +60,7 @@ const ResponseExampleBodyMode = ({ item, collection, exampleUid, body, bodyMode,
   const onPrettify = () => {
     if (body?.json && bodyMode === 'json') {
       try {
-        const edits = format(body.json, undefined, { tabSize: 2, insertSpaces: true });
-        const prettyBodyJson = applyEdits(body.json, edits);
+        const prettyBodyJson = prettifyJsonString(body.json);
         onBodyEdit(prettyBodyJson);
       } catch (e) {
         toastError(new Error(t('REQUEST.UNABLE_TO_PRETTIFY_JSON', 'Unable to prettify. Invalid JSON format.')));

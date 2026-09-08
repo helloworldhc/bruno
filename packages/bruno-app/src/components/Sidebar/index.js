@@ -10,6 +10,7 @@ import CollectionsSection from './Sections/CollectionsSection/index';
 import ApiSpecsSection from './Sections/ApiSpecsSection/index';
 import MockServersSection from './Sections/MockServersSection/index';
 import useKeybinding from 'hooks/useKeybinding';
+import useClearSidebarSelectionOnEscape from 'hooks/useClearSidebarSelectionOnEscape';
 import { useBetaFeature, BETA_FEATURES } from 'utils/beta-features';
 import { useTranslation } from 'react-i18next';
 
@@ -55,6 +56,8 @@ const Sidebar = () => {
     dispatch(toggleSidebarSearch());
     return false;
   });
+
+  useClearSidebarSelectionOnEscape();
 
   const displayWidth = dragging ? asideWidth : leftSidebarWidth;
   const currentWidth = sidebarCollapsed ? 0 : displayWidth;

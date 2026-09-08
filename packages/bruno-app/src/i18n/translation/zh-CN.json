@@ -143,7 +143,15 @@
     "KEYBOARD_SHORTCUTS": "快捷键提示",
     "REMOVE_ITEM": "删除项",
     "LEARN_MORE": "了解更多",
-    "DISMISS": "关闭"
+    "DISMISS": "关闭",
+    "LINKEDIN": "LinkedIn",
+    "ITEM_NAME": "{{item}}名称",
+    "VERSION": "版本",
+    "NOT_SET": "未设置",
+    "FOLDERS": "个文件夹",
+    "REQUESTS": "个请求",
+    "SELECT_ALL": "全选",
+    "FILE_NAME": "文件名"
   },
   "WELCOME": {
     "ABOUT_BRUNO": "用于探索和测试 API 的开源 IDE",
@@ -451,7 +459,17 @@
     "AUTH_INHERITED_FROM": "继承自 {{name}} 的认证：",
     "ADD_CUSTOM": "添加自定义方法",
     "UNABLE_TO_CREATE": "无法创建请求",
-    "CREATE_ERROR": "创建请求时发生错误"
+    "CREATE_ERROR": "创建请求时发生错误",
+    "INHERITED_HEADERS": "继承的请求头",
+    "REQUEST_HEADERS": "请求头",
+    "HIDE_INHERITED_HEADERS": "隐藏继承的请求头",
+    "SHOW_INHERITED_HEADERS": "显示继承的请求头 ({{count}})",
+    "HEADER_ADDED_AT_RUNTIME": "运行时自动添加",
+    "HEADER_CANNOT_BE_OMITTED": "HTTP 必需，无法省略",
+    "HEADER_OVERRIDDEN": "已被请求头覆盖",
+    "HEADER_OVERRIDES_DEFAULT": "将覆盖 Bruno 的默认请求头",
+    "HEADER_NAME_ERROR": "请求头名称不能包含空格或换行",
+    "HEADER_VALUE_ERROR": "请求头值不能包含换行"
   },
   "RESPONSE": {
     "STATUS": "状态码",
@@ -565,7 +583,13 @@
     "SAVED": "环境已保存",
     "GLOBAL_SAVED": "全局环境已保存",
     "FAILED_SAVE": "保存环境失败",
-    "FAILED_SAVE_GLOBAL": "保存全局环境失败"
+    "FAILED_SAVE_GLOBAL": "保存全局环境失败",
+    "INHERITED_TAB": "继承的{{tab}}",
+    "INHERITING_FROM": "正在从 {{name}} 继承变量",
+    "STOPPED_INHERITING": "已停止继承变量",
+    "SAVE_INHERIT_ERROR": "保存继承环境时发生错误",
+    "IMPORT_GLOBAL_ENVIRONMENTS": "导入全局环境",
+    "IMPORT_ENVIRONMENTS": "导入环境"
   },
   "PREFERENCES": {
     "TITLE": "首选项",
@@ -838,7 +862,9 @@
     "NO_FOLDERS_FOUND": "未找到文件夹",
     "NO_FOLDERS_AVAILABLE": "暂无可用的文件夹",
     "SELECT_COLLECTION_ERROR": "请选择要保存到的集合",
-    "COLLECTION_NOT_FOUND": "未找到目标集合"
+    "COLLECTION_NOT_FOUND": "未找到目标集合",
+    "INVALID_FILE_MODE": "请求内容无效，请先在文件模式中修复后再保存",
+    "SAVE_ERROR": "保存请求失败"
   },
   "NEW_APP": {
     "NAME_REQUIRED": "应用名称不能为空",
@@ -918,7 +944,12 @@
     "NOT_FOUND_TITLE": "未找到 Git",
     "NOT_FOUND_MSG": "系统上未检测到 Git。需要安装 Git 才能继续。",
     "DOWNLOAD_FOR_OS": "您可以在此处下载适用于 {{os}} 的 Git：",
-    "DOWNLOAD_GIT_FOR": "下载适用于 {{os}} 的 Git"
+    "DOWNLOAD_GIT_FOR": "下载适用于 {{os}} 的 Git",
+    "BRANCH": "分支",
+    "LOADING_BRANCHES": "正在加载分支...",
+    "REPOSITORY_DEFAULT": "仓库默认分支",
+    "NO_BRANCHES_MATCH": "没有匹配的分支",
+    "BRANCHES_LIST_FAILED": "无法列出此仓库的分支，克隆将使用默认分支。"
   },
   "ENVIRONMENT": {
     "IMPORTING_ENVIRONMENTS": "正在导入环境 ({{count}})",
@@ -1407,7 +1438,12 @@
     "RESPONSE_CLONED": "Mock 响应已克隆",
     "CLONE_RESPONSE_ERROR": "克隆 Mock 响应失败",
     "ROUTES_REFRESHED_DETAIL": "路由已刷新：{{routes}} 条路由，{{responses}} 条响应",
-    "PORT_VALIDATE_ERROR": "端口校验失败"
+    "PORT_VALIDATE_ERROR": "端口校验失败",
+    "CREATED_SYNC_FAILED": "Mock 服务器已创建，但同步响应失败",
+    "LOADING_COLLECTION": "正在加载集合…",
+    "STANDALONE_HELP": "独立 Mock 服务器没有数据源。请从控制台手动添加响应。",
+    "SYNC_WITH_API_SPEC_ON_CREATE": "将 Mock 响应与 API 规范同步",
+    "SYNC_WITH_COLLECTION_EXAMPLES_ON_CREATE": "将 Mock 响应与集合示例同步"
   },
   "API_SPEC": {
     "API_SPEC": "API 规范",
@@ -1719,7 +1755,11 @@
     "SOURCE_REQUEST": "请求",
     "SOURCE_COLLECTION": "集合",
     "SOURCE_FOLDER": "文件夹: {{name}}",
-    "SOURCE_FOLDER_GENERIC": "文件夹"
+    "SOURCE_FOLDER_GENERIC": "文件夹",
+    "BEFORE_CALL_START": "调用开始前脚本错误",
+    "BEFORE_MESSAGE_SEND": "消息发送前脚本错误",
+    "AFTER_MESSAGE_RECEIVE": "消息接收后脚本错误",
+    "AFTER_CALL_END": "调用结束后脚本错误"
   },
   "PROMPT_VARIABLES": {
     "INPUT_REQUIRED": "需要输入",
@@ -2123,7 +2163,35 @@
     "VERSION_UPDATED": "集合版本已更新",
     "VERSION_UPDATE_ERROR": "更新集合版本失败",
     "REQUEST_MADE_SUCCESS": "请求成功发出",
-    "CROSS_FORMAT_FOLDER_MOVE_ERROR": "不支持在不同格式的集合之间移动文件夹"
+    "CROSS_FORMAT_FOLDER_MOVE_ERROR": "不支持在不同格式的集合之间移动文件夹",
+    "ITEM_CLONED": "{{item}}已克隆！",
+    "CLONE_ITEM_ERROR": "克隆{{item}}时发生错误"
+  },
+  "GENERATE_DOCS": {
+    "TITLE": "生成文档",
+    "COLLECTION_NOT_FOUND": "未找到集合。该集合可能已被删除或不再可用。",
+    "FEATURE_1": "独立 HTML 文件，无需服务器",
+    "FEATURE_2": "交互式 API 调试台",
+    "FEATURE_3": "可托管在任意静态文件服务器上",
+    "GENERATE": "生成",
+    "GENERATE_SUCCESS": "文档生成成功",
+    "GENERATE_ERROR": "生成文档失败",
+    "LOADING_COLLECTION": "正在加载集合...",
+    "INTERACTIVE_DOCS_TITLE": "交互式 API 文档",
+    "DESCRIPTION": "生成可随处托管或与团队分享的独立 HTML 文件。",
+    "ENVIRONMENTS_TO_INCLUDE": "要包含的环境",
+    "CDN_NOTE": "生成的文件会从 CDN 加载 Bruno 的 JavaScript 和 CSS，需要联网。"
+  },
+  "ENVIRONMENT_SELECTION_LIST": {
+    "SELECTED_COUNT": "(已选 {{selectedCount}}/{{total}})"
+  },
+  "COLLECTION_VERSION_INFO": {
+    "ZERO_ENVIRONMENTS": "0 个环境"
+  },
+  "COLLECTION_ITEM_INFO": {
+    "ON_FILESYSTEM": "(文件系统)",
+    "FOLDER_HELP": "文件系统上的文件夹名称。",
+    "REQUEST_HELP": "Bruno 会将每个请求保存为集合文件夹中的一个文件。"
   },
   "RESPONSE_EXAMPLE": {
     "SELECT_STATUS": "选择状态"
@@ -2149,6 +2217,17 @@
     "NO_APP_YET": "暂无 App",
     "HINT": "在 App 标签页中添加 HTML/JS 代码，为此请求渲染自定义界面。"
   },
+  "COLLECTION_APP": {
+    "EMPTY_HINT": "在代码视图中添加 HTML/JS，即可为此应用渲染自定义界面。"
+  },
+  "CODE_EDITOR": {
+    "LABEL": "代码编辑器"
+  },
+  "EDITOR_LINK": {
+    "EDIT": "编辑链接",
+    "REMOVE": "移除链接",
+    "COPY": "复制链接"
+  },
   "CHANGE_VERSION": {
     "TITLE": "修改集合版本",
     "COLLECTION_NOT_FOUND": "未找到集合。该集合可能已被删除或不再可用。",
@@ -2157,5 +2236,15 @@
     "NEW_VERSION": "新版本",
     "VERSION_PLACEHOLDER": "例如 v1.0.0",
     "UPDATES_PREVIEW": "将 {{targetFile}} 中的 <0>{{targetKey}}</0> 从 "
+  },
+  "SUPPORT": {
+    "HELP": "帮助",
+    "COMMUNITY": "社区",
+    "DOCUMENTATION_DESCRIPTION": "指南、参考与示例",
+    "REPORT_ISSUES_DESCRIPTION": "提交缺陷或功能请求",
+    "DISCORD_DESCRIPTION": "提问并与团队交流",
+    "GITHUB_DESCRIPTION": "源码、发布与讨论",
+    "TWITTER_DESCRIPTION": "发布说明与公告",
+    "LINKEDIN_DESCRIPTION": "公司动态与更新"
   }
 }

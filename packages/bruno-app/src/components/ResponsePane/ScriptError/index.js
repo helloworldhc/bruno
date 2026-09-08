@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { IconX, IconChevronDown, IconChevronRight, IconExternalLink } from '@tabler/icons';
+import { SCRIPT_TYPES } from '@usebruno/common';
 import ErrorBanner from 'ui/ErrorBanner';
 import CodeSnippet from 'components/CodeSnippet';
 import { getTreePathFromCollectionToItem } from 'utils/collections';
@@ -211,64 +212,51 @@ const ScriptErrorCard = ({ title, message, errorContext, item, collection, scrip
   );
 };
 
+// phase key matches with the CodeEditor scriptType so the error stack navigates back to the right editor.
+const SCRIPT_PHASES = [
+  { phase: SCRIPT_TYPES.PRE_REQUEST, titleKey: 'SCRIPT_ERROR.PRE_REQUEST_ERROR', titleFallback: 'Pre-Request Script Error', messageKey: 'preRequestScriptErrorMessage', contextKey: 'preRequestScriptErrorContext' },
+  { phase: SCRIPT_TYPES.POST_RESPONSE, titleKey: 'SCRIPT_ERROR.POST_RESPONSE_ERROR', titleFallback: 'Post-Response Script Error', messageKey: 'postResponseScriptErrorMessage', contextKey: 'postResponseScriptErrorContext' },
+  { phase: SCRIPT_TYPES.TEST, titleKey: 'SCRIPT_ERROR.TEST_SCRIPT_ERROR', titleFallback: 'Test Script Error', messageKey: 'testScriptErrorMessage', contextKey: 'testScriptErrorContext' },
+  { phase: SCRIPT_TYPES.BEFORE_CALL_START, titleKey: 'SCRIPT_ERROR.BEFORE_CALL_START', titleFallback: 'Before Call Start Script Error', messageKey: 'beforeCallStartScriptErrorMessage', contextKey: 'beforeCallStartScriptErrorContext' },
+  { phase: SCRIPT_TYPES.BEFORE_MESSAGE_SEND, titleKey: 'SCRIPT_ERROR.BEFORE_MESSAGE_SEND', titleFallback: 'Before Message Send Script Error', messageKey: 'beforeMessageSendScriptErrorMessage', contextKey: 'beforeMessageSendScriptErrorContext' },
+  { phase: SCRIPT_TYPES.AFTER_MESSAGE_RECEIVE, titleKey: 'SCRIPT_ERROR.AFTER_MESSAGE_RECEIVE', titleFallback: 'After Message Receive Script Error', messageKey: 'afterMessageReceiveScriptErrorMessage', contextKey: 'afterMessageReceiveScriptErrorContext' },
+  { phase: SCRIPT_TYPES.AFTER_CALL_END, titleKey: 'SCRIPT_ERROR.AFTER_CALL_END', titleFallback: 'After Call End Script Error', messageKey: 'afterCallEndScriptErrorMessage', contextKey: 'afterCallEndScriptErrorContext' }
+];
+
+export const hasScriptError = (item) => SCRIPT_PHASES.some(({ messageKey }) => Boolean(item?.[messageKey]));
+
 const ScriptError = ({ item, collection, onClose }) => {
   const { t } = useTranslation();
-  const preRequestError = item?.preRequestScriptErrorMessage;
-  const postResponseError = item?.postResponseScriptErrorMessage;
-  const testScriptError = item?.testScriptErrorMessage;
+  const errors = SCRIPT_PHASES
+    .map((phase) => ({
+      ...phase,
+      title: t(phase.titleKey, phase.titleFallback),
+      message: item?.[phase.messageKey],
+      errorContext: item?.[phase.contextKey]
+    }))
+    .filter(({ message }) => Boolean(message));
 
-  if (!preRequestError && !postResponseError && !testScriptError) return null;
+  if (!errors.length) return null;
 
-  const preRequestContext = item?.preRequestScriptErrorContext;
-  const postResponseContext = item?.postResponseScriptErrorContext;
-  const testContext = item?.testScriptErrorContext;
-
-  const hasAnyContext = preRequestContext || postResponseContext || testContext;
-
-  // If no error context available for any error, fall back to ErrorBanner
-  if (!hasAnyContext) {
-    const errors = [];
-    if (preRequestError) errors.push({ title: t('SCRIPT_ERROR.PRE_REQUEST', 'Pre-Request Script Error'), message: preRequestError });
-    if (postResponseError) errors.push({ title: t('SCRIPT_ERROR.POST_RESPONSE', 'Post-Response Script Error'), message: postResponseError });
-    if (testScriptError) errors.push({ title: t('SCRIPT_ERROR.TEST_SCRIPT', 'Test Script Error'), message: testScriptError });
-    return <ErrorBanner errors={errors} onClose={onClose} className="mb-2" />;
+  // If no error context is available for any error, fall back to ErrorBanner
+  if (!errors.some(({ errorContext }) => Boolean(errorContext))) {
+    return <ErrorBanner errors={errors.map(({ title, message }) => ({ title, message }))} onClose={onClose} className="mb-2" />;
   }
 
   return (
     <div className="mb-2 flex flex-col gap-2">
-      {preRequestError && (
+      {errors.map(({ phase, title, message, errorContext }) => (
         <ScriptErrorCard
-          title={t('SCRIPT_ERROR.PRE_REQUEST', 'Pre-Request Script Error')}
-          message={preRequestError}
-          errorContext={preRequestContext}
+          key={phase}
+          title={title}
+          message={message}
+          errorContext={errorContext}
           item={item}
           collection={collection}
-          scriptPhase="pre-request"
+          scriptPhase={phase}
           onClose={onClose}
         />
-      )}
-      {postResponseError && (
-        <ScriptErrorCard
-          title={t('SCRIPT_ERROR.POST_RESPONSE', 'Post-Response Script Error')}
-          message={postResponseError}
-          errorContext={postResponseContext}
-          item={item}
-          collection={collection}
-          scriptPhase="post-response"
-          onClose={onClose}
-        />
-      )}
-      {testScriptError && (
-        <ScriptErrorCard
-          title={t('SCRIPT_ERROR.TEST_SCRIPT', 'Test Script Error')}
-          message={testScriptError}
-          errorContext={testContext}
-          item={item}
-          collection={collection}
-          scriptPhase="test"
-          onClose={onClose}
-        />
-      )}
+      ))}
     </div>
   );
 };

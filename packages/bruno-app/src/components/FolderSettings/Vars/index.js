@@ -22,7 +22,7 @@ const Vars = ({ collection, folder }) => {
   useTrackScroll({ ref: wrapperRef, selector: '.folder-settings-content', onChange: setScroll, initialValue: scroll });
 
   return (
-    <StyledWrapper className="w-full flex flex-col" ref={wrapperRef}>
+    <StyledWrapper className="w-full flex flex-col" ref={wrapperRef} data-testid="folder-vars-panel">
       <div>
         <div className="mb-3 title text-xs">{t('REQUEST.PRE_REQUEST', 'Pre Request')}</div>
         <VarsTable folder={folder} collection={collection} vars={requestVars} varType="request" initialScroll={scroll} isDraft={isDraft} />

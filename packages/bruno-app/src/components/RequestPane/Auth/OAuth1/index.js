@@ -140,6 +140,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
             collection={collection}
             item={item}
             isCompact
+            disableLinkAwareClick={true}
           />
         </div>
       </div>
@@ -158,6 +159,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
               item={item}
               isSecret={true}
               isCompact
+              disableLinkAwareClick={true}
             />
             {consumerSecretSensitive.showWarning && <SensitiveFieldWarning fieldName="oauth1-consumer-secret" warningMessage={consumerSecretSensitive.warningMessage} />}
           </div>
@@ -176,6 +178,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
             collection={collection}
             item={item}
             isCompact
+            disableLinkAwareClick={true}
           />
         </div>
       </div>
@@ -193,6 +196,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
             item={item}
             isSecret={true}
             isCompact
+            disableLinkAwareClick={true}
           />
           {tokenSecretSensitive.showWarning && <SensitiveFieldWarning fieldName="oauth1-token-secret" warningMessage={tokenSecretSensitive.warningMessage} />}
         </div>
@@ -351,6 +355,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
                 collection={collection}
                 item={item}
                 isCompact
+                disableLinkAwareClick={true}
               />
             </div>
           </div>
@@ -367,6 +372,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
                 collection={collection}
                 item={item}
                 isCompact
+                disableLinkAwareClick={true}
               />
             </div>
           </div>
@@ -383,6 +389,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
                 collection={collection}
                 item={item}
                 isCompact
+                disableLinkAwareClick={true}
               />
             </div>
           </div>
@@ -399,6 +406,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
                 collection={collection}
                 item={item}
                 isCompact
+                disableLinkAwareClick={true}
               />
             </div>
           </div>
@@ -415,6 +423,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
                 collection={collection}
                 item={item}
                 isCompact
+                disableLinkAwareClick={true}
               />
             </div>
           </div>
@@ -431,6 +440,7 @@ const OAuth1 = ({ item = {}, collection, request, save, updateAuth }) => {
                 collection={collection}
                 item={item}
                 isCompact
+                disableLinkAwareClick={true}
               />
             </div>
           </div>

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, memo } from 'react';
 import { Virtuoso } from 'react-virtuoso';
+import { IconDatabase } from '@tabler/icons';
 import ColorBadge from 'components/ColorBadge';
 import { useTranslation } from 'react-i18next';
 
@@ -25,11 +26,10 @@ const EnvironmentSelectionList = ({
   selectedUids = [],
   onToggle,
   onToggleAll,
-  title,
-  disabled = false
+  title
 }) => {
   const { t } = useTranslation();
-  const displayTitle = title || t('ENVIRONMENTS.TITLE', 'Environments');
+  const displayTitle = title || t('ENVIRONMENTS.ENVIRONMENTS', 'Environments');
   // O(1) membership checks regardless of how many environments are rendered.
   const selectedSet = useMemo(() => new Set(selectedUids), [selectedUids]);
 
@@ -58,7 +58,6 @@ const EnvironmentSelectionList = ({
           type="checkbox"
           className="env-checkbox"
           checked={selectedSet.has(env?.uid)}
-          disabled={disabled}
           onChange={() => onToggle?.(env?.uid)}
           data-testid={`env-select-${env?.uid}`}
         />
@@ -66,7 +65,7 @@ const EnvironmentSelectionList = ({
         <span className="env-name truncate">{env?.name}</span>
       </label>
     ),
-    [selectedSet, disabled, onToggle]
+    [selectedSet, onToggle]
   );
 
   if (!environments.length) {
@@ -80,9 +79,12 @@ const EnvironmentSelectionList = ({
     <>
       <div className="env-section-header">
         <div className="env-section-heading">
-          <h4 className="env-section-title" data-testid="env-section-title">{displayTitle}</h4>
+          <h4 className="env-section-title" data-testid="env-section-title">
+            <IconDatabase className="env-section-icon" size={16} strokeWidth={1.33} aria-hidden="true" />
+            {displayTitle}
+          </h4>
           <span className="env-section-count" data-testid="env-selected-count">
-            {t('ENVIRONMENT_SELECTION_LIST.SELECTED_COUNT', `(${selectedCount}/${environments.length} selected)`, {
+            {t('ENVIRONMENT_SELECTION_LIST.SELECTED_COUNT', '({{selectedCount}}/{{total}} selected)', {
               selectedCount,
               total: environments.length
             })}
@@ -94,7 +96,6 @@ const EnvironmentSelectionList = ({
             type="checkbox"
             className="env-checkbox"
             checked={allSelected}
-            disabled={disabled}
             onChange={handleToggleAll}
             data-testid="env-select-all"
           />

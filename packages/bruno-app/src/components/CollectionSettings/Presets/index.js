@@ -92,7 +92,7 @@ const PresetsSettings = ({ collection }) => {
             type="text"
             name="requestUrl"
             placeholder={t('COLLECTION_SETTINGS.REQUEST_URL', 'Request URL')}
-            className="block textbox preset-input"
+            className="block textbox preset-input mousetrap"
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"

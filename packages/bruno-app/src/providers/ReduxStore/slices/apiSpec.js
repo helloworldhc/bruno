@@ -13,7 +13,7 @@ export const apiSpecSlice = createSlice({
   initialState,
   reducers: {
     apiSpecAddFileEvent: (state, action) => {
-      const { name, raw, uid, filename, pathname, json } = action?.payload?.data || {};
+      const { name, raw, uid, filename, pathname, json, resolvedJson } = action?.payload?.data || {};
       if (!uid) {
         toast.error(i18n.t('API_SPEC.ERROR_ADDING', 'Error adding API spec'));
       }
@@ -24,6 +24,7 @@ export const apiSpecSlice = createSlice({
         apiSpec.filename = filename;
         apiSpec.pathname = pathname;
         apiSpec.json = json;
+        apiSpec.resolvedJson = resolvedJson;
       } else {
         const newApiSpec = {
           name,
@@ -31,14 +32,15 @@ export const apiSpecSlice = createSlice({
           uid,
           filename,
           pathname,
-          json
+          json,
+          resolvedJson
         };
         state.apiSpecs.push(newApiSpec);
       }
       state.activeApiSpecUid = uid;
     },
     apiSpecChangeFileEvent: (state, action) => {
-      const { name, raw, uid, filename, pathname, json } = action?.payload?.data || {};
+      const { name, raw, uid, filename, pathname, json, resolvedJson } = action?.payload?.data || {};
       if (!uid) return;
 
       const apiSpec = findApiSpecByUid(state.apiSpecs, uid);
@@ -48,6 +50,7 @@ export const apiSpecSlice = createSlice({
         apiSpec.filename = filename;
         apiSpec.pathname = pathname;
         apiSpec.json = json;
+        apiSpec.resolvedJson = resolvedJson;
       }
     },
     saveApiSpec: (state, action) => {

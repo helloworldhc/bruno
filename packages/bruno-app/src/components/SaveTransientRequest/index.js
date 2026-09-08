@@ -13,13 +13,12 @@ import CollectionListItem from './CollectionListItem';
 import FolderBreadcrumbs from './FolderBreadcrumbs';
 import useCollectionFolderTree from 'hooks/useCollectionFolderTree';
 import { removeSaveTransientRequestModal } from 'providers/ReduxStore/slices/collections';
-import { addTab } from 'providers/ReduxStore/slices/tabs';
 import { insertTaskIntoQueue } from 'providers/ReduxStore/slices/app';
 import { newFolder, closeTabs, mountCollection, createCollection, browseDirectory } from 'providers/ReduxStore/slices/collections/actions';
 import { sanitizeName, validateName, validateNameError } from 'utils/common/regex';
 import { resolveRequestFilename } from 'utils/common/platform';
 import path, { normalizePath } from 'utils/common/path';
-import { transformRequestToSaveToFilesystem, findCollectionByUid, findItemInCollection, getDefaultRequestPaneTab } from 'utils/collections';
+import { transformRequestToSaveToFilesystem, findCollectionByUid, findItemInCollection } from 'utils/collections';
 import { DEFAULT_COLLECTION_FORMAT } from 'utils/common/constants';
 import { itemSchema } from '@usebruno/schema';
 import { uuid } from 'utils/common';
@@ -93,6 +92,7 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
     navigateIntoFolder,
     navigateToBreadcrumb,
     navigateToRoot,
+    getCurrentSelectedFolder,
     reset
   } = useCollectionFolderTree(folderTreeCollectionUid);
 
@@ -139,7 +139,11 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
     handleClose();
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    if (!item || !collection || !latestItem) {
+      return;
+    }
+
     const trimmedName = requestName.trim();
     if (!trimmedName) {
       toast.error(t('NEW_REQUEST.NAME_REQUIRED', 'Request name is required'));
@@ -151,7 +155,6 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
       return;
     }
 
-    // Determine target collection
     let targetCollection = collection;
     if (isScratchCollection) {
       if (!selectedTargetCollectionPath) {
@@ -167,95 +170,85 @@ const SaveTransientRequest = ({ item: itemProp, collection: collectionProp, isOp
       }
     }
 
-    const currentFilename = sanitizeName(trimmedName);
-    const existingFilenames = currentFolders
-      .map((i) => i.filename)
-      .filter((filename) => Boolean(filename));
-
-    let resolvedFilename;
     try {
-      resolvedFilename = resolveRequestFilename(
-        currentFilename,
-        existingFilenames,
-        targetCollection?.format || DEFAULT_COLLECTION_FORMAT
-      );
-    } catch (err) {
-      toast.error(err.message);
-      return;
-    }
+      const { ipcRenderer } = window;
 
-    const baseRequestItem = latestItem || item;
-    const requestData = {
-      ...baseRequestItem,
-      name: trimmedName,
-      filename: resolvedFilename
-    };
+      const selectedFolder = getCurrentSelectedFolder();
+      const targetDirname = selectedFolder ? selectedFolder.pathname : targetCollection.pathname;
+      const sanitizedFilename = sanitizeName(trimmedName);
 
-    if (isScratchCollection) {
-      const sourceItemUid = item.uid;
-      const targetCollectionUid = targetCollection.uid;
-      const targetFolderUid = selectedFolderUid;
-
-      const itemToSave = transformRequestToSaveToFilesystem(requestData);
-
-      itemSchema
-        .validate(itemToSave)
-        .then(() => {
-          window.ipcRenderer
-            .invoke('renderer:save-request-to-collection', {
-              item: itemToSave,
-              targetCollectionUid,
-              targetFolderUid
-            })
-            .then((result) => {
-              if (result && result.error) {
-                toast.error(formatIpcError(result.error));
-                return;
-              }
-              const savedItemUid = result?.itemUid;
-              if (savedItemUid) {
-                dispatch(
-                  insertTaskIntoQueue({
-                    uid: uuid(),
-                    type: 'SAVE_TRANSIENT_REQUEST',
-                    itemUid: savedItemUid,
-                    collectionUid: targetCollectionUid
-                  })
-                );
-                dispatch(closeTabs({ tabUids: [sourceItemUid] }));
-                dispatch(
-                  addTab({
-                    uid: savedItemUid,
-                    collectionUid: targetCollectionUid,
-                    requestPaneTab: getDefaultRequestPaneTab(itemToSave)
-                  })
-                );
-              }
-              handleClose();
-            })
-            .catch((err) => {
-              toast.error(formatIpcError(err));
-            });
-        })
-        .catch((err) => {
-          console.error(err);
-          toast.error(err.message);
-        });
-    } else {
-      dispatch(
-        insertTaskIntoQueue({
-          uid: uuid(),
-          type: 'SAVE_TRANSIENT_REQUEST',
-          itemUid: item.uid,
-          collectionUid: collection.uid,
-          targetFolderUid: selectedFolderUid,
-          data: requestData
-        })
-      );
-      if (closeAfterSave) {
-        dispatch(closeTabs({ tabUids: [item.uid] }));
+      const hasFileModeEdit = latestItem.draft?.raw != null && latestItem.draft.raw !== latestItem.raw;
+      let baseItem;
+      if (hasFileModeEdit) {
+        const rawSourceFormat = collection.format || DEFAULT_COLLECTION_FORMAT;
+        try {
+          const parsed = await ipcRenderer.invoke(
+            'renderer:convert-to-json',
+            latestItem,
+            latestItem.draft.raw,
+            rawSourceFormat
+          );
+          baseItem = { ...latestItem, ...parsed, uid: latestItem.uid, pathname: latestItem.pathname };
+        } catch (err) {
+          toast.error(formatIpcError(err) || t('SAVE_TRANSIENT_REQUEST.INVALID_FILE_MODE', 'Invalid request content - fix it in file mode before saving'));
+          return;
+        }
+      } else {
+        baseItem = latestItem.draft ? { ...latestItem, ...latestItem.draft } : { ...latestItem };
       }
+
+      const itemToSave = { ...baseItem };
+      itemToSave.name = sanitizedFilename;
+      delete itemToSave.draft;
+      delete itemToSave.raw;
+
+      const transformedItem = transformRequestToSaveToFilesystem(itemToSave);
+      await itemSchema.validate(transformedItem);
+
+      const targetFormat = targetCollection.format || DEFAULT_COLLECTION_FORMAT;
+      const sourceFormat = collection.format || DEFAULT_COLLECTION_FORMAT;
+      const targetFilename = resolveRequestFilename(sanitizedFilename, targetFormat);
+      const targetPathname = path.join(targetDirname, targetFilename);
+
+      const saveResult = await ipcRenderer.invoke('renderer:save-transient-request', {
+        sourcePathname: item.pathname,
+        targetDirname,
+        targetFilename,
+        request: transformedItem,
+        format: targetFormat,
+        sourceFormat
+      });
+
+      // use the path resolved by the handler.
+      const savedPathname = saveResult?.newPathname || targetPathname;
+
+      if (!closeAfterSave) {
+        dispatch(
+          insertTaskIntoQueue({
+            uid: uuid(),
+            type: 'OPEN_REQUEST',
+            collectionUid: targetCollection.uid,
+            itemPathname: savedPathname,
+            preview: false
+          })
+        );
+      }
+
+      dispatch(closeTabs({ tabUids: [item.uid] }));
+
+      dispatch({
+        type: 'collections/deleteItem',
+        payload: {
+          itemUid: item.uid,
+          collectionUid: collection.uid
+        }
+      });
+
+      toast.success(t('COLLECTIONS.REQUEST_SAVED_SUCCESS', 'Request saved successfully'));
       handleClose();
+    } catch (err) {
+      toast.error(formatIpcError(err) || t('SAVE_TRANSIENT_REQUEST.SAVE_ERROR', 'Failed to save request'));
+      console.error('Error saving request:', err);
     }
   };
 

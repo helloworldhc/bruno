@@ -68,6 +68,7 @@ const ApiKeyAuth = ({ collection }) => {
           onChange={(val) => handleAuthChange('key', val)}
           collection={collection}
           isCompact
+          disableLinkAwareClick={true}
         />
       </div>
 
@@ -80,6 +81,7 @@ const ApiKeyAuth = ({ collection }) => {
           onChange={(val) => handleAuthChange('value', val)}
           collection={collection}
           isCompact
+          disableLinkAwareClick={true}
         />
       </div>
 
@@ -92,14 +94,16 @@ const ApiKeyAuth = ({ collection }) => {
               dropdownTippyRef.current.hide();
               handleAuthChange('placement', 'header');
             }}
-          >{t('AUTH.HEADER', 'Header')}</div>
+          >{t('AUTH.HEADER', 'Header')}
+          </div>
           <div
             className="dropdown-item"
             onClick={() => {
               dropdownTippyRef.current.hide();
               handleAuthChange('placement', 'queryparams');
             }}
-          >{t('AUTH.QUERY_PARAM', 'Query Params')}</div>
+          >{t('AUTH.QUERY_PARAM', 'Query Params')}
+          </div>
         </Dropdown>
       </div>
     </StyledWrapper>

@@ -1,11 +1,13 @@
 import React from 'react';
 import Modal from 'components/Modal';
 import Help from 'components/Help';
+import { getItemTypeLabel } from 'utils/collections';
 import { useTranslation } from 'react-i18next';
 
 const CollectionItemInfo = ({ item, onClose }) => {
   const { t } = useTranslation();
   const { name, filename, type } = item;
+  const itemTypeLabel = getItemTypeLabel(item);
 
   return (
     <Modal
@@ -20,7 +22,7 @@ const CollectionItemInfo = ({ item, onClose }) => {
           <tbody>
             <tr className="">
               <td className="py-2 px-2 text-left text-muted ">
-                {type == 'folder' ? t('COMMON.FOLDER_NAME', 'Folder Name') : t('COMMON.REQUEST_NAME', 'Request Name')}
+                {t('COMMON.ITEM_NAME', '{{item}} Name', { item: itemTypeLabel })}
               </td>
               <td className="py-2 px-2 text-nowrap truncate max-w-[500px]" title={name}>
                 <span className="mr-2">:</span>{name}
@@ -39,7 +41,7 @@ const CollectionItemInfo = ({ item, onClose }) => {
                 ) : (
                   <Help width="300">
                     <p>
-                      {t('COLLECTION_ITEM_INFO.REQUEST_HELP', "Bruno saves each request as a file in your collection's folder.")}
+                      {t('COLLECTION_ITEM_INFO.REQUEST_HELP', 'Bruno saves each request as a file in your collection\'s folder.')}
                     </p>
                   </Help>
                 )}

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import { useDispatch } from 'react-redux';
+import { resolveEnvironmentInheritance } from '@usebruno/common/utils';
 import { sendNetworkRequest } from 'utils/network/index';
 import { findEnvironmentInCollection } from 'utils/collections';
 import {
@@ -12,9 +13,8 @@ import { updateRequestPaneTab, setTabAppPreview } from 'providers/ReduxStore/sli
 import { addLog } from 'providers/ReduxStore/slices/logs';
 import { uuid } from 'utils/common';
 import { useTheme } from 'providers/Theme';
-import Button from 'ui/Button';
+import EmptyAppState from 'components/EmptyAppState';
 import StyledWrapper from './StyledWrapper';
-import EmptyAppState from './EmptyAppState';
 import { useTranslation } from 'react-i18next';
 import { buildVariables } from './buildVariables';
 import {
@@ -162,7 +162,11 @@ const AppView = ({ item, collection, code }) => {
   );
 
   const environment = useMemo(
-    () => findEnvironmentInCollection(collection, collection.activeEnvironmentUid),
+    () =>
+      resolveEnvironmentInheritance({
+        environments: collection.environments,
+        targetEnvironment: findEnvironmentInCollection(collection, collection.activeEnvironmentUid)
+      }),
     [collection]
   );
   const variables = useMemo(() => buildVariables(collection, item), [collection, item]);
@@ -297,10 +301,6 @@ const AppView = ({ item, collection, code }) => {
     dispatch(setTabAppPreview({ uid: item.uid, appPreview: false }));
   }, [dispatch, item.uid]);
 
-  const openAppsDocs = useCallback(() => {
-    window?.ipcRenderer?.openExternal('https://link.usebruno.com/apps');
-  }, []);
-
   return (
     <StyledWrapper data-testid="app-view">
       <div className="app-view-toolbar">
@@ -321,30 +321,8 @@ const AppView = ({ item, collection, code }) => {
         </div>
       ) : (
         <EmptyAppState
-          title={t('APP_VIEW.NO_APP_YET', 'No app yet')}
           hint={t('APP_VIEW.HINT', 'Add HTML/JS in the App tab to render a custom UI for this request.')}
-          actions={(
-            <>
-              <Button
-                size="sm"
-                variant="filled"
-                color="primary"
-                onClick={goToAppTab}
-                data-testid="empty-app-add-code"
-              >
-                {t('APP.ADD_APP_CODE', 'Add app code')}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                color="secondary"
-                onClick={openAppsDocs}
-                data-testid="empty-app-learn-more"
-              >
-                {t('COMMON.LEARN_MORE', 'Learn more')}
-              </Button>
-            </>
-          )}
+          onAddCode={goToAppTab}
         />
       )}
     </StyledWrapper>

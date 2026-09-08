@@ -12,14 +12,13 @@ import Portal from 'components/Portal';
 import StyledWrapper from './StyledWrapper';
 import CollectionVersionInfo from './CollectionVersionInfo';
 import EnvironmentSelectionList from './EnvironmentSelectionList';
+import Advanced from './Advanced';
 import { useApp } from 'providers/App';
-import { transformCollectionToSaveToExportAsFile, findCollectionByUid, areItemsLoading, sortItemsBySidebarOrder, getCollectionItemCounts, getCollectionVersion } from 'utils/collections/index';
+import useCollectionGitRemoteUrl from 'hooks/useCollectionGitRemoteUrl';
+import { transformCollectionToSaveToExportAsFile, findCollectionByUid, areItemsLoading, sortItemsBySidebarOrder, getCollectionItemCounts, getCollectionVersion, getUniqueTagsFromItems } from 'utils/collections/index';
 import { brunoToOpenCollection } from '@usebruno/converters';
-import { sanitizeName } from 'utils/common/regex';
-import { escapeHtml } from 'utils/response';
+import { generateApiDocsHtml, getApiDocsFileName } from '@usebruno/common';
 import { useTranslation } from 'react-i18next';
-
-const CDN_BASE_URL = 'https://cdn.usebruno.com';
 
 const CollectionNotFound = ({ onClose }) => {
   const { t } = useTranslation();
@@ -36,32 +35,6 @@ const CollectionNotFound = ({ onClose }) => {
     </Portal>
   );
 };
-
-const buildHtmlDocument = (collectionName, escapedYamlContent) => `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${collectionName} - API Documentation</title>
-    <style>
-        body { margin: 0; padding: 0; }
-        #opencollection-container { width: 100vw; height: 100vh; }
-    </style>
-    <link rel="stylesheet" href="${CDN_BASE_URL}/api-docs/api-docs.css">
-    <script src="${CDN_BASE_URL}/api-docs/api-docs.js"></script>
-</head>
-<body>
-    <div id="opencollection-container"></div>
-    <script>
-        const collectionData = ${escapedYamlContent};
-        new window.OpenCollection({
-            target: document.getElementById('opencollection-container'),
-            opencollection: collectionData,
-            theme: 'light'
-        });
-    </script>
-</body>
-</html>`;
 
 const GenerateDocumentation = ({ onClose, collectionUid }) => {
   const { t } = useTranslation();
@@ -83,7 +56,6 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
 
   const currentVersion = getCollectionVersion(collection);
 
-  // Folder + request counts, computed from the collection tree (recursively).
   const { folderCount, requestCount } = useMemo(
     () => getCollectionItemCounts(collection?.items),
     [collection?.items]
@@ -110,63 +82,46 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
     });
   }, []);
 
-  // Select all -> every environment selected; deselect all -> nothing selected.
   const toggleAllEnvs = useCallback(
     (selectAll) => setSelectedEnvUidsSet(selectAll ? new Set(environments.map((env) => env.uid)) : new Set()),
     [environments]
   );
 
+  const availableTags = useMemo(
+    () => getUniqueTagsFromItems(collection?.items || [], { includeDrafts: false }),
+    [collection?.items]
+  );
+  const [filterByTags, setFilterByTags] = useState(false);
+  const [docTags, setDocTags] = useState({ include: [], exclude: [] });
+  const [includeGitLink, setIncludeGitLink] = useState(true);
+  const { gitCollectionUrl, isResolved: gitUrlLoaded } = useCollectionGitRemoteUrl(collection?.pathname);
+  const hasGitUrl = gitUrlLoaded && Boolean(gitCollectionUrl);
+
   const handleGenerate = useCallback(() => {
     try {
       const collectionCopy = cloneDeep(collection);
 
-      // Order items exactly like the Sidebar tree (folders by seq, then requests by seq
-      // ) at every depth, so the generated docs match the collection shown in the sidebar.
+      // Match the sidebar's ordering (folders then requests, by seq, at every depth)
+      // so the generated docs read in the same order as the collection tree.
       collectionCopy.items = sortItemsBySidebarOrder(collectionCopy.items);
 
-      // Only include the environments the user explicitly selected in the generated docs.
-      const selectedSet = new Set(selectedEnvUids);
-      collectionCopy.environments = (collectionCopy.environments || []).filter((env) => selectedSet.has(env.uid));
+      collectionCopy.environments = (collectionCopy.environments || []).filter((env) => selectedEnvUidsSet.has(env.uid));
 
       const transformedCollection = transformCollectionToSaveToExportAsFile(collectionCopy);
-      const openCollection = brunoToOpenCollection(transformedCollection);
 
-      // The docs are generated from the current collection version (when set).
-      if (currentVersion) {
-        openCollection.info = {
-          ...openCollection.info,
-          version: currentVersion
-        };
-      }
-
-      openCollection.extensions = {
-        ...openCollection.extensions,
-        bruno: {
-          ...openCollection.extensions?.bruno,
+      const htmlContent = generateApiDocsHtml(
+        transformedCollection,
+        {
+          tags: filterByTags ? docTags : { include: [], exclude: [] },
+          gitCollectionUrl: includeGitLink ? gitCollectionUrl : undefined,
+          collectionVersion: currentVersion,
           exportedAt: new Date().toISOString(),
           exportedUsing: version ? `Bruno/${version}` : 'Bruno'
-        }
-      };
-
-      const yamlContent = jsyaml.dump(openCollection, {
-        indent: 2,
-        lineWidth: -1,
-        noRefs: true,
-        sortKeys: false
-      });
-
-      // jsesc handles all edge cases: Unicode, special chars, quotes, template literals, etc.
-      let escapedYaml = jsesc(yamlContent, { quotes: 'double', wrap: true });
-
-      // Escape closing tags to prevent HTML parser from breaking out of the script block
-      escapedYaml = escapedYaml.replace(/<\//g, '<\\/');
-
-      const htmlContent = buildHtmlDocument(
-        escapeHtml(collection.name),
-        escapedYaml
+        },
+        { brunoToOpenCollection, dumpYaml: jsyaml.dump, escapeString: jsesc }
       );
 
-      const fileName = `${sanitizeName(collection.name)}-documentation.html`;
+      const fileName = getApiDocsFileName(collection.name);
       FileSaver.saveAs(new Blob([htmlContent], { type: 'text/html' }), fileName);
 
       toast.success(t('GENERATE_DOCS.GENERATE_SUCCESS', 'Documentation generated successfully'));
@@ -175,7 +130,7 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
       console.error('Error generating documentation:', error);
       toast.error(t('GENERATE_DOCS.GENERATE_ERROR', 'Failed to generate documentation'));
     }
-  }, [collection, version, onClose, currentVersion, selectedEnvUids, t]);
+  }, [collection, version, onClose, currentVersion, selectedEnvUidsSet, filterByTags, docTags, includeGitLink, gitCollectionUrl, t]);
 
   if (!collection) {
     return <CollectionNotFound onClose={onClose} />;
@@ -190,18 +145,18 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
         cancelText={t('COMMON.CANCEL', 'Cancel')}
         handleConfirm={isLoading ? undefined : handleGenerate}
         handleCancel={onClose}
-        confirmDisabled={isLoading}
+        confirmDisabled={isLoading || (includeGitLink && !gitUrlLoaded)}
       >
         <StyledWrapper>
           {isLoading ? (
             <div className="flex items-center justify-center gap-3 py-8">
-              <IconLoader2 size={20} className="animate-spin" />
+              <IconLoader2 size={20} className="animate-spin" aria-hidden="true" />
               <span>{t('GENERATE_DOCS.LOADING_COLLECTION', 'Loading collection...')}</span>
             </div>
           ) : (
             <div className="content">
               <h3 className="title flex items-center gap-2 mt-2 font-medium">
-                <IconBook size={18} />
+                <IconBook size={18} aria-hidden="true" />
                 <span>{t('GENERATE_DOCS.INTERACTIVE_DOCS_TITLE', 'Interactive API Documentation')}</span>
               </h3>
               <p className="description mb-4">
@@ -211,7 +166,7 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
               <ul className="features flex flex-col list-none gap-2 p-0 mb-4">
                 {features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2.5">
-                    <IconCheck size={16} className="check-icon flex-shrink-0" />
+                    <IconCheck size={16} className="check-icon flex-shrink-0" aria-hidden="true" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -233,10 +188,22 @@ const GenerateDocumentation = ({ onClose, collectionUid }) => {
                     </div>
                   </Fragment>
                 )}
+
+                <div className="card-divider" />
+                <Advanced
+                  filterByTags={filterByTags}
+                  onFilterModeChange={setFilterByTags}
+                  tags={docTags}
+                  availableTags={availableTags}
+                  onTagsChange={setDocTags}
+                  includeGitLink={includeGitLink}
+                  onGitLinkToggle={() => setIncludeGitLink((prev) => !prev)}
+                  hasGitUrl={hasGitUrl}
+                />
               </div>
 
               <p className="note m-0">
-                {t('GENERATE_DOCS.CDN_NOTE', "The generated file loads Bruno's JavaScript and CSS files from a CDN, which requires an internet connection.")}
+                {t('GENERATE_DOCS.CDN_NOTE', 'The generated file loads Bruno\'s JavaScript and CSS files from a CDN, which requires an internet connection.')}
               </p>
             </div>
           )}

@@ -50,6 +50,7 @@ const Documentation = ({ item, collection }) => {
         onEdit={onEdit}
         onSave={onSave}
         isEditing={isEditing}
+        item={item}
         collection={collection}
         collectionPath={collection?.pathname}
         onRequestEdit={() => setEditing(true)}

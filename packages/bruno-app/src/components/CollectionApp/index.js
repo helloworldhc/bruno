@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import { useDispatch, useSelector } from 'react-redux';
+import { resolveEnvironmentInheritance } from '@usebruno/common/utils';
 import { sendNetworkRequest } from 'utils/network/index';
 import {
   findEnvironmentInCollection,
@@ -24,7 +25,7 @@ import CodeEditor from 'components/CodeEditor';
 import AIAssist from 'components/AIAssist';
 import { buildAiVariablesPayload, buildDocsContextFromCollection } from 'utils/ai';
 import StyledWrapper from './StyledWrapper';
-import EmptyAppState from '../AppView/EmptyAppState';
+import EmptyAppState from 'components/EmptyAppState';
 import { buildVariables } from '../AppView/buildVariables';
 import {
   SENTINEL,
@@ -195,7 +196,11 @@ const CollectionApp = ({ item, collection }) => {
   );
 
   const environment = useMemo(
-    () => findEnvironmentInCollection(collection, collection.activeEnvironmentUid),
+    () =>
+      resolveEnvironmentInheritance({
+        environments: collection.environments,
+        targetEnvironment: findEnvironmentInCollection(collection, collection.activeEnvironmentUid)
+      }),
     [collection]
   );
   const variables = useMemo(() => buildVariables(collection), [collection]);
@@ -403,8 +408,8 @@ const CollectionApp = ({ item, collection }) => {
       ) : (
         <div className="app-pane" data-testid="collection-app-preview">
           <EmptyAppState
-            title={t('APP_VIEW.NO_APP_YET', 'No app yet')}
-            hint={t('COLLECTION_APP.EMPTY_HINT', 'Switch to Code and write some HTML/JS')}
+            hint={t('COLLECTION_APP.EMPTY_HINT', 'Add HTML/JS in the Code view to render a custom UI for this app.')}
+            onAddCode={() => setView('code')}
           />
         </div>
       )}

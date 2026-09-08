@@ -5,12 +5,12 @@ import * as Yup from 'yup';
 import Modal from 'components/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { isItemAFolder } from 'utils/tabs';
+import { getItemTypeLabel } from 'utils/collections';
 import { cloneItem } from 'providers/ReduxStore/slices/collections/actions';
 import { IconArrowBackUp, IconEdit, IconCaretDown } from '@tabler/icons';
 import { sanitizeName, validateName, validateNameError } from 'utils/common/regex';
 import Help from 'components/Help';
 import PathDisplay from 'components/PathDisplay/index';
-import path from 'utils/common/path';
 import Portal from 'components/Portal';
 import Dropdown from 'components/Dropdown';
 import StyledWrapper from './StyledWrapper';
@@ -26,6 +26,7 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
   const [isEditing, toggleEditing] = useState(false);
   const itemName = item?.name;
   const itemType = item?.type;
+  const itemTypeLabel = getItemTypeLabel(item);
   const [showFilesystemName, toggleShowFilesystemName] = useState(false);
 
   const dropdownTippyRef = useRef();
@@ -55,11 +56,11 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
     onSubmit: (values) => {
       dispatch(cloneItem(values.name, values.filename, item.uid, collectionUid))
         .then(() => {
-          toast.success(t('COLLECTIONS.REQUEST_CLONED', 'Request cloned!'));
+          toast.success(t('COLLECTIONS.ITEM_CLONED', '{{item}} cloned!', { item: itemTypeLabel }));
           onClose();
         })
         .catch((err) => {
-          toast.error(err ? err.message : 'An error occurred while cloning the request');
+          toast.error(err ? err.message : t('COLLECTIONS.CLONE_ITEM_ERROR', 'An error occurred while cloning the {{item}}', { item: itemTypeLabel.toLowerCase() }));
         });
     }
   });
@@ -89,14 +90,14 @@ const CloneCollectionItem = ({ collectionUid, item, onClose }) => {
       <StyledWrapper>
         <Modal
           size="md"
-          title={`${t('COMMON.CLONE', 'Clone')} ${isFolder ? t('NEW_FOLDER.TITLE', 'Folder') : t('REQUEST.REQUEST', 'Request')}`}
+          title={`${t('COMMON.CLONE', 'Clone')} ${itemTypeLabel}`}
           handleCancel={onClose}
           hideFooter
         >
           <form className="bruno-form" onSubmit={formik.handleSubmit}>
             <div>
               <label htmlFor="name" className="block font-medium">
-                {isFolder ? t('NEW_FOLDER.NAME_LABEL', 'Folder Name') : t('NEW_REQUEST.NAME_LABEL', 'Request Name')}
+                {t('COMMON.ITEM_NAME', '{{item}} Name', { item: itemTypeLabel })}
               </label>
               <input
                 id="collection-item-name"
