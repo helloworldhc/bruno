@@ -8,6 +8,17 @@ on:
         required: false
         type: boolean
         default: false
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+    paths:
+      - 'packages/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.nvmrc'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -71,7 +82,7 @@ jobs:
           retention-days: 30
 
       - name: Create GitHub Release
-        if: ${{ inputs.create_release }}
+        if: ${{ inputs.create_release || startsWith(github.ref, 'refs/tags/v') }}
         uses: softprops/action-gh-release@v2
         with:
           draft: true
